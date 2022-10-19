@@ -24,12 +24,20 @@
           <div class="cell-block" :style="getCellHeight(scope.row[column.prop])"  :data-td="column.prop">
             <template v-for="(mark, index) in scope.row[column.prop]">
               <div
+                v-if="index < limit"
                 class="ganttd"
                 :key="index"
                 :data-td="column.prop"
                 @click="tdClick(scope.row[column.prop], mark)"
                 :style="getTdStyle(mark, index)">{{ mark.name }}</div>
             </template>
+            <div
+              class="ganttd__else"
+              :style="getTdStyle({ beyondBlock: 0 }, limit)"
+              :data-td="column.prop"
+              v-if="scope.row[column.prop] && limit < scope.row[column.prop].length">
+              还有 {{ scope.row[column.prop].length -  limit }} 个{{ cellMoreTitle }}...
+            </div>
           </div>
         </template>
       </el-table-column>
@@ -75,6 +83,36 @@ export default {
   name: 'EasyGantt',
   components: {
     // DateTable
+  },
+  props: {
+    // 行数限制
+    limit: {
+      type: Number,
+      default: 2
+    },
+    // 更多标题
+    cellMoreTitle: {
+      type: String,
+      default: '工单'
+    },
+    // 鼠标滑动添加
+    moveToAdd: {
+      type: Boolean,
+      default: true
+    },
+    // 使用自定义弹窗
+    usePersonalTips: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    tdBlockHeight () {
+      return 25
+    },
+    tdPaddingTop () {
+      return 9
+    }
   },
   data () {
     return {
@@ -238,8 +276,9 @@ export default {
       const right = -data.beyondBlock * 100 // 负数为跨时间渲染，需要占到隔壁时间
       return `
       user-select: none;
+      height: ${this.tdBlockHeight}px;
       right: calc(${right}% + 10px);
-      top: ${index * 25 + 12}px
+      top: ${index * this.tdBlockHeight + this.tdPaddingTop * (index + 1)}px
       `
       // right: calc(${right}% + 10px);  距离单元格右侧距离，
       // top: ${index * 25 + 12}px （数据index * 色块高度 + 单元格上边距12）
@@ -248,9 +287,10 @@ export default {
      * @dscription: 单元格高度。 渲染色块是 absolute 布局，所以单元格也需要随着色块数，自动撑开
      */
     getCellHeight (data) {
-      let height = 25
+      let height = this.tdBlockHeight
       if (data && data.length) {
-        height = data.length * 25
+        const length = data.length > this.limit ? this.limit + 1 : data.length
+        height = length * this.tdBlockHeight + (length - 1) * this.tdPaddingTop
       }
       return `height: ${height}px;`
     },
@@ -280,6 +320,9 @@ export default {
       this.moveTop = null
     },
     mousedown (e) {
+      if (!this.moveToAdd) {
+        return
+      }
       // const reg = /row-id\d+/
       // this.handleRow = e.target.className.match(reg)[0]
       if (e.target.className === 'ganttd') return
@@ -306,6 +349,16 @@ export default {
       if (this.handleEnd) {
         if (this.beyondBlock({ start: this.handleStart, end: this.handleEnd }) < 0) { // 从右往左选
           [this.handleStart, this.handleEnd] = [this.handleEnd, this.handleStart] // 交换开始合结束位置
+        }
+        if (this.usePersonalTips) {
+          const select = {
+            start: this.headEnum[this.handleStart].label,
+            end: this.headEnum[this.handleEnd].label
+          }
+          this.$emit('seletcRange', select)
+          console.log(select)
+          this.handleClose('init')
+          return
         }
         this.dialogVisible = true
       } else {
@@ -340,7 +393,7 @@ export default {
       for (let i = 0; i < td.length; i++) {
         const _this = td[i]
         if (this.dialogVisible || type === 'init') {
-          _this.className = _this.className.replace(' showColor', '')
+          _this.className = _this.className.replace(' easy-gantt__showColor', '')
           continue
         }
         const domrect = _this.getBoundingClientRect()
@@ -358,10 +411,10 @@ export default {
 
         // 鼠标滑动区域 与 当前行的单元格重叠，即为选中的时间跨度
         if (b1 < t2 || l1 > r2 || t1 > b2 || r1 < l2) {
-          _this.className = _this.className.replace(' showColor', '')
+          _this.className = _this.className.replace(' easy-gantt__showColor', '')
         } else {
-          _this.className = _this.className.replace(' showColor', '')
-          _this.className = _this.className + ' showColor'
+          _this.className = _this.className.replace(' easy-gantt__showColor', '')
+          _this.className = _this.className + ' easy-gantt__showColor'
         }
       }
     }
@@ -370,24 +423,52 @@ export default {
 </script>
 
 <style>
-.showColor {
+.easy-gantt__showColor {
   background-color: rgb(36, 141, 245, 0.3) !important;
 }
 </style>
 <style scoped>
+.easy-gantt {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.ganttable {
+  /* min-width: max-content; */
+  width: max-content;
+}
 .ganttd {
   cursor: pointer;
   position: absolute;
+  display: flex;
+  align-items: center;
   border-radius: 4px;
-  color: rgba(255, 255, 255, 1);
   padding: 0px 12px;
   background-color: #248DF5;
   left: 10px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  top: 12px;
+  top: 9px;
   z-index: 1;
+  color: rgba(255, 255, 255, 1);
+  font-size: 12px;
+  text-align: left;
+  font-family: PingFangSC-Regular;
+}
+.ganttd__else {
+  position: absolute;
+  padding: 0px 12px;
+  left: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  top: 9px;
+  z-index: 1;
+  color: rgba(50, 50, 51, 1);
+  font-size: 12px;
+  text-align: left;
+  font-family: PingFangSC-Regular;
 }
 .td-box {
   position: absolute;
