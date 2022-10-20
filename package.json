@@ -1,11 +1,16 @@
 {
   "name": "easy-gantt",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "author": "chenjing0823",
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
     "build": "vue-cli-service build --target lib --name easyGantt packages/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenjing0823/easy-gantt"
   },
   "dependencies": {
     "core-js": "^3.6.5",

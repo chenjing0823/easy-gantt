@@ -42,8 +42,8 @@
               class="ganttd__else"
               :style="getTdStyle({ beyondBlock: 0 }, limit)"
               :data-td="column.prop"
-              v-if="scope.row[column.prop] && limit < scope.row[column.prop].length">
-              还有 {{ scope.row[column.prop].length -  limit }} 个{{ cellMoreTitle }}...
+              v-if="scope.row.hide[column.prop]">
+              还有 {{ scope.row.hide[column.prop] }} 个{{ cellMoreTitle }}...
             </div>
           </div>
         </template>
@@ -66,7 +66,7 @@
     </el-dialog>
   </div>
 </template>
-
+<!-- eslint-disable no-prototype-builtins -->
 <script>
 export default {
   name: 'EasyGantt',
@@ -158,21 +158,24 @@ export default {
       // oi 外层index
       for (let oi = 0; oi < _showTableData.length; oi++) {
         const data = _showTableData[oi]
+        data.hide = {}
         // 按顺序遍历需要处理的色块
         this.ganttHead.forEach((head) => {
           const item = head.prop // 当前色块prop
           if (Array.isArray(data[item])) { // 若为数组，代表当前色块有数据
             // tdi 当前格子的数据index
+            let hideNum = 0
             for (let tdi = 0; tdi < data[item].length; tdi++) { // 遍历当前td内的数据，找出有超出的数据，为其后面数据添加占位数据
-              // debugger
-              console.log('debugger')
               if (!data[item][tdi]) {
                 data[item][tdi] = {}
               }
-              if (tdi >= this.limit) {
+              if (tdi >= this.limit && !data[item][tdi].hasOwnProperty('visible')) {
                 data[item][tdi].visible = false
-              } else {
+              } else if (tdi < this.limit && !data[item][tdi].hasOwnProperty('visible')) {
                 data[item][tdi].visible = true
+              }
+              if (data[item][tdi].visible === false) {
+                hideNum += 1
               }
               data[item][tdi].index = tdi
               const beyondBlock = data[item][tdi].beyondBlock // 超出的格子数
@@ -204,6 +207,7 @@ export default {
                 }
               }
             }
+            data.hide[item] = hideNum
           }
         })
       }
