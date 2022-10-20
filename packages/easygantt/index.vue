@@ -23,13 +23,6 @@
           <div class="td-box" :class="`row-id${scope.row.id}`" :data-td="column.prop" :data-id="scope.row.id"></div>
           <div class="cell-block" :style="getCellHeight(scope.row[column.prop])"  :data-td="column.prop">
             <template v-for="(mark, index) in scope.row[column.prop]">
-              <!-- <div
-                class="ganttd"
-                :key="index"
-                :data-td="column.prop"
-                @click="tdClick(scope.row[column.prop], mark)"
-                :style="getTdStyle(mark, index)">{{ mark.name}}{{ mark.visible }}</div>
-            </template> -->
               <div
                 v-if="index < limit && mark.name"
                 class="ganttd"
@@ -200,7 +193,11 @@ export default {
                       _showTableData[oi][prop][tdi].visible = false
                     }
                   } else {
-                    _showTableData[oi][prop].splice(tdi, 0, { visible: data[item][tdi].visible })
+                    if (!_showTableData[oi][prop][tdi]) {
+                      _showTableData[oi][prop].splice(tdi, 1, { visible: data[item][tdi].visible })
+                    } else {
+                      _showTableData[oi][prop].splice(tdi, 0, { visible: data[item][tdi].visible })
+                    }
                   }
 
                   mark++

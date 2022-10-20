@@ -1,8 +1,9 @@
 {
   "name": "easy-gantt",
-  "version": "0.1.0",
+  "version": "1.0.3",
   "private": false,
   "author": "chenjing0823",
+  "main": "lib/easyGantt.umd.min.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
@@ -11,6 +12,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/chenjing0823/easy-gantt"
+  },
+  "peerDependencies": {
+    "element-ui": "^2.15.10"
   },
   "dependencies": {
     "core-js": "^3.6.5",

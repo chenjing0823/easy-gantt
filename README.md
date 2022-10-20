@@ -14,8 +14,13 @@ npm run serve
 ```
 npm run build
 ```
-### 使用
-main.js
+
+# 使用
+```
+npm i easy-gantt
+```
+
+``` main.js ``` 内引入依赖
 ```js
 import EasyGantt from 'easy-gantt'
 import 'easy-gantt/lib/easyGantt.css'
@@ -24,20 +29,27 @@ import 'easy-gantt/lib/easyGantt.css'
 Vue.use(EasyGantt)
 ```
 
-+ 用法
-参数
-``` limit ```: 最多展示条数
+### 默认用法
++ 传参 ``` ganttHead ```, 用于渲染甘特图的时间
++ 传参 ``` ganttData ```, 用于渲染甘特图的数据
+
+> 数据说明：
+<br />
+``` ganttData ``` 内的 ``` data ``` 中,
+<br />
+``` start ```表示开始时间刻度 ``` end ``` 表示结束时间刻度
+<br />
+操作说明：
+``` this.$refs.easygantt.renderGantBlock() ```用于更新渲染甘特图
 
 ``` vue
 <template>
   <div id="app">
     <EasyGantt
       ref="easygantt"
-      :limit="limit"
       :ganttHead="ganttHead"
       :ganttData="ganttData"
       @seletcData="seletcData"
-      @itemClick="itemClick"
       ></EasyGantt>
   </div>
 </template>
@@ -101,9 +113,6 @@ export default {
       this.ganttData[rowindex].data.push(
         { start: start, end: end, name: '12:00-13:00 手动添加' })
       this.$refs.easygantt.renderGantBlock() // 触发渲染
-    },
-    itemClick (item) {
-      console.log(item)
     }
   }
 }
