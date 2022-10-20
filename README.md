@@ -10,6 +10,9 @@ npm install
 npm run serve
 ```
 
+# homepage
+组件具体使用说明：[组件使用说明](https://chenjing0823.github.io/comps/#npm%E5%AE%89%E8%A3%85)
+
 ### Compiles and minifies for production
 ```
 npm run build

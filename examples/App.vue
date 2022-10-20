@@ -30,12 +30,12 @@ export default {
           title: '陈靖',
           order: 1,
           data: [
-            { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称1' },
-            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称2' },
-            { start: 'fri', end: 'fri', name: '12:00-13:00 工单名称3' },
-            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称4' },
-            { start: 'sat', end: 'sat', name: '12:00-13:00 工单名称5' },
-            { start: 'sun', end: 'sun', name: '12:00-13:00 工单名称6' }
+            // { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称1' },
+            // { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称2' },
+            // { start: 'fri', end: 'fri', name: '12:00-13:00 工单名称3' },
+            // { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称4' },
+            // { start: 'sat', end: 'sat', name: '12:00-13:00 工单名称5' },
+            // { start: 'sun', end: 'sun', name: '12:00-13:00 工单名称6' }
           ]
         },
         {
@@ -43,8 +43,8 @@ export default {
           title: '余宇豪',
           order: 2,
           data: [
-            { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称7' },
-            { start: 'wen', end: 'thu', name: '12:00-13:00 工单名称8' }
+            // { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称7' },
+            // { start: 'wen', end: 'thu', name: '12:00-13:00 工单名称8' }
           ]
         },
         {
@@ -52,7 +52,7 @@ export default {
           title: '刘娟娟',
           order: 3,
           data: [
-            { start: 'thu', end: 'thu', name: '12:00-13:00 工单名称9' }
+            // { start: 'thu', end: 'thu', name: '12:00-13:00 工单名称9' }
           ]
         }
       ]

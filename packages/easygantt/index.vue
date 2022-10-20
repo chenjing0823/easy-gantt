@@ -7,7 +7,7 @@
       @mousedown.native="mousedown"
       >
       <el-table-column
-        width="180"
+        width="80"
         fixed>
         <template slot-scope="scope">
           <div>{{ scope.row.title }}</div>
@@ -310,7 +310,7 @@ export default {
             start: this.handleStart,
             end: this.handleEnd
           }
-          this.$emit('seletcRange', select)
+          this.$emit('seletcData', select)
           console.log(select)
           this.handleClose('init')
           return
