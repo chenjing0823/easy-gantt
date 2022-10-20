@@ -14,7 +14,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        v-for="column in tableHead"
+        v-for="column in ganttHead"
         :key="column.prop"
         :label="column.label"
         :data="column"
@@ -23,8 +23,15 @@
           <div class="td-box" :class="`row-id${scope.row.id}`" :data-td="column.prop" :data-id="scope.row.id"></div>
           <div class="cell-block" :style="getCellHeight(scope.row[column.prop])"  :data-td="column.prop">
             <template v-for="(mark, index) in scope.row[column.prop]">
+              <!-- <div
+                class="ganttd"
+                :key="index"
+                :data-td="column.prop"
+                @click="tdClick(scope.row[column.prop], mark)"
+                :style="getTdStyle(mark, index)">{{ mark.name}}{{ mark.visible }}</div>
+            </template> -->
               <div
-                v-if="index < limit"
+                v-if="index < limit && mark.name"
                 class="ganttd"
                 :key="index"
                 :data-td="column.prop"
@@ -57,28 +64,10 @@
         <el-button type="primary" @click="confirm">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- <div style="margin-top: 200px">
-
-      <el-button @click="prevMonth">上个月</el-button>
-      <el-button @click="nextMonth">下个月</el-button>
-      <el-button @click="prevYear">上个年</el-button>
-      <el-button @click="nextYear">下个年</el-button>
-      <el-button @click="prevWeek">上周</el-button>
-      <el-button @click="nextWeek">下周</el-button>
-      <DateTable ref="dateTable" :date="date"></DateTable>
-      <DateTable :date="date" type="normal"></DateTable>
-    </div> -->
   </div>
 </template>
 
 <script>
-// import DateTable from './date-table.vue'
-// import {
-//   prevMonth as _prevMonth,
-//   nextMonth as _nextMonth,
-//   prevYear as _prevYear,
-//   nextYear as _nextYear
-// } from './date'
 export default {
   name: 'EasyGantt',
   components: {
@@ -104,6 +93,14 @@ export default {
     usePersonalTips: {
       type: Boolean,
       default: false
+    },
+    ganttHead: {
+      type: Array,
+      default: () => []
+    },
+    ganttData: {
+      type: Array,
+      default: () => []
     }
   },
   computed: {
@@ -118,47 +115,6 @@ export default {
     return {
       date: new Date(),
       dialogVisible: false,
-      tableHead: [
-        { prop: 'wen', label: '07-13 周三', block: 1 },
-        { prop: 'thu', label: '07-14 周四', block: 2 },
-        { prop: 'fri', label: '07-15 周五', block: 3 },
-        { prop: 'sat', label: '07-16 周六', block: 4 },
-        { prop: 'sun', label: '07-17 周天', block: 5 },
-        { prop: 'mon', label: '07-18 周一', block: 6 },
-        { prop: 'tue', label: '07-19 周二', block: 7 }
-      ],
-      resources: [
-        {
-          id: '1',
-          title: '陈靖',
-          order: 1,
-          data: [
-            { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称1' },
-            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称2' },
-            { start: 'fri', end: 'fri', name: '12:00-13:00 工单名称3' },
-            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称4' },
-            { start: 'sat', end: 'sat', name: '12:00-13:00 工单名称5' },
-            { start: 'sun', end: 'sun', name: '12:00-13:00 工单名称6' }
-          ]
-        },
-        {
-          id: '2',
-          title: '余宇豪',
-          order: 2,
-          data: [
-            { start: 'mon', end: 'mon', name: '12:00-13:00 工单名称7' },
-            { start: 'mon', end: 'tue', name: '12:00-13:00 工单名称8' }
-          ]
-        },
-        {
-          id: '3',
-          title: '刘娟娟',
-          order: 3,
-          data: [
-            { start: 'thu', end: 'thu', name: '12:00-13:00 工单名称9' }
-          ]
-        }
-      ],
       headEnum: {},
       showTableData: [],
       handleRowid: null,
@@ -171,53 +127,21 @@ export default {
     }
   },
   created () {
-    this.tableHead.forEach((item, index) => {
+    this.ganttHead.forEach((item, index) => {
       this.$set(this.headEnum, item.prop, { label: item.label, block: index })
     })
     this.renderGantBlock()
   },
   methods: {
-    // prevMonth () {
-    //   this.date = _prevMonth(this.date)
-    // },
-    // nextMonth () {
-    //   this.date = _nextMonth(this.date)
-    // },
-    // prevYear () {
-    //   this.date = _prevYear(this.date)
-    // },
-    // nextYear () {
-    //   this.date = _nextYear(this.date)
-    // },
-    // prevWeek () {
-    //   if (this.$refs.dateTable.todayrow === 0) {
-    //     this.prevMonth()
-    //     this.$nextTick(() => {
-    //       this.$refs.dateTable.todayrow = this.$refs.dateTable.showRows.length - 1
-    //     })
-    //   } else {
-    //     this.$refs.dateTable.todayrow = this.$refs.dateTable.todayrow - 1
-    //   }
-    // },
-    // nextWeek () {
-    //   if (this.$refs.dateTable.todayrow === this.$refs.dateTable.showRows.length - 1) {
-    //     this.nextMonth()
-    //     this.$nextTick(() => {
-    //       this.$refs.dateTable.todayrow = 0
-    //     })
-    //   } else {
-    //     this.$refs.dateTable.todayrow = this.$refs.dateTable.todayrow + 1
-    //   }
-    // },
     /**
      * @description: 渲染甘特图色块数据处理
      */
     renderGantBlock () {
       // 数据初过滤，获取每格需要渲染的色块数据
-      const _showTableData = this.resources.map(data => {
+      const _showTableData = this.ganttData.map(data => {
         const obj = {}
         const _data = JSON.parse(JSON.stringify(data))
-        _data.data.forEach(item => {
+        _data.data.forEach((item, index) => {
           if (!Object.prototype.hasOwnProperty.call(obj, item.start)) {
             obj[item.start] = []
           }
@@ -229,25 +153,53 @@ export default {
           ...obj
         }
       })
+      console.log(JSON.parse(JSON.stringify(_showTableData)))
       // 遍历色块数据，处理需要跨时间的色块
       // oi 外层index
       for (let oi = 0; oi < _showTableData.length; oi++) {
         const data = _showTableData[oi]
         // 按顺序遍历需要处理的色块
-        this.tableHead.forEach((head) => {
+        this.ganttHead.forEach((head) => {
           const item = head.prop // 当前色块prop
           if (Array.isArray(data[item])) { // 若为数组，代表当前色块有数据
             // tdi 当前格子的数据index
             for (let tdi = 0; tdi < data[item].length; tdi++) { // 遍历当前td内的数据，找出有超出的数据，为其后面数据添加占位数据
+              // debugger
+              console.log('debugger')
+              if (!data[item][tdi]) {
+                data[item][tdi] = {}
+              }
+              if (tdi >= this.limit) {
+                data[item][tdi].visible = false
+              } else {
+                data[item][tdi].visible = true
+              }
+              data[item][tdi].index = tdi
               const beyondBlock = data[item][tdi].beyondBlock // 超出的格子数
               if (beyondBlock > 0) { // 若有超出格子数 则后面需要有空数据占位
                 let mark = 1
                 while (mark <= beyondBlock) { // 超出多少格子，后面就补多少个
-                  const index = this.tableHead.findIndex(head => head.prop === item) + mark // 当前 td 在表头的index, +mark 为下一个td
-                  const prop = this.tableHead[index].prop // 获取下一个td的 prop ，用于给其添加占位数据
-                  if (Array.isArray(_showTableData[oi][prop])) {
-                    _showTableData[oi][prop].splice(tdi, 0, {}) // 为下个时间块，添加空白占位数据
+                  const index = this.ganttHead.findIndex(head => head.prop === item) + mark // 当前 td 在表头的index, +mark 为下一个td
+                  const prop = this.ganttHead[index].prop // 获取下一个td的 prop ，用于给其添加占位数据
+                  let replaceFlag = true
+                  if (!Array.isArray(_showTableData[oi][prop])) {
+                    replaceFlag = false
+                    _showTableData[oi][prop] = new Array(data[item].length).fill(null)
                   }
+                  if (!replaceFlag) {
+                    if (!_showTableData[oi][prop][tdi]) {
+                      _showTableData[oi][prop][tdi] = {}
+                    }
+                    if (data[item][tdi].visible) {
+                      _showTableData[oi][prop][tdi].visible = true
+                    } else {
+                    // _showTableData[oi][prop].splice(tdi, 0, { visible: false })
+                      _showTableData[oi][prop][tdi].visible = false
+                    }
+                  } else {
+                    _showTableData[oi][prop].splice(tdi, 0, { visible: data[item][tdi].visible })
+                  }
+
                   mark++
                 }
               }
@@ -267,7 +219,8 @@ export default {
       return endBlock - startBlock
     },
     tdClick (row, item) {
-      console.log(row, item)
+      this.$emit('itemClick', item)
+      // console.log(row, item)
     },
     /**
      * @description: 获取td内渲染的色块样式，在单元格内的位置为：
@@ -278,7 +231,7 @@ export default {
       user-select: none;
       height: ${this.tdBlockHeight}px;
       right: calc(${right}% + 10px);
-      top: ${index * this.tdBlockHeight + this.tdPaddingTop * (index + 1)}px
+      top: ${index * this.tdBlockHeight + this.tdPaddingTop * (index + 1)}px;
       `
       // right: calc(${right}% + 10px);  距离单元格右侧距离，
       // top: ${index * 25 + 12}px （数据index * 色块高度 + 单元格上边距12）
@@ -298,11 +251,12 @@ export default {
      * @description: 确认操作
      */
     confirm () {
-      const rowindex = this.resources.findIndex(res => res.id === this.handleRowid)
-      // 添加数据
-      this.resources[rowindex].data.push(
-        { start: this.handleStart, end: this.handleEnd, name: '12:00-13:00 手动添加' })
-      this.renderGantBlock() // 触发渲染
+      const select = {
+        rowid: this.handleRowid,
+        start: this.handleStart,
+        end: this.handleEnd
+      }
+      this.$emit('seletcData', select)
       this.handleClose()
     },
     handleClose (type) {
@@ -325,7 +279,7 @@ export default {
       }
       // const reg = /row-id\d+/
       // this.handleRow = e.target.className.match(reg)[0]
-      if (e.target.className === 'ganttd') return
+      if (['ganttd', 'ganttd__else'].includes(e.target.className)) return
       this.handleRowid = e.target.dataset.id // 数据row id
       this.handleStart = e.target.dataset.td // 开始时间
       this.startLeft = e.clientX
@@ -352,8 +306,8 @@ export default {
         }
         if (this.usePersonalTips) {
           const select = {
-            start: this.headEnum[this.handleStart].label,
-            end: this.headEnum[this.handleEnd].label
+            start: this.handleStart,
+            end: this.handleEnd
           }
           this.$emit('seletcRange', select)
           console.log(select)
@@ -449,7 +403,6 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  top: 9px;
   z-index: 1;
   color: rgba(255, 255, 255, 1);
   font-size: 12px;
@@ -458,12 +411,13 @@ export default {
 }
 .ganttd__else {
   position: absolute;
+  border-radius: 4px;
+  background-color: #f3f3f3;
   padding: 0px 12px;
   left: 10px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  top: 9px;
   z-index: 1;
   color: rgba(50, 50, 51, 1);
   font-size: 12px;
