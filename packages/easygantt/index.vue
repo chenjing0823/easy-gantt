@@ -126,10 +126,17 @@ export default {
       moveTop: null
     }
   },
+  watch: {
+    ganttHead: {
+      handler (val) {
+        this.headEnumInit()
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   created () {
-    this.ganttHead.forEach((item, index) => {
-      this.$set(this.headEnum, item.prop, { label: item.label, block: index })
-    })
+    this.headEnumInit()
     this.renderGantBlock()
   },
   methods: {
@@ -222,6 +229,12 @@ export default {
         })
       }
       this.showTableData = _showTableData
+    },
+    headEnumInit () {
+      this.headEnum = {}
+      this.ganttHead.forEach((item, index) => {
+        this.$set(this.headEnum, item.prop, { label: item.label, block: index })
+      })
     },
     /**
      * @description: 计算当前数据是否有跨时间显示
