@@ -1,9 +1,14 @@
 {
-  "name": "easy-gantt",
-  "version": "1.0.3",
+  "name": "easygantt",
+  "version": "1.0.7",
   "private": false,
   "author": "chenjing0823",
-  "main": "lib/easyGantt.umd.min.js",
+  "main": "dist/easyGantt.umd.min.js",
+  "homepage": "https://chenjing0823.github.io/",
+  "keywords": [
+    "vue",
+    "gantt"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
@@ -11,10 +16,11 @@
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/chenjing0823/easy-gantt"
-  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "license": "MIT",
   "peerDependencies": {
     "element-ui": "^2.15.10"
   },

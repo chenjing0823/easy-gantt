@@ -16,43 +16,147 @@ export default {
   data () {
     return {
       ganttHead: [
-        { prop: 'wen', label: '07-13 周三' },
-        { prop: 'thu', label: '07-14 周四' },
-        { prop: 'fri', label: '07-15 周五' },
-        { prop: 'sat', label: '07-16 周六' },
-        { prop: 'sun', label: '07-17 周天' },
-        { prop: 'mon', label: '07-18 周一' },
-        { prop: 'tue', label: '07-19 周二' }
+        {
+          prop: '0',
+          label: '00:00'
+        },
+        {
+          prop: '1',
+          label: '01:00'
+        },
+        {
+          prop: '2',
+          label: '02:00'
+        },
+        {
+          prop: '3',
+          label: '03:00'
+        },
+        {
+          prop: '4',
+          label: '04:00'
+        },
+        {
+          prop: '5',
+          label: '05:00'
+        },
+        {
+          prop: '6',
+          label: '06:00'
+        },
+        {
+          prop: '7',
+          label: '07:00'
+        },
+        {
+          prop: '8',
+          label: '08:00'
+        },
+        {
+          prop: '9',
+          label: '09:00'
+        },
+        {
+          prop: '10',
+          label: '10:00'
+        },
+        {
+          prop: '11',
+          label: '11:00'
+        },
+        {
+          prop: '12',
+          label: '12:00'
+        },
+        {
+          prop: '13',
+          label: '13:00'
+        },
+        {
+          prop: '14',
+          label: '14:00'
+        },
+        {
+          prop: '15',
+          label: '15:00'
+        },
+        {
+          prop: '16',
+          label: '16:00'
+        },
+        {
+          prop: '17',
+          label: '17:00'
+        },
+        {
+          prop: '18',
+          label: '18:00'
+        },
+        {
+          prop: '19',
+          label: '19:00'
+        },
+        {
+          prop: '20',
+          label: '20:00'
+        },
+        {
+          prop: '21',
+          label: '21:00'
+        },
+        {
+          prop: '22',
+          label: '22:00'
+        },
+        {
+          prop: '23',
+          label: '23:00'
+        }
       ],
       ganttData: [
         {
-          id: '1',
-          title: '陈靖',
+          id: 8983,
+          title: '老八',
+          order: 0,
+          data: [
+            {
+              start: '0',
+              end: '2',
+              name: '工单名称 00:00 - 3:00'
+            },
+            {
+              start: '0',
+              end: '2',
+              name: '00:00 - 3:00 工单名称2',
+              state: 'success'
+            },
+            {
+              start: '0',
+              end: '2',
+              name: '00:00 - 3:00 工单名称3'
+            },
+            {
+              start: '2',
+              end: '4',
+              name: '2:00 - 5:00 工单名称4'
+            }
+          ]
+        },
+        {
+          id: 8982,
+          title: '老六',
           order: 1,
           data: [
-            // { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称1' },
-            // { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称2' },
-            // { start: 'fri', end: 'fri', name: '12:00-13:00 工单名称3' },
-            // { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称4' },
-            // { start: 'sat', end: 'sat', name: '12:00-13:00 工单名称5' },
-            // { start: 'sun', end: 'sun', name: '12:00-13:00 工单名称6' }
-          ]
-        },
-        {
-          id: '2',
-          title: '余宇豪',
-          order: 2,
-          data: [
-            // { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称7' },
-            // { start: 'wen', end: 'thu', name: '12:00-13:00 工单名称8' }
-          ]
-        },
-        {
-          id: '3',
-          title: '刘娟娟',
-          order: 3,
-          data: [
-            // { start: 'thu', end: 'thu', name: '12:00-13:00 工单名称9' }
+            {
+              start: '0',
+              end: '2',
+              name: '00:00 - 3:00 工单名称3'
+            },
+            {
+              start: '2',
+              end: '4',
+              name: '2:00 - 5:00 工单名称4'
+            }
           ]
         }
       ]
@@ -63,7 +167,7 @@ export default {
       console.log(data)
       const { rowid, start, end } = data
 
-      const rowindex = this.ganttData.findIndex(res => res.id === rowid)
+      const rowindex = this.ganttData.findIndex(res => +res.id === +rowid)
       // 添加数据
       this.ganttData[rowindex].data.push(
         { start: start, end: end, name: '12:00-13:00 手动添加' })

@@ -26,6 +26,7 @@
               <div
                 v-if="index < limit && mark.name"
                 class="ganttd"
+                :class="{'ganttd__success': mark.state === 'success'}"
                 :key="index"
                 :data-td="column.prop"
                 @click="tdClick(scope.row[column.prop], mark)"
@@ -33,6 +34,7 @@
             </template>
             <div
               class="ganttd__else"
+              :class="{'ganttd__else_shadow': cellMoreShadow}"
               :style="getTdStyle({ beyondBlock: 0 }, limit)"
               :data-td="column.prop"
               v-if="scope.row.hide[column.prop]">
@@ -87,6 +89,11 @@ export default {
       type: Boolean,
       default: false
     },
+    // 更多是否展示阴影
+    cellMoreShadow: {
+      type: Boolean,
+      default: true
+    },
     ganttHead: {
       type: Array,
       default: () => []
@@ -139,6 +146,7 @@ export default {
             obj[item.start] = []
           }
           item.beyondBlock = this.beyondBlock(item) // 超出格子数
+          item.effect = true // 有效格子
           obj[item.start].push(item)
         })
         return {
@@ -150,53 +158,58 @@ export default {
       // 遍历色块数据，处理需要跨时间的色块
       // oi 外层index
       for (let oi = 0; oi < _showTableData.length; oi++) {
-        const data = _showTableData[oi]
-        data.hide = {}
+        const rowData = _showTableData[oi] // 行数据
+        rowData.hide = {} // 更多统计
         // 按顺序遍历需要处理的色块
         this.ganttHead.forEach((head) => {
-          const item = head.prop // 当前色块prop
-          if (Array.isArray(data[item])) { // 若为数组，代表当前色块有数据
+          const _prop = head.prop // 当前色块prop
+          if (Array.isArray(rowData[_prop])) { // 若为数组，代表当前色块有数据
             // tdi 当前格子的数据index
             let hideNum = 0
-            for (let tdi = 0; tdi < data[item].length; tdi++) { // 遍历当前td内的数据，找出有超出的数据，为其后面数据添加占位数据
-              if (!data[item][tdi]) {
-                data[item][tdi] = {}
+            for (let tdi = 0; tdi < rowData[_prop].length; tdi++) { // 遍历当前td内的数据，找出有超出的数据，为其后面数据添加占位数据
+              if (!rowData[_prop][tdi]) {
+                rowData[_prop][tdi] = {}
               }
-              if (tdi >= this.limit && !data[item][tdi].hasOwnProperty('visible')) {
-                data[item][tdi].visible = false
-              } else if (tdi < this.limit && !data[item][tdi].hasOwnProperty('visible')) {
-                data[item][tdi].visible = true
+              if (tdi >= this.limit && !rowData[_prop][tdi].hasOwnProperty('visible')) {
+                rowData[_prop][tdi].visible = false
+              } else if (tdi < this.limit && !rowData[_prop][tdi].hasOwnProperty('visible')) {
+                rowData[_prop][tdi].visible = true
               }
-              if (data[item][tdi].visible === false) {
+              if (rowData[_prop][tdi].visible === false && rowData[_prop][tdi].effect) {
                 hideNum += 1
               }
-              data[item][tdi].index = tdi
-              const beyondBlock = data[item][tdi].beyondBlock // 超出的格子数
+              rowData[_prop][tdi].index = tdi
+              const beyondBlock = rowData[_prop][tdi].beyondBlock // 超出的格子数
               if (beyondBlock > 0) { // 若有超出格子数 则后面需要有空数据占位
                 let mark = 1
                 while (mark <= beyondBlock) { // 超出多少格子，后面就补多少个
-                  const index = this.ganttHead.findIndex(head => head.prop === item) + mark // 当前 td 在表头的index, +mark 为下一个td
-                  const prop = this.ganttHead[index].prop // 获取下一个td的 prop ，用于给其添加占位数据
+                  const index = this.ganttHead.findIndex(head => head.prop === _prop) + mark // 当前 td 在表头的index, +mark 为下一个td
+                  const _nextProp = this.ganttHead[index].prop // 获取下一个td的 prop ，用于给其添加占位数据
                   let replaceFlag = true
-                  if (!Array.isArray(_showTableData[oi][prop])) {
+                  // if (_prop === '2') debugger
+                  if (!Array.isArray(rowData[_nextProp])) {
                     replaceFlag = false
-                    _showTableData[oi][prop] = new Array(data[item].length).fill(null)
+                    // const length = rowData[_prop].filter(_ => _.hasOwnProperty('name')).length
+                    const length = rowData[_prop].length
+                    rowData[_nextProp] = new Array(length).fill(null)
                   }
                   if (!replaceFlag) {
-                    if (!_showTableData[oi][prop][tdi]) {
-                      _showTableData[oi][prop][tdi] = {}
+                    if (!rowData[_nextProp][tdi]) {
+                      rowData[_nextProp][tdi] = {
+                        effect: true
+                      }
                     }
-                    if (data[item][tdi].visible) {
-                      _showTableData[oi][prop][tdi].visible = true
+                    if (rowData[_prop][tdi].visible) {
+                      rowData[_nextProp][tdi].visible = true
                     } else {
-                    // _showTableData[oi][prop].splice(tdi, 0, { visible: false })
-                      _showTableData[oi][prop][tdi].visible = false
+                    // rowData[_nextProp].splice(tdi, 0, { visible: false })
+                      rowData[_nextProp][tdi].visible = false
                     }
                   } else {
-                    if (!_showTableData[oi][prop][tdi]) {
-                      _showTableData[oi][prop].splice(tdi, 1, { visible: data[item][tdi].visible })
+                    if (!rowData[_nextProp][tdi]) {
+                      rowData[_nextProp].splice(tdi, 1, { visible: rowData[_prop][tdi].visible, effect: true })
                     } else {
-                      _showTableData[oi][prop].splice(tdi, 0, { visible: data[item][tdi].visible })
+                      rowData[_nextProp].splice(tdi, 0, { visible: rowData[_prop][tdi].visible, effect: true })
                     }
                   }
 
@@ -204,7 +217,7 @@ export default {
                 }
               }
             }
-            data.hide[item] = hideNum
+            rowData.hide[_prop] = hideNum
           }
         })
       }
@@ -410,10 +423,12 @@ export default {
   text-align: left;
   font-family: PingFangSC-Regular;
 }
+.ganttd__success {
+  background-color: #00C241;
+}
 .ganttd__else {
   position: absolute;
   border-radius: 4px;
-  background-color: #f3f3f3;
   padding: 0px 12px;
   left: 10px;
   overflow: hidden;
@@ -424,6 +439,9 @@ export default {
   font-size: 12px;
   text-align: left;
   font-family: PingFangSC-Regular;
+}
+.ganttd__else_shadow {
+  background-color: #f3f3f3;
 }
 .td-box {
   position: absolute;

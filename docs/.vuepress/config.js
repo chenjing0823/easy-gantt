@@ -18,7 +18,6 @@ module.exports = {
     sidebar: { // 配置侧边栏部分
       '/comps/': ['/comps/', '/comps/easygantt.md']
     }
-    
   },
   head: [],
   plugins: ['demo-container'],

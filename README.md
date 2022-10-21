@@ -20,13 +20,13 @@ npm run build
 
 # 使用
 ```
-npm i easy-gantt
+npm i easygantt
 ```
 
 ``` main.js ``` 内引入依赖
 ```js
-import EasyGantt from 'easy-gantt'
-import 'easy-gantt/lib/easyGantt.css'
+import EasyGantt from 'easygantt'
+import 'easygantt/dist/easyGantt.css'
 
 
 Vue.use(EasyGantt)
