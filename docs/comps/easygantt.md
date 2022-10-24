@@ -1,5 +1,7 @@
 # Easy Gantt 使用
 
+> 本文档使用vuepress搭建，其自动生成的样式，与部分element样式冲突，可能会出现一些滑动异常bug，不影响正常使用
+
 ## 基本用法
 + 传参 ``` ganttHead ```, 用于渲染甘特图的时间
 + 传参 ``` ganttData ```, 用于渲染甘特图的数据
@@ -45,12 +47,7 @@
           title: '陈靖',
           order: 1,
           data: [
-            { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称1' },
-            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称2' },
-            { start: 'fri', end: 'fri', name: '12:00-13:00 工单名称3' },
-            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称4' },
-            { start: 'sat', end: 'sat', name: '12:00-13:00 工单名称5' },
-            { start: 'sun', end: 'sun', name: '12:00-13:00 工单名称6' }
+            { start: 'fri', end: 'sat', name: '12:00-13:00 工单名称4' }
           ]
         },
         {
@@ -58,8 +55,7 @@
           title: '余宇豪',
           order: 2,
           data: [
-            { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称7' },
-            { start: 'wen', end: 'thu', name: '12:00-13:00 工单名称8' }
+            { start: 'wen', end: 'wen', name: '12:00-13:00 工单名称7' }
           ]
         },
         {
