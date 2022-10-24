@@ -37,13 +37,13 @@ Vue.use(EasyGantt)
 + 传参 ``` ganttData ```, 用于渲染甘特图的数据
 
 > 数据说明：
-<br />
-``` ganttData ``` 内的 ``` data ``` 中,
-<br />
-``` start ```表示开始时间刻度 ``` end ``` 表示结束时间刻度
-<br />
-操作说明：
-``` this.$refs.easygantt.renderGantBlock() ```用于更新渲染甘特图
+> <br />
+> ``` ganttData ``` 内的 ``` data ``` 中,
+> <br />
+> ``` start ```表示开始时间刻度 ``` end ``` 表示结束时间刻度
+> <br />
+> 操作说明：
+> ``` this.$refs.easygantt.renderGantBlock() ```用于更新渲染甘特图
 
 ``` vue
 <template>
