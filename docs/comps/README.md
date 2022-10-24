@@ -3,14 +3,14 @@
 ## npm安装
 
 ```sh
-npm i easy-gantt
+npm i easygantt
 ```
 
 ## 引入依赖
 ``` main.js ``` 内引入依赖
 ```js
-import EasyGantt from 'easy-gantt'
-import 'easy-gantt/lib/easyGantt.css'
+import EasyGantt from 'easygantt'
+import 'easygantt/lib/easyGantt.css'
 
 
 Vue.use(EasyGantt)

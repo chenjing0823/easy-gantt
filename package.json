@@ -1,6 +1,6 @@
 {
   "name": "easygantt",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": false,
   "author": "chenjing0823",
   "main": "dist/easyGantt.umd.min.js",
