@@ -1,7 +1,7 @@
 module.exports = {
   theme: '',
   title: 'Easy Gantt',
-  description: 'Easy Gantt 甘特图组件说明',
+  description: '基于vue + element-ui 的甘特图组件',
   base: '/',
   port: '8080',
   themeConfig: { // 新增代码

@@ -1,7 +1,10 @@
 ---
 home: true
-heroImage: https://artice-code-1258339218.cos.ap-beijing.myqcloud.com/vuepress/element-index.png
+heroImage: /logo.png
 heroText: Easy Gantt
+actionText: 快速上手 →
+actionLink: /comps/
 features:
 footer: chenjing
+---
 ---
