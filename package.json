@@ -1,11 +1,28 @@
 {
-  "name": "easy-gantt",
-  "version": "0.1.0",
-  "private": true,
+  "name": "easygantt",
+  "version": "1.1.2",
+  "private": false,
+  "author": "chenjing0823",
+  "main": "dist/easyGantt.umd.min.js",
+  "homepage": "https://chenjing0823.github.io/",
+  "keywords": [
+    "vue",
+    "gantt"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
-    "build": "vue-cli-service build --target lib --name easyGantt packages/index.js"
+    "build": "vue-cli-service build --target lib --name easyGantt packages/index.js",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "element-ui": "^2.15.10"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -24,6 +41,8 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "vuepress": "^1.9.7",
+    "vuepress-plugin-demo-container": "^0.2.0"
   }
 }
