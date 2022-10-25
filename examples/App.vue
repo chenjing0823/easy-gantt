@@ -2,6 +2,7 @@
   <div id="app">
     <EasyGantt
       ref="easygantt"
+      :sort="sort"
       :ganttHead="ganttHead"
       :ganttData="ganttData"
       @seletcData="seletcData"
@@ -15,6 +16,10 @@
 export default {
   data () {
     return {
+      sort: {
+        row: '时间',
+        column: '员工'
+      },
       ganttHead: [
         {
           prop: '0',
