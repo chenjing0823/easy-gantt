@@ -1,22 +1,10 @@
-# east-gantt
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+<img src="https://github.com/chenjing0823/easy-gantt/blob/master/docs/.vuepress/public/logo.png" alt="Easy Gantt">
 
 # homepage
 组件具体使用说明：[组件使用说明](https://chenjing0823.github.io/comps/#npm%E5%AE%89%E8%A3%85)
 
-### Compiles and minifies for production
-```
-npm run build
-```
+
 
 # 使用
 ```
