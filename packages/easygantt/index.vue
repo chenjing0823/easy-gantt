@@ -1,16 +1,27 @@
 <template>
   <div class="easy-gantt">
+    <div class="head-sort" v-if="sort.row && sort.column">
+      <span class="row">{{sort.row}}</span>
+      <span class="column">{{sort.column}}</span>
+    </div>
     <el-table
       class="ganttable"
+      ref="elTable"
       :data="showTableData"
       border
       @mousedown.native="mousedown"
       >
       <el-table-column
-        width="80"
+        width="200"
         fixed>
         <template slot-scope="scope">
-          <div>{{ scope.row.title }}</div>
+          <div class="staff-info">
+            <div class="staff">
+              <div class="img"></div>
+              <div class="name">{{ scope.row.title }}</div>
+            </div>
+            <div class="workorder-num">({{scope.row.data.length}})</div>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -25,21 +36,35 @@
             <template v-for="(mark, index) in scope.row[column.prop]">
               <div
                 v-if="index < limit && mark.name"
-                class="ganttd"
+                class="ganttd ganttd__basic"
                 :class="{'ganttd__success': mark.state === 'success'}"
                 :key="index"
                 :data-td="column.prop"
                 @click="tdClick(scope.row[column.prop], mark)"
                 :style="getTdStyle(mark, index)">{{ mark.name }}</div>
             </template>
-            <div
-              class="ganttd__else"
-              :class="{'ganttd__else_shadow': cellMoreShadow}"
-              :style="getTdStyle({ beyondBlock: 0 }, limit)"
-              :data-td="column.prop"
-              v-if="scope.row.hide[column.prop]">
-              还有 {{ scope.row.hide[column.prop] }} 个{{ cellMoreTitle }}...
-            </div>
+            <el-popover
+              v-if="scope.row.hide[column.prop] && scope.row.hide[column.prop].hideNum"
+              placement="bottom"
+              width="288"
+              trigger="hover">
+              <div class="more-workorder-list">
+                <div class="color-lump"
+                  :class="{'ganttd__success': mark.state === 'completed'}"
+                  v-for="(mark, index) in scope.row.hide[column.prop].hideList" :key="index">
+                  {{mark.name}}
+                </div>
+              </div>
+              <div
+                slot="reference"
+                class="ganttd ganttd__else"
+                :class="{'ganttd__else_shadow': cellMoreShadow}"
+                :style="getTdStyle({ beyondBlock: 0 }, limit)"
+                :data-td="column.prop"
+                >
+                还有 {{ scope.row.hide[column.prop].hideNum }} 个{{ cellMoreTitle }}...
+              </div>
+            </el-popover>
           </div>
         </template>
       </el-table-column>
@@ -73,6 +98,11 @@ export default {
     limit: {
       type: Number,
       default: 2
+    },
+    // 表格横纵轴代表的数据类型
+    sort: {
+      type: Object,
+      default: () => ({})
     },
     // 更多标题
     cellMoreTitle: {
@@ -128,7 +158,7 @@ export default {
   },
   watch: {
     ganttHead: {
-      handler (val) {
+      handler () {
         this.headEnumInit()
       },
       deep: true,
@@ -140,6 +170,12 @@ export default {
     this.renderGantBlock()
   },
   methods: {
+    headEnumInit () {
+      this.headEnum = {}
+      this.ganttHead.forEach((item, index) => {
+        this.$set(this.headEnum, item.prop, { label: item.label, block: index })
+      })
+    },
     /**
      * @description: 渲染甘特图色块数据处理
      */
@@ -173,6 +209,7 @@ export default {
           if (Array.isArray(rowData[_prop])) { // 若为数组，代表当前色块有数据
             // tdi 当前格子的数据index
             let hideNum = 0
+            const hideList = []
             for (let tdi = 0; tdi < rowData[_prop].length; tdi++) { // 遍历当前td内的数据，找出有超出的数据，为其后面数据添加占位数据
               if (!rowData[_prop][tdi]) {
                 rowData[_prop][tdi] = {}
@@ -184,6 +221,7 @@ export default {
               }
               if (rowData[_prop][tdi].visible === false && rowData[_prop][tdi].effect) {
                 hideNum += 1
+                hideList.push(this.getHideInfo(rowData[_prop][tdi].id, rowData))
               }
               rowData[_prop][tdi].index = tdi
               const beyondBlock = rowData[_prop][tdi].beyondBlock // 超出的格子数
@@ -200,23 +238,26 @@ export default {
                     const length = rowData[_prop].length
                     rowData[_nextProp] = new Array(length).fill(null)
                   }
+                  const { id } = rowData[_prop][tdi]
                   if (!replaceFlag) {
                     if (!rowData[_nextProp][tdi]) {
                       rowData[_nextProp][tdi] = {
                         effect: true
                       }
                     }
-                    if (rowData[_prop][tdi].visible) {
-                      rowData[_nextProp][tdi].visible = true
-                    } else {
-                    // rowData[_nextProp].splice(tdi, 0, { visible: false })
-                      rowData[_nextProp][tdi].visible = false
-                    }
+                    // if (rowData[_prop][tdi].visible) {
+                    //   rowData[_nextProp][tdi].visible = true
+                    // } else {
+                    // // rowData[_nextProp].splice(tdi, 0, { visible: false })
+                    //   rowData[_nextProp][tdi].visible = false
+                    // }
+                    rowData[_nextProp][tdi].visible = rowData[_prop][tdi].visible
+                    rowData[_nextProp][tdi].id = id
                   } else {
                     if (!rowData[_nextProp][tdi]) {
-                      rowData[_nextProp].splice(tdi, 1, { visible: rowData[_prop][tdi].visible, effect: true })
+                      rowData[_nextProp].splice(tdi, 1, { visible: rowData[_prop][tdi].visible, effect: true, id: id })
                     } else {
-                      rowData[_nextProp].splice(tdi, 0, { visible: rowData[_prop][tdi].visible, effect: true })
+                      rowData[_nextProp].splice(tdi, 0, { visible: rowData[_prop][tdi].visible, effect: true, id: id })
                     }
                   }
 
@@ -224,17 +265,24 @@ export default {
                 }
               }
             }
-            rowData.hide[_prop] = hideNum
+            rowData.hide[_prop] = {
+              hideNum,
+              hideList
+            }
           }
         })
       }
       this.showTableData = _showTableData
-    },
-    headEnumInit () {
-      this.headEnum = {}
-      this.ganttHead.forEach((item, index) => {
-        this.$set(this.headEnum, item.prop, { label: item.label, block: index })
+      this.$nextTick(() => {
+        this.$refs.elTable.doLayout()
       })
+    },
+    /**
+     * @description: 根据id获取对应的行信息
+     * @return {object} 匹配到的行信息
+     */
+    getHideInfo (id, row) {
+      return row.data.find(td => td.id === id)
     },
     /**
      * @description: 计算当前数据是否有跨时间显示
@@ -306,7 +354,7 @@ export default {
       }
       // const reg = /row-id\d+/
       // this.handleRow = e.target.className.match(reg)[0]
-      if (['ganttd', 'ganttd__else'].includes(e.target.className)) return
+      if (e.target.className.indexOf('ganttd') > -1) return
       this.handleRowid = e.target.dataset.id // 数据row id
       this.handleStart = e.target.dataset.td // 开始时间
       this.startLeft = e.clientX
@@ -316,14 +364,15 @@ export default {
       window.addEventListener('mouseup', this.mouseup)
     },
     mousemove (e) {
+      // console.log(e)
       this.moveLeft = e.clientX
       this.moveTop = e.clientY
       this.crashPlaceholder(this.moveLeft, this.moveTop, this.startLeft, this.startTop)
       this.elementCrash()
     },
     mouseup (e) {
-      // console.log(e)
-      this.handleEnd = e.target.dataset.td// 结束时间
+      // this.handleEnd = e.target.dataset.td// 结束时间
+      this.handleEnd = this.elementCrash('', e)
       const table = document.documentElement.querySelector('.ganttable')
       table.removeEventListener('mousemove', this.mousemove)
       window.removeEventListener('mouseup', this.mouseup)
@@ -368,8 +417,11 @@ export default {
       // show.style.backgroundColor = 'blue'
       document.body.appendChild(show) // 鼠标滑动的区域
     },
+
     // 碰撞检测 判断鼠标滑动区域与table中重合的部分 进行高亮
-    elementCrash (type) {
+    elementCrash (type, e) {
+      const x = !!e && e.clientX // 鼠标位置
+      const y = !!e && e.clientY // 鼠标位置
       const td = document.documentElement.getElementsByClassName(`row-id${this.handleRowid}`)
       for (let i = 0; i < td.length; i++) {
         const _this = td[i]
@@ -397,6 +449,9 @@ export default {
           _this.className = _this.className.replace(' easy-gantt__showColor', '')
           _this.className = _this.className + ' easy-gantt__showColor'
         }
+        if (e && x > l1 && x < r1 && y > t1 && y < b1) { // 修复滑动时间区间选取bug 鼠标最后位置
+          return _this.dataset.td
+        }
       }
     }
   }
@@ -407,8 +462,80 @@ export default {
 .easy-gantt__showColor {
   background-color: rgb(36, 141, 245, 0.3) !important;
 }
+.el-table__header tr,
+.el-table__header th {
+  height: 44px;
+  background-color: #F7F8FA;
+}
 </style>
 <style scoped>
+.color-lump {
+  cursor: pointer;
+  margin: 6px;
+  padding: 0 6px;
+  height: 20px;
+  line-height: 20px;
+  width: 264px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 4px;
+  background-color: #248DF5;
+  color: #fff;
+  font-size: 12px;
+}
+.head-sort {
+  z-index: 10;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  border-left: 1px solid #e5e6eb;
+  border-top: 1px solid #e5e6eb;
+  height: 44px;
+  width: 200px;
+  font-size: 14px;
+  color: #969799;
+  background-image:
+    linear-gradient(to bottom left, white 49.5% , #e5e6eb, white 51.5%)
+}
+.head-sort .row {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+.head-sort .column {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+}
+.staff-info {
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+.staff-info .workorder-num {
+  height: 28px;
+  color: #e5e6eb;
+  line-height: 28px;
+}
+.staff-info .staff {
+  width: 100px;
+  display: flex;
+  justify-content: left;
+}
+.staff-info .staff .img {
+  height: 28px;
+  width: 28px;
+  margin-right: 16px;
+  border-radius: 14px;
+  background-color: #e5e6eb;
+}
+.staff-info .staff .name {
+  height: 28px;
+  color: #323233;
+  line-height: 28px;
+}
 .easy-gantt {
   position: relative;
   width: 100%;
@@ -419,40 +546,45 @@ export default {
   width: max-content;
 }
 .ganttd {
-  cursor: pointer;
   position: absolute;
-  display: flex;
-  align-items: center;
   border-radius: 4px;
   padding: 0px 12px;
-  background-color: #248DF5;
+  text-overflow: ellipsis;
   left: 10px;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
   z-index: 1;
-  color: rgba(255, 255, 255, 1);
-  font-size: 12px;
   text-align: left;
+  font-size: 12px;
   font-family: PingFangSC-Regular;
+
+}
+.ganttd__basic {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: #248DF5;
+  color: #fff;
+}
+.ganttd__else {
+  color: rgba(50, 50, 51, 1);
+}
+.ganttd__basic:hover, .color-lump:hover {
+  background-color: #4DACFF;
+}
+.ganttd__basic:active, .color-lump:active {
+  background-color: #186FD2;
 }
 .ganttd__success {
   background-color: #00C241;
 }
-.ganttd__else {
-  position: absolute;
-  border-radius: 4px;
-  padding: 0px 12px;
-  left: 10px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  z-index: 1;
-  color: rgba(50, 50, 51, 1);
-  font-size: 12px;
-  text-align: left;
-  font-family: PingFangSC-Regular;
+.ganttd__success:hover {
+  background-color: #27D65C;
 }
+.ganttd__success:active {
+  background-color:#00AC3F;
+}
+
 .ganttd__else_shadow {
   background-color: #f3f3f3;
 }
