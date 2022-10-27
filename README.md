@@ -2,9 +2,12 @@
 <img src="https://github.com/chenjing0823/easy-gantt/blob/master/docs/.vuepress/public/logo.png" alt="Easy Gantt">
 
 # homepage
-组件具体使用说明：[组件使用说明](http://saiyanjing.top/)
+在线文档：[组件使用说明](http://saiyanjing.top/)
 
 
+# 动手试试
+在线demo，动手试试。
+ [codesanbox](https://codesandbox.io/s/easygantt-demo-8vl48r?file=/src/App.vue)
 
 # 使用
 ```

@@ -10,7 +10,7 @@ npm i easygantt
 ``` main.js ``` 内引入依赖
 ```js
 import EasyGantt from 'easygantt'
-import 'easygantt/lib/easyGantt.css'
+import 'easygantt/dist/easyGantt.css'
 
 
 Vue.use(EasyGantt)
