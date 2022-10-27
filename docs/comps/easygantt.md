@@ -175,3 +175,8 @@
 | -------- | -------- | -------- |
 | ```itemClick``` | 行数据中，具体条目点击事件 | 条目对象 |
 | ```seletcData``` | 鼠标滑动选中的区间 | 开始时间节点 和 结束时间节点 |
+
+
+## 动手试试
+在线demo，动手试试。
+ [codesanbox](https://codesandbox.io/s/easygantt-demo-8vl48r?file=/src/App.vue)
