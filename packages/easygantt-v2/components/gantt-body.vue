@@ -1,0 +1,583 @@
+<template>
+  <div class="gantt-body">
+    <div class="row-line" :style="{top: (index + 1) * 41 + 49 + 'px'}"
+      v-for="(item, index) in computedList"
+      :key="index">
+    </div>
+    <div class="lineBG">
+      <template v-for="(item, index) in computedLine">
+        <div :key="index"
+          style="position: absolute;"
+          :style="{
+            left: item.startX + 'px',
+            top: item.startY + 'px',
+            width: item.endX - item.startX + 'px,',
+            height: item.endY - item.startY + 'px,'
+          }">1
+        </div>
+      </template>
+      <template v-for="(item, index) in computedList">
+        <div
+          class="line"
+          :style="{
+            left: item.left + 'px',
+            width: item.widthMe + 'px',
+            top: item.top + 'px'
+          }"
+          v-if="(item.type === '1' || item.type === '2') && item.isShow"
+          :ref="'line' + item.id"
+          :key="item.id + index + 'ccc'"
+          @mousedown="lineMousedown(`line${item.id}`, $event, item.id, item.parentId, index)"
+          @mouseover="lineMouseover(`line${item.id}`, $event, item.id, item.parentId, index)"
+          @mouseleave="lineMouseleave"
+          @mouseenter="lineMouseenter(`line${item.id}`, $event, item.id,item.parentId, index)"
+          >
+          <slider
+            :min="0"
+            :max="100"
+            v-model="item.per"
+            :id="item.id"
+            :parentId="item.parentId"
+            :widths="item.widthChild"
+            v-show="item.type === '1'"
+          ></slider>
+        </div>
+        <div
+          class="group"
+          :style="{
+            top: item.top + 'px',
+            left: item.left + 'px',
+            width: item.widthMe + 'px'
+          }"
+          v-else-if="item.type === '3'"
+          :key="item.id + 'zzzzz'"
+        >
+          <div class="progress" :style="{ width: item.per + '%' }"></div>
+        </div>
+      </template>
+    </div>
+    <transition name="el-zoom-in-center">
+      <div
+        class="projectMsg"
+        v-if="isShowMsg"
+        :style="{
+          left: currentProjectMsg.left + 'px',
+          top: currentProjectMsg.top + 'px'
+        }"
+      >
+        <div class="lineMsg">
+          <span class="projectName">{{ currentProjectMsg.name }}</span>
+        </div>
+        <div class="lineMsg">
+          <span class="title">持续时间:</span
+          ><span>{{ currentProjectMsg.allTime }}天</span>
+        </div>
+        <div class="lineMsg">
+          <span class="title">当前进度:</span
+          ><span>{{ currentProjectMsg.per }}%</span>
+        </div>
+        <div class="lineMsg">
+          <span class="title">开始时间:</span
+          ><span>{{ currentProjectMsg.startTime }}</span>
+        </div>
+
+        <div class="lineMsg">
+          <span class="title">结束时间:</span
+          ><span>{{ currentProjectMsg.endTime }}</span>
+        </div>
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script>
+import slider from './silder.vue'
+export default {
+  name: 'gantt-body',
+
+  components: {
+    slider
+  },
+
+  filters: {
+  },
+
+  mixins: [],
+  props: {
+    leftWidth: {
+      type: Number
+    },
+    list: {
+      type: Array,
+      default: () => []
+    },
+    line: {
+      type: Array,
+      default: () => []
+    },
+    currentDaySize: {
+      type: Object,
+      default: () => {
+        return {
+          label: '天',
+          value: 40
+        }
+      }
+    },
+    currentLineDay: {
+      type: Object,
+      default: () => {
+        return {
+          start: 0,
+          end: 0
+        }
+      }
+    }
+  },
+
+  data () {
+    return {
+      // 是否显示信息
+      isShowMsg: false,
+      // 当前hover的项目信息
+      currentProjectMsg: {
+        name: '',
+        allTime: 0,
+        per: 0,
+        startTime: 0,
+        endTime: 0,
+        left: 0,
+        top: 0
+      },
+      isHover: false
+    }
+  },
+
+  computed: {
+    computedList () {
+      let arr = []
+      this.list.forEach(item => {
+        if (!item.children || item.children.length < 1) {
+          arr.push(item)
+        } else if (item.children && item.children.length >= 1) {
+          arr.push(item)
+          arr = arr.concat(item.children)
+        }
+      })
+      return arr
+    },
+    computedLine () {
+      const arr = []
+      this.line.forEach(line => {
+        const obj = {}
+        const source = this.computedList.find(list => {
+          return list.id === line.source
+        })
+        const target = this.computedList.find(list => {
+          return list.id === line.target
+        })
+        obj.startX = source.left + source.widthMe
+        obj.startY = source.top + 20
+        obj.endX = target.left
+        obj.endY = target.top + 20
+        arr.push(obj)
+      })
+      return arr
+    },
+    // 当前年份
+    currentYear () {
+      return new Date().getFullYear()
+    },
+    // 当前月份
+    currentMonth () {
+      return new Date().getMonth() + 1
+    },
+    // 当前日
+    currentDay () {
+      return new Date().getDate()
+    }
+  },
+
+  watch: {
+  },
+
+  mounted () {
+  },
+
+  methods: {
+    // 每一行拖拽
+    /**
+     * @param  {String} dom ref
+     * @param  {Object} events $event
+     * @param  {Number} id id
+     * @param  {Number} parentId parentId
+     * @param  {Number} index index
+     */
+    lineMousedown (dom, e, id, parentId, index) {
+      const line = this.$refs[dom][0]
+      const initX = e.pageX
+      const initScrollX = document.querySelector('.gantt-right').scrollLeft
+      let result
+      let z = 0
+      let left
+      // console.log(cp);
+      document.onmousemove = event => {
+        const scrollX = document.querySelector('.gantt-right').scrollLeft
+        const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
+        const clientWidth = ganttBlock.width
+        // event.clientX - ganttBlock.left 鼠标距离 gantt-right 左侧位置
+        if (event.clientX - ganttBlock.left >= clientWidth - 40) {
+          z = scrollX + this.currentDaySize.value
+          // window.scrollTo(z, 0);
+          document.querySelector('.gantt-right').scrollTo({
+            top: 0,
+            left: z,
+            behavior: 'smooth'
+          })
+          const newWith = event.pageX - initX + scrollX - initScrollX
+
+          result = this.computedList[index].left + newWith
+          line.style.left = result + 'px'
+          if (result <= 0) result = 0
+        } else if (event.clientX - ganttBlock.left <= 0) {
+          z = scrollX - this.currentDaySize.value
+          // window.scrollTo(z, 0);
+          document.querySelector('.gantt-right').scrollTo({
+            top: 0,
+            left: z,
+            behavior: 'smooth'
+          })
+          const newWith = event.pageX - initX + scrollX - initScrollX
+
+          result = this.computedList[index].left + newWith
+          if (result <= 0) result = 0
+          line.style.left = result + 'px'
+        } else {
+          const newWith = event.pageX - initX + scrollX - initScrollX
+
+          result = this.computedList[index].left + newWith
+          if (result <= 0) result = 0
+          line.style.left = result + 'px'
+        }
+        this.lineMouseover(dom, e, id, parentId, index)
+        this.lineMouseleave(e, true)
+      }
+      document.onmouseup = events => {
+        if (!result) {
+          document.onmousemove = document.onmouseup = null
+          return
+        }
+        left =
+          Math.round(result / this.currentDaySize.value) *
+          this.currentDaySize.value
+        this.computedList[index].left = left
+        line.style.left = left + 'px'
+        this.checkIsin(dom, events, id, parentId, index)
+        if (parentId) {
+          this.list.forEach(item => {
+            if (item.id === parentId) {
+              item.children.forEach(k => {
+                if (k.id === id) {
+                  k.left = left
+                }
+              })
+            }
+          })
+          this.setGroupWidth(parentId)
+        } else {
+          this.list.forEach(item => {
+            if (item.id === id) {
+              item.left = left
+            }
+          })
+        }
+        document.onmousemove = document.onmouseup = null
+      }
+    },
+    changeTime (dom, e, id, parentId, index) {
+      const start =
+        Math.round(
+          parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
+        ) *
+          this.currentDaySize.value +
+        this.currentDaySize.value
+      let end =
+        parseInt(this.$refs[dom][0].style.left) +
+        parseInt(this.$refs[dom][0].style.width)
+      end =
+        Math.round(end / this.currentDaySize.value) * this.currentDaySize.value
+      const obj = {
+        id,
+        parentId,
+        index,
+        startTime: this.computedWithTime(start - this.currentDaySize.value, true),
+        endTime: this.computedWithTime(end - this.currentDaySize.value, true)
+      }
+      console.log(this.computedWithTime(start - this.currentDaySize.value, false))
+      console.log(this.computedWithTime(end - this.currentDaySize.value, false))
+      this.$emit('handleTimeChange', obj)
+    },
+    /**
+     * @param  {String} dom ref
+     * @param  {Object} events $event
+     * @param  {Number} id id
+     * @param  {Number} parentId parentId
+     * @param  {Number} index index
+     */
+    // 鼠标悬停展示上部日期
+    lineMouseover (dom, e, id, parentId, index) {
+      const start =
+        Math.round(
+          parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
+        ) *
+          this.currentDaySize.value +
+        this.currentDaySize.value
+      let end =
+        parseInt(this.$refs[dom][0].style.left) +
+        parseInt(this.$refs[dom][0].style.width)
+      end =
+        Math.round(end / this.currentDaySize.value) * this.currentDaySize.value
+      const currentLineDay = {
+        start,
+        end
+      }
+      this.$emit('handleCurrentLineDay', currentLineDay)
+      this.isHover = true
+      this.handlerSelect(this.computedList[index])
+      this.lineMouseenter(dom, e, id, parentId, index)
+    },
+    // 鼠标离开信息消失，时间显示消失
+    /**
+     * @param  {Object} e $event
+     * @param  {Boolean} move 是否移动状态
+     */
+    lineMouseleave (e, move) {
+      if (move) {
+        this.isShowMsg = false
+        this.currentProjectMsg = {
+          name: '',
+          allTime: 0,
+          per: 0,
+          startTime: 0,
+          endTime: 0,
+          left: 0,
+          top: 0
+        }
+        // this.handlerSelect();
+        return
+      }
+
+      const currentLineDay = {
+        start: 0,
+        end: 0
+      }
+      this.$emit('currentLineDayInit', currentLineDay)
+      this.isHover = false
+      this.isShowMsg = false
+      this.currentProjectMsg = {
+        name: '',
+        allTime: 0,
+        per: 0,
+        startTime: 0,
+        endTime: 0,
+        left: 0,
+        top: 0
+      }
+      this.handlerSelect()
+    },
+    /**
+     * @param  {String} dom ref
+     * @param  {Object} events $event
+     * @param  {Number} id id
+     * @param  {Number} parentId parentId
+     * @param  {Number} index index
+     */
+    // 鼠标进入显示当前项目的基本信息框
+    lineMouseenter (dom, e, id, parentId, index) {
+      // const start =
+      //   Math.round(
+      //     parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
+      //   ) * this.currentDaySize.value
+      // let end =
+      //   parseInt(this.$refs[dom][0].style.left) +
+      //   parseInt(this.$refs[dom][0].style.width)
+      // end =
+      //   Math.round(end / this.currentDaySize.value) *
+      //     this.currentDaySize.value -
+      //   this.currentDaySize.value
+      // this.currentProjectMsg = {
+      //   name: this.computedList[index].name,
+      //   allTime: (end - start) / this.currentDaySize.value + 1,
+      //   per: this.computedList[index].per,
+      //   startTime: this.computedWithTime(start),
+      //   endTime: this.computedWithTime(end),
+      //   left:
+      //     e.pageX + 220 >= document.querySelector('.gantt-right').getBoundingClientRect().width + this.leftWidth
+      //       ? e.pageX - 220
+      //       : e.pageX,
+      //   top: e.y - 40
+      // }
+      // console.log(e.pageX)
+      // console.log(e.y)
+      // this.isShowMsg = true
+    },
+    // 根据index值和e判断是否在当前line的范围里，是否展示时间和msg框
+    /**
+     * @param  {String} dom ref
+     * @param  {Object} events $event
+     * @param  {Number} id id
+     * @param  {Number} parentId parentId
+     * @param  {Number} index index
+     */
+    checkIsin (dom, events, id, parentId, index) {
+      const line = this.$refs[dom][0] // 目标silder
+      // const lineTop = parseInt(line.style.top)
+      // const lineDown = lineTop + 16
+      // const lineLeft = parseInt(line.style.left)
+      // const lineRight = parseInt(this.computedList[index].widthMe) + lineLeft
+      const targetElement = events.target || events.srcElement // 鼠标最后的元素
+      if (line.contains(targetElement)) {
+        this.lineMouseover(dom, events, id, parentId, index)
+        this.lineMouseenter(dom, events, id, parentId, index)
+      } else {
+        this.isShowMsg = false
+        const currentLineDay = {
+          start: 0,
+          end: 0
+        }
+        this.$emit('currentLineDayInit', currentLineDay)
+      }
+      this.changeTime(dom, events, id, parentId, index)
+    },
+    // 根据距离计算时间
+    /**
+     * @param  {Number} width
+     * @param  {Boolean|String} time
+     */
+    computedWithTime (width, time) {
+      const startTime =
+        (width / this.currentDaySize.value) * (1000 * 60 * 60 * 24) +
+        new Date(`${this.currentYear - 1}/01/01`).getTime()
+      const s = new Date(startTime)
+      if (time && time === true) {
+        return s.getTime()
+      } else if (time && time === 'YD') {
+        return `${s.getFullYear()}年${s.getMonth() + 1}月`
+      } else {
+        return `${s.getFullYear()}年${s.getMonth() + 1}月${s.getDate()}日`
+      }
+    },
+    // 根据id设置group的宽度
+    setGroupWidth (id, lists) {
+      let parent
+      if (lists) {
+        parent = lists.find(item => {
+          return item.id === id
+        })
+      } else {
+        parent = this.list.find(item => {
+          return item.id === id
+        })
+      }
+      const left = Math.min.apply(
+        Math,
+        parent.children.map(o => {
+          return o.left
+        })
+      )
+      const arr = []
+      parent.children.forEach(item => {
+        arr.push(item.left + item.widthMe)
+      })
+      const width = Math.max.apply(Math, arr)
+      const widthMe = width - left
+      parent.widthMe = parent.widthChild = widthMe
+      parent.left = left
+      // return parent;
+    },
+    // 设置左侧leftmenu高亮
+    handlerSelect (row) {
+      // console.log('handlerSelect', row)
+    }
+  }
+}
+</script>
+
+<style lang="stylus" scoped>
+.gantt-body {
+  height: 100%;
+  .row-line {
+    border-bottom: 1px solid #EBEEF5;
+    width:100%;
+    position: absolute;
+  }
+  .lineBG {
+    width: 100%;
+    height: calc(100% - 50px);
+    position: relative;
+    .first {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 15px;
+      height: 2px;
+      background-color: black;
+    }
+    .seconed {
+
+    }
+    .line {
+      position: absolute;
+    }
+    .group {
+      position: absolute;
+      background-color: #C1E8FF !important;
+      border: none !important;
+      border-radius: 0 !important;
+      height: 18px !important;
+      line-height: 18px !important;
+      clip-path: polygon(
+        100% 0,
+        100% 100%,
+        calc(100% - 8px) 60%,
+        8px 60%,
+        0 100%,
+        0 0
+      );
+      // > div {
+      //   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      // }
+      .progress {
+        // width: 50px;
+        background-color: #74C3FF !important;
+        height: 100%;
+      }
+    }
+  }
+  .projectMsg {
+    box-sizing: border-box;
+    padding: 20px;
+    position: absolute;
+    width: 220px;
+    height: 200px;
+    background-color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    border: 1px solid #ebeef5;
+
+    .lineMsg {
+      margin-bottom: 10px;
+      .projectName {
+        font-size: 22px;
+      }
+      span {
+        font-size: 14px;
+        color: #909090;
+      }
+      .title {
+        margin-right: 10px;
+      }
+    }
+  }
+}
+</style>
