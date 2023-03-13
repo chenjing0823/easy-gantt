@@ -361,7 +361,7 @@ export default {
             obj.top =
               this.list[index - 1].children[this.list[index - 1].children.length - 1].top + 40
           } else {
-            obj.top = this.list[index - 1].top + 40
+            obj.top = this.list[index - 1].top + 40 - 2 // 任务是top 6，项目8 - 2
           }
         }
       }
