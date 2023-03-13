@@ -5,17 +5,6 @@
       :key="index">
     </div>
     <div class="lineBG">
-      <template v-for="(item, index) in computedLine">
-        <div :key="index"
-          style="position: absolute;"
-          :style="{
-            left: item.startX + 'px',
-            top: item.startY + 'px',
-            width: item.endX - item.startX + 'px,',
-            height: item.endY - item.startY + 'px,'
-          }">1
-        </div>
-      </template>
       <template v-for="(item, index) in computedList">
         <div
           class="line"
@@ -41,6 +30,16 @@
             :widths="item.widthChild"
             v-show="item.type === '1'"
           ></slider>
+          <div
+            class="leftCurDrag"
+            v-show="item.type == '1' && isHover"
+            @mousedown.stop="leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
+          ></div>
+          <div
+            class="rightCurDrag"
+            v-show="item.type == '1' && isHover"
+            @mousedown.stop="rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
+          ></div>
         </div>
         <div
           class="group"
@@ -111,10 +110,6 @@ export default {
       type: Array,
       default: () => []
     },
-    line: {
-      type: Array,
-      default: () => []
-    },
     currentDaySize: {
       type: Object,
       default: () => {
@@ -166,24 +161,6 @@ export default {
       })
       return arr
     },
-    computedLine () {
-      const arr = []
-      this.line.forEach(line => {
-        const obj = {}
-        const source = this.computedList.find(list => {
-          return list.id === line.source
-        })
-        const target = this.computedList.find(list => {
-          return list.id === line.target
-        })
-        obj.startX = source.left + source.widthMe
-        obj.startY = source.top + 20
-        obj.endX = target.left
-        obj.endY = target.top + 20
-        arr.push(obj)
-      })
-      return arr
-    },
     // 当前年份
     currentYear () {
       return new Date().getFullYear()
@@ -217,16 +194,16 @@ export default {
       const line = this.$refs[dom][0]
       const initX = e.pageX
       const initScrollX = document.querySelector('.gantt-right').scrollLeft
+      const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
       let result
       let z = 0
       let left
       // console.log(cp);
       document.onmousemove = event => {
         const scrollX = document.querySelector('.gantt-right').scrollLeft
-        const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
         const clientWidth = ganttBlock.width
-        // event.clientX - ganttBlock.left 鼠标距离 gantt-right 左侧位置
-        if (event.clientX - ganttBlock.left >= clientWidth - 40) {
+        // event.pageX - ganttBlock.left 鼠标距离 gantt-right 左侧位置
+        if (event.pageX - ganttBlock.left >= clientWidth - 40) {
           z = scrollX + this.currentDaySize.value
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
@@ -239,7 +216,7 @@ export default {
           result = this.computedList[index].left + newWith
           line.style.left = result + 'px'
           if (result <= 0) result = 0
-        } else if (event.clientX - ganttBlock.left <= 0) {
+        } else if (event.pageX - ganttBlock.left <= 0) {
           z = scrollX - this.currentDaySize.value
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
@@ -498,6 +475,184 @@ export default {
     // 设置左侧leftmenu高亮
     handlerSelect (row) {
       // console.log('handlerSelect', row)
+    },
+    // 左侧拖拽增加
+    /**
+     * @param  {String} dom ref
+     * @param  {Object} e $event
+     * @param  {Number} id id
+     * @param  {Number} parentId parentId
+     * @param  {Number} index index
+     */
+    leftCurDragMounsedown (dom, e, id, parentId, index) {
+      const initScrollX = document.querySelector('.gantt-right').scrollLeft
+      const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
+      const line = this.$refs[dom][0]
+      const cx = e.pageX
+      let result
+      let result1
+      let z = 0
+      let addwidth
+      document.onmousemove = event => {
+        const scrollX = document.querySelector('.gantt-right').scrollLeft
+        if (event.pageX - ganttBlock.left <= 40) {
+          z = scrollX - this.currentDaySize.value
+          // window.scrollTo(z, 0);
+          document.querySelector('.gantt-right').scrollTo({
+            top: 0,
+            left: z,
+            behavior: 'smooth'
+          })
+          addwidth = -(event.pageX - cx + scrollX - initScrollX)
+        } else {
+          addwidth = -(event.pageX - cx)
+        }
+        console.log(addwidth)
+        result = this.computedList[index].widthMe + addwidth
+        result1 = this.computedList[index].left - addwidth
+        if (result <= this.currentDaySize.value) {
+          result = this.currentDaySize.value
+          result1 =
+            this.computedList[index].left +
+            this.computedList[index].widthMe -
+            this.currentDaySize.value
+        } else if (result1 <= 0) {
+          result1 = 0
+          // console.log(result1);
+        }
+        line.style.width = result + 'px'
+        line.style.left = result1 + 'px'
+        this.computedList[index].widthChild = result
+        this.lineMouseover(dom, e, id, parentId, index)
+        this.lineMouseleave(e, true)
+      }
+      document.onmouseup = events => {
+        if (!result) {
+          document.onmousemove = document.onmouseup = null
+          return
+        }
+        result =
+          Math.round(result / this.currentDaySize.value) *
+          this.currentDaySize.value
+        result1 =
+          Math.round(parseInt(line.style.left) / this.currentDaySize.value) *
+          this.currentDaySize.value
+        this.computedList[index].widthMe = result
+        this.computedList[index].widthChild = result
+        line.style.width = result + 'px'
+        this.computedList[index].left = result1
+        line.style.left = result1 + 'px'
+        this.checkIsin(dom, events, id, parentId, index)
+        // this.setComputedListGroupWidth(parentId);
+        if (parentId) {
+          this.list.forEach(item => {
+            if (item.id === parentId) {
+              item.children.forEach(k => {
+                if (k.id === id) {
+                  k.widthMe = k.widthChild = result
+                  k.left = result1
+                }
+              })
+            }
+          })
+          this.setGroupWidth(parentId)
+        } else {
+          this.list.forEach(item => {
+            if (item.id === id) {
+              item.widthMe = item.widthChild = result
+              item.left = result1
+            }
+          })
+        }
+        document.onmousemove = document.onmouseup = null
+      }
+    },
+    // 右侧边缘增加
+    /**
+     * @param  {String} dom ref
+     * @param  {Object} e $event
+     * @param  {Number} id id
+     * @param  {Number} parentId parentId
+     * @param  {Number} index index
+     */
+    rightCurDragMounsedown (dom, e, id, parentId, index) {
+      const initScrollX = document.querySelector('.gantt-right').scrollLeft
+      const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
+      const line = this.$refs[dom][0]
+      const cx = e.pageX
+      let result
+      let z = 0
+      let addwidth
+      document.onmousemove = event => {
+        const scrollX = document.querySelector('.gantt-right').scrollLeft
+        const clientWidth = ganttBlock.width
+        if (event.pageX - ganttBlock.left >= clientWidth - 40) {
+          z = scrollX + this.currentDaySize.value
+          document.querySelector('.gantt-right').scrollTo({
+            top: 0,
+            left: z,
+            behavior: 'smooth'
+          })
+          addwidth = event.pageX - cx + scrollX - initScrollX
+        } else if (event.pageX - ganttBlock.left <= 40) {
+          z = scrollX - this.currentDaySize.value
+          // window.scrollTo(z, 0);
+          document.querySelector('.gantt-right').scrollTo({
+            top: 0,
+            left: z,
+            behavior: 'smooth'
+          })
+          addwidth = event.pageX - cx + scrollX - initScrollX
+        } else {
+          addwidth = event.pageX - cx
+        }
+        result = this.computedList[index].widthMe + addwidth
+        line.style.width = result + 'px'
+        this.computedList[index].widthChild = result
+        // console.log(line.style.width);
+        if (result <= this.currentDaySize.value) {
+          result = this.currentDaySize.value
+          line.style.width = result + 'px'
+          this.computedList[index].widthMe = result
+          this.computedList[index].widthChild = result
+        }
+        this.lineMouseover(dom, e, id, parentId, index)
+        this.lineMouseleave(e, true)
+      }
+      document.onmouseup = events => {
+        if (!result) {
+          document.onmousemove = document.onmouseup = null
+          return
+        }
+        result =
+          Math.round(result / this.currentDaySize.value) *
+          this.currentDaySize.value
+        this.computedList[index].widthMe = result
+        this.computedList[index].widthChild = result
+        line.style.width = result + 'px'
+        this.checkIsin(dom, events, id, parentId, index)
+        if (parentId) {
+          this.list.forEach(item => {
+            if (item.id === parentId) {
+              item.children.forEach(k => {
+                if (k.id === id) {
+                  k.widthMe = k.widthChild = result
+                  // k.left = result1;
+                }
+              })
+            }
+          })
+          this.setGroupWidth(parentId)
+        } else {
+          this.list.forEach(item => {
+            if (item.id === id) {
+              item.widthMe = item.widthChild = result
+              // item.left = result1;
+            }
+          })
+        }
+        document.onmousemove = document.onmouseup = null
+      }
     }
   }
 }
@@ -528,6 +683,32 @@ export default {
     }
     .line {
       position: absolute;
+      .rightCurDrag {
+        cursor: e-resize;
+        width: 10px;
+        border: 1px solid #e5e6eb;
+        background-color: #ffffff;
+        height: 26px;
+        position: absolute;
+        right: 0px;
+        transform: translateY(-50%);
+        top: 50%;
+        border-radius: 3px;
+        user-select: none;
+      }
+      .leftCurDrag {
+        cursor: e-resize;
+        width: 10px;
+        border: 1px solid #e5e6eb;
+        background-color: #ffffff;
+        height: 26px !important;
+        position: absolute;
+        left: 0px;
+        transform: translateY(-50%);
+        top: 50%;
+        border-radius: 3px;
+        user-select: none;
+      }
     }
     .group {
       position: absolute;

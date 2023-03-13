@@ -27,7 +27,6 @@
         :current-line-day="currentLineDay"
         :left-width="leftWidth"
         :list="list"
-        :line="line"
         @currentLineDayInit="currentLineDayInit"
         @handleCurrentLineDay="handleCurrentLineDay"
         @handleTimeChange="handleTimeChange"
@@ -67,10 +66,6 @@ export default {
       default: 240
     },
     list: {
-      type: Array,
-      default: () => []
-    },
-    line: {
       type: Array,
       default: () => []
     }
@@ -303,6 +298,7 @@ export default {
       if (this.isChildren && this.currentListIndex !== '') {
         const row = this.list[parseInt(this.currentListIndex)]
         row.children = row.children ? row.children : []
+        this.$set(row, 'expand', true) // 展开有操作 需要响应
         const cindex = row.children.length
         obj.top = 40 + cindex * 40 + row.top
         obj.parentId = row.id

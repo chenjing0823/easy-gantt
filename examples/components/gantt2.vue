@@ -1,7 +1,7 @@
 <template>
   <div class="gantt2" style="display: flex;">
     <!-- <div>asdas</div> -->
-    <EasyGanttV2 :list="list" :line="line" @handleTimeChange="handleTimeChange"></EasyGanttV2>
+    <EasyGanttV2 :list="list" @handleTimeChange="handleTimeChange"></EasyGanttV2>
   </div>
 </template>
 
@@ -21,12 +21,6 @@ export default {
 
   data () {
     return {
-      // 项目数据
-      line: [
-        {
-          id: 1, source: 1589512287571, target: 1589512309848
-        }
-      ],
       list: [
         {
           name: '项目启动阶段',
