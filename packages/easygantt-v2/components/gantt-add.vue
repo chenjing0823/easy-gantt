@@ -13,9 +13,9 @@
         </el-form-item>
         <el-form-item label="类型">
           <el-select v-model="form.type" placeholder="请选择活动区域">
-            <el-option label="计划项目" value="1"></el-option>
+            <el-option label="任务" value="1"></el-option>
             <el-option label="里程碑" value="2"></el-option>
-            <el-option label="分组" value="3"></el-option>
+            <el-option label="项目阶段" value="3"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="进度">
