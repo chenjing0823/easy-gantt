@@ -15,7 +15,7 @@
             :style="{ width: currentDaySize.value + 'px' }">
             <template v-if="currentDaySize.value === 40">
               <span
-                class="dateNum"
+                class="dateNum border-line"
                 style="border-left:1px solid #d7d7d7;"
                 :class="{
                   todayNum: day.today,
@@ -253,6 +253,9 @@ export default {
             height: 26px;
             border-bottom: 1px solid #d7d7d7;
             box-sizing: border-box;
+          }
+          .border-line {
+            border-left:1px solid #d7d7d7;
           }
 
           // .todayDateNum {

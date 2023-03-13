@@ -288,6 +288,15 @@ export default {
       this.currentLineDay = data
     },
     handleTimeChange (data) {
+      if (!data.parentId) {
+        // 里程碑节点
+        const stone = this.list.findIndex((stone) => {
+          return stone.id === data.id
+        })
+        this.list[stone].startTime = data.startTime
+        this.list[stone].endTime = data.endTime
+        return
+      }
       const first = this.list.findIndex((first) => {
         return first.id === data.parentId
       })

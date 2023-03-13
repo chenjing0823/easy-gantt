@@ -82,10 +82,10 @@ export default {
           left: 17120
         },
         {
-          name: '项目第二阶段',
+          name: '项目里程碑1',
           ower: '',
           per: 100,
-          type: '3',
+          type: '2',
           planTime: [],
           stoneTime: 1678723200000,
           startTime: 1678723200000,
@@ -98,10 +98,10 @@ export default {
           isShow: true
         },
         {
-          name: '项目第三阶段',
+          name: '项目里程碑2',
           ower: '',
           per: 100,
-          type: '3',
+          type: '2',
           planTime: [
             1679500800000,
             1679500800000

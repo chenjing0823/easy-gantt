@@ -40,6 +40,15 @@
             v-show="item.type == '1' && hoverId === item.id"
             @mousedown.stop="rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
           ></div>
+          <div
+            class="stoneLine"
+            :style="{ top: -item.top + 'px', height: item.top + 'px' }"
+            v-if="item.type == '2'"
+            @mouseenter="stoneLineMouseenter"
+          ></div>
+          <div class="milestone" v-if="item.type == '2'">
+            <i class="el-icon-s-flag"></i>
+          </div>
         </div>
         <div
           class="group"
@@ -404,6 +413,15 @@ export default {
       // console.log(e.y)
       // this.isShowMsg = true
     },
+    // 里程碑去掉mouseenter显示
+    stoneLineMouseenter () {
+      this.isShowMsg = false
+      const currentLineDay = {
+        start: 0,
+        end: 0
+      }
+      this.$emit('currentLineDayInit', currentLineDay)
+    },
     // 根据index值和e判断是否在当前line的范围里，是否展示时间和msg框
     /**
      * @param  {String} dom ref
@@ -714,6 +732,35 @@ export default {
         top: 50%;
         border-radius: 3px;
         user-select: none;
+      }
+      .stoneLine {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        bottom: 0;
+        margin-left: -1px;
+        width: 2px;
+        background-color: #FF8C2E;
+      }
+      .milestone {
+        position: absolute;
+        font-size: 12px;
+        left: 50%;
+        // transform: translateX(-50%);
+        cursor: move;
+        margin-left: -10px;
+        width: 20px;
+        height: 20px;
+        background-color: #FF8C2E;
+        transform: rotate(-45deg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        i {
+          transform: rotate(45deg);
+          color: #fff;
+          z-index: 1;
+        }
       }
     }
     .group {
