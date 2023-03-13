@@ -1,6 +1,6 @@
 <template>
   <div class="gantt-body">
-    <div class="row-line" :style="{top: (index + 1) * 41 + 49 + 'px'}"
+    <div class="row-line" :style="{top: (index + 1) * 40 + 49 + 'px'}"
       v-for="(item, index) in computedList"
       :key="index">
     </div>

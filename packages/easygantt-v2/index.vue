@@ -271,7 +271,7 @@ export default {
             obj.top =
               this.list[index - 1].children[this.list[index - 1].children.length - 1].top + 40
           } else {
-            obj.top = this.list[index - 1].top + 40
+            obj.top = this.list[index - 1].top + 40 - 2 // 任务是top 6，项目8 - 2
           }
         }
       }
@@ -283,7 +283,7 @@ export default {
         obj.id = new Date().getTime()
         obj.expand = true
         if (index === 0) {
-          obj.top = 6
+          obj.top = 8 // 项目top 8 刚好
         } else {
           if (this.list[index - 1].children && this.list[index - 1].children.length > 0) {
             obj.top =

@@ -85,7 +85,7 @@ export default {
   }
 }
 .line-height {
-  height: 20px;
+  height: 19px;
   border-bottom: 1px solid #EBEEF5;
   display: flex;
   align-items: center;
