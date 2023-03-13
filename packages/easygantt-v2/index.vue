@@ -359,7 +359,7 @@ export default {
         row.children = row.children ? row.children : []
         this.$set(row, 'expand', true) // 展开有操作 需要响应
         const cindex = row.children.length
-        obj.top = 40 + cindex * 40 + row.top
+        obj.top = 40 + cindex * 40 + row.top - 2 // 任务是top 6，项目8 - 2
         obj.parentId = row.id
         row.children.push(obj)
         row.children.forEach((item) => {
