@@ -32,12 +32,12 @@
           ></slider>
           <div
             class="leftCurDrag"
-            v-show="item.type == '1' && isHover"
+            v-show="item.type == '1' && hoverId === item.id"
             @mousedown.stop="leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
           ></div>
           <div
             class="rightCurDrag"
-            v-show="item.type == '1' && isHover"
+            v-show="item.type == '1' && hoverId === item.id"
             @mousedown.stop="rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
           ></div>
         </div>
@@ -144,7 +144,8 @@ export default {
         left: 0,
         top: 0
       },
-      isHover: false
+      isHover: false,
+      hoverId: ''
     }
   },
 
@@ -360,6 +361,7 @@ export default {
         left: 0,
         top: 0
       }
+      this.hoverId = ''
       this.handlerSelect()
     },
     /**
@@ -371,6 +373,7 @@ export default {
      */
     // 鼠标进入显示当前项目的基本信息框
     lineMouseenter (dom, e, id, parentId, index) {
+      this.hoverId = id
       // const start =
       //   Math.round(
       //     parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
