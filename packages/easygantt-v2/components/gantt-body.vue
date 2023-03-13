@@ -127,6 +127,10 @@ export default {
           end: 0
         }
       }
+    },
+    isHover: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -144,7 +148,6 @@ export default {
         left: 0,
         top: 0
       },
-      isHover: false,
       hoverId: ''
     }
   },
@@ -320,7 +323,7 @@ export default {
         end
       }
       this.$emit('handleCurrentLineDay', currentLineDay)
-      this.isHover = true
+      this.$emit('update:isHover', true)
       this.handlerSelect(this.computedList[index])
       this.lineMouseenter(dom, e, id, parentId, index)
     },
@@ -350,7 +353,7 @@ export default {
         end: 0
       }
       this.$emit('currentLineDayInit', currentLineDay)
-      this.isHover = false
+      this.$emit('update:isHover', false)
       this.isShowMsg = false
       this.currentProjectMsg = {
         name: '',

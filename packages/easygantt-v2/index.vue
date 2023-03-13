@@ -1,9 +1,17 @@
 <template>
   <div class="easy-gantt-v2">
     <el-button style="position: fixed; top: 0; right: 0" @click="gotoday">今天</el-button>
-    <el-button style="position: fixed; top: 0; right: 200px" @click="dialogFormVisible = true"
+    <el-button style="position: fixed; top: 0; right: 100px" @click="dialogFormVisible = true"
       >新建数据</el-button
     >
+    <el-select v-model="currentDaySize.value" @change="handleSetDaySize" placeholder="请选择" style="position: fixed; top: 0; right: 200px">
+      <el-option
+        v-for="item in currentDaySizeOptions"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value">
+      </el-option>
+    </el-select>
     <div class="gantt-left">
       <div class="search">
         <el-input v-model="search" placeholder="请输入内容" size="mini"> </el-input>
@@ -18,11 +26,14 @@
     <div class="gantt-right">
       <gnatt-head
         :all-days="allDays"
+        :isHover="isHover"
         :current-day-size="currentDaySize"
         :current-line-day="currentLineDay"
       >
       </gnatt-head>
       <gantt-body
+        ref="ganttbody"
+        :isHover.sync="isHover"
         :current-day-size="currentDaySize"
         :current-line-day="currentLineDay"
         :left-width="leftWidth"
@@ -73,6 +84,7 @@ export default {
 
   data () {
     return {
+      isHover: false,
       // 当前项是否是子集
       isChildren: false,
       search: '',
@@ -85,6 +97,20 @@ export default {
         label: '天',
         value: 40
       },
+      currentDaySizeOptions: [
+        {
+          label: '天',
+          value: 40
+        },
+        {
+          label: '周',
+          value: 24
+        },
+        {
+          label: '月',
+          value: 12
+        }
+      ],
       // 当前hover的项目起止时间
       currentLineDay: {
         start: 0,
@@ -111,7 +137,22 @@ export default {
     }
   },
 
-  watch: {},
+  watch: {
+    'currentDaySize.value' (newValue, oldValue) {
+      this.list.forEach(item => {
+        item.left = (item.left / oldValue) * newValue
+        item.widthMe = item.widthChild =
+          (item.widthMe / oldValue) * newValue
+        if (item.children && item.children.length > 0) {
+          item.children.forEach(k => {
+            k.left = (k.left / oldValue) * newValue
+            k.widthMe = k.widthChild =
+              (k.widthMe / oldValue) * newValue
+          })
+        }
+      })
+    }
+  },
 
   mounted () {
     this.getDay()
@@ -142,6 +183,24 @@ export default {
       })
 
       this.checkDate()
+    },
+    handleSetDaySize () {
+      let arr = []
+      let days = []
+      this.allDays.forEach((item) => {
+        arr = arr.concat(item.month)
+      })
+      arr.forEach((item) => {
+        for (const j in item) {
+          days = days.concat(item[j])
+        }
+      })
+      days.forEach((item, index) => {
+        item.width = (index + 1) * this.currentDaySize.value
+      })
+      this.$nextTick(() => {
+        this.gotoday()
+      })
     },
     // 根据年份天数创建月份及月份天数数组
     checkDate () {

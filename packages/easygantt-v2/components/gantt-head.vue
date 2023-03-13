@@ -13,13 +13,13 @@
             v-for="(day, index) in value"
             :key="index + 'dd'"
             :style="{ width: currentDaySize.value + 'px' }">
-            <template v-if="currentDaySize.value == 40">
+            <template v-if="currentDaySize.value === 40">
               <span
                 class="dateNum"
                 style="border-left:1px solid #d7d7d7;"
                 :class="{
                   todayNum: day.today,
-                  weekday: day.weekday == 0 || day.weekday == 6,
+                  weekday: day.weekday === 0 || day.weekday === 6,
                   isHover:
                     day.width >= currentLineDay.start &&
                     day.width <= currentLineDay.end
@@ -29,13 +29,99 @@
               <span
                 class="dateBG"
                 :class="{
-                  weekday2: day.weekday == 0,
-                  weekday1: day.weekday == 6,
+                  weekday2: day.weekday === 0,
+                  weekday1: day.weekday === 6,
                   today: day.today
                 }"
                 :style="{
                   width: currentDaySize.value + 'px',
                   height: lineBGHeight
+                }"
+              ></span>
+            </template>
+            <template v-else-if="currentDaySize.value === 24">
+              <span
+                class="dateNum"
+                :class="{
+                  weekday: day.weekday === 0 || day.weekday === 6,
+                  isHover:
+                    day.width >= currentLineDay.start &&
+                    day.width <= currentLineDay.end,
+                  nodBorder:
+                    day.width >= currentLineDay.start &&
+                    day.width <= currentLineDay.end
+                }"
+              >
+                <div
+                  style="width:100%21px;height:100%;"
+                  :style="{
+                    borderLeft: index === 0 ? 'none' : '1px solid #d7d7d7'
+                  }"
+                  v-show="
+                    (day.width === currentLineDay.end &&
+                      isHover &&
+                      day.weekday !== 1) ||
+                      (day.width === currentLineDay.start &&
+                        isHover &&
+                        day.weekday !== 1) ||
+                      day.weekday === 1
+                  "
+                >
+                  {{ day.date }}
+                </div>
+              </span>
+              <span
+                class="dateBG"
+                :class="{
+                  weekday2: day.weekday === 0,
+                  weekday1: day.weekday === 6,
+                  today: day.today
+                }"
+                :style="{
+                  width: currentDaySize.value + 'px',
+                  height:
+                    day.weekday === 0 || day.weekday === 6 ? lineBGHeight : '0px'
+                }"
+              ></span>
+            </template>
+            <template v-else-if="currentDaySize.value === 12">
+              <span
+                class="dateNum"
+                :class="{
+                  isHover:
+                    day.width >= currentLineDay.start &&
+                    day.width <= currentLineDay.end,
+                  nodBorder:
+                    day.width >= currentLineDay.start &&
+                    day.width <= currentLineDay.end
+                }"
+              >
+                <div
+                  style="width:100%;height:100%;font-size:10px!important;"
+                  :style="{
+                    borderLeft: index === 0 ? 'none' : '1px solid #d7d7d7'
+                  }"
+                  v-show="
+                    (day.width === currentLineDay.end && isHover && day.date !== 1) ||
+                      (day.width === currentLineDay.start &&
+                        isHover &&
+                        day.date !== 1) ||
+                      day.date === 1
+                  "
+                >
+                  {{ day.date }}
+                </div>
+              </span>
+              <span
+                class="dateBG weekday2"
+                :class="{
+                  today: day.today
+                }"
+                style="border-right:none;"
+                :style="{
+                  width: currentDaySize.value + 'px',
+                  height:
+                    day.weekday === 0 || day.weekday === 6 ? lineBGHeight : '0px'
                 }"
               ></span>
             </template>
@@ -79,6 +165,10 @@ export default {
           end: 0
         }
       }
+    },
+    isHover: {
+      type: Boolean,
+      default: false
     }
   },
 
