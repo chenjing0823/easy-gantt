@@ -386,32 +386,32 @@ export default {
     // 鼠标进入显示当前项目的基本信息框
     lineMouseenter (dom, e, id, parentId, index) {
       this.hoverId = id
-      // const start =
-      //   Math.round(
-      //     parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
-      //   ) * this.currentDaySize.value
-      // let end =
-      //   parseInt(this.$refs[dom][0].style.left) +
-      //   parseInt(this.$refs[dom][0].style.width)
-      // end =
-      //   Math.round(end / this.currentDaySize.value) *
-      //     this.currentDaySize.value -
-      //   this.currentDaySize.value
-      // this.currentProjectMsg = {
-      //   name: this.computedList[index].name,
-      //   allTime: (end - start) / this.currentDaySize.value + 1,
-      //   per: this.computedList[index].per,
-      //   startTime: this.computedWithTime(start),
-      //   endTime: this.computedWithTime(end),
-      //   left:
-      //     e.pageX + 220 >= document.querySelector('.gantt-right').getBoundingClientRect().width + this.leftWidth
-      //       ? e.pageX - 220
-      //       : e.pageX,
-      //   top: e.y - 40
-      // }
-      // console.log(e.pageX)
-      // console.log(e.y)
-      // this.isShowMsg = true
+      const start =
+        Math.round(
+          parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
+        ) * this.currentDaySize.value
+      let end =
+        parseInt(this.$refs[dom][0].style.left) +
+        parseInt(this.$refs[dom][0].style.width)
+      end =
+        Math.round(end / this.currentDaySize.value) *
+          this.currentDaySize.value -
+        this.currentDaySize.value
+      this.currentProjectMsg = {
+        name: this.computedList[index].name,
+        allTime: (end - start) / this.currentDaySize.value + 1,
+        per: this.computedList[index].per,
+        startTime: this.computedWithTime(start),
+        endTime: this.computedWithTime(end),
+        left:
+          e.pageX + 220 >= document.querySelector('.gantt-right').getBoundingClientRect().width + this.leftWidth
+            ? e.pageX - 220
+            : e.pageX,
+        top: e.y
+      }
+      console.log(e.pageX)
+      console.log(e.y)
+      this.isShowMsg = true
     },
     // 里程碑去掉mouseenter显示
     stoneLineMouseenter () {
