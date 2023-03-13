@@ -46,7 +46,16 @@ const addNum = (num, month, year) => {
   return arr
 }
 
+/**
+ * @description: 判断是否闰年
+ * @param  {Number} year 传入年份
+ */
+const isLeapYear = (year) => {
+  return year % 4 > 0
+}
+
 export default {
   checkMonthDays,
-  addNum
+  addNum,
+  isLeapYear
 }

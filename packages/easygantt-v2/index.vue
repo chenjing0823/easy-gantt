@@ -162,29 +162,22 @@ export default {
     getDay () {
       this.getAllDate()
     },
-    // 判断是否为闰年
-    /**
-     * @param  {Number} year 传入年份
-     */
-    isLeapYear (year) {
-      if (year % 4 > 0) {
-        return true
-      }
-      return false
-    },
     getAllDate () {
       let obj = {}
       const arr = [this.currentYear - 1, this.currentYear, this.currentYear + 1]
       arr.forEach((item) => {
         obj.year = item
-        obj.days = this.isLeapYear(item) ? 365 : 366
+        obj.days = ganttTool.isLeapYear(item) ? 365 : 366
         this.allDays.push(obj)
         obj = {}
       })
 
       this.checkDate()
     },
-    handleSetDaySize () {
+    /**
+     * @description: 天数距离左侧距离
+     */
+    dayWidthFormat () {
       let arr = []
       let days = []
       this.allDays.forEach((item) => {
@@ -198,11 +191,19 @@ export default {
       days.forEach((item, index) => {
         item.width = (index + 1) * this.currentDaySize.value
       })
+    },
+    /**
+     * @description: 切换时间轴
+     */
+    handleSetDaySize () {
+      this.dayWidthFormat()
       this.$nextTick(() => {
         this.gotoday()
       })
     },
-    // 根据年份天数创建月份及月份天数数组
+    /**
+     * @description: 根据年份天数创建月份及月份天数数组
+     */
     checkDate () {
       this.allDays = this.allDays.map((item) => {
         item.month = this.handleMonthDay(item.days, item.year)
@@ -225,21 +226,10 @@ export default {
       //   return element.date === this.currentDay
       // })
       today.today = true
-      let arr = []
-      let days = []
-      this.allDays.forEach((item) => {
-        arr = arr.concat(item.month)
-      })
-      arr.forEach((item) => {
-        for (const j in item) {
-          days = days.concat(item[j])
-        }
-      })
-      days.forEach((item, index) => {
-        item.width = (index + 1) * this.currentDaySize.value
-      })
+      this.dayWidthFormat()
     },
     /**
+     * @description: 处理每月等天数数组
      * @param  {Number} days
      * @param  {Number} year
      */
@@ -254,9 +244,11 @@ export default {
       for (const item in allMonth) {
         allMonth[item] = ganttTool.addNum(allMonth[item], item, year)
       }
-      // console.log(arr);
       return arr
     },
+    /**
+     * @description: 回到今天
+     */
     gotoday () {
       const day = 1000 * 60 * 60 * 24
       const ganttLeft =
@@ -287,6 +279,10 @@ export default {
     currentLineDayInit (data) {
       this.currentLineDay = data
     },
+    /**
+     * @description: 移动任务时间，或者伸缩任务，重新获取开始时间和结束时间
+     * @param: {Object} 滑动任务快的数据体
+     */
     handleTimeChange (data) {
       if (!data.parentId) {
         // 里程碑节点
@@ -306,7 +302,11 @@ export default {
       this.list[first].children[second].startTime = data.startTime
       this.list[first].children[second].endTime = data.endTime
     },
-    // 根据时间计算距离
+    /**
+     * @description: 根据时间计算距离
+     * @param: {Number} startTime 开始时间戳 毫秒
+     * @param: {Number} endTime 结束时间戳 毫秒
+     */
     computedTimeWidth (startTime, endTime) {
       const left =
         (Math.floor(startTime - new Date(`${this.currentYear - 1}/01/01`).getTime()) /
@@ -321,6 +321,10 @@ export default {
         return width
       }
     },
+    /**
+     * @description: 新增提交数据
+     * @param: {Object} 表格内容
+     */
     submit (val) {
       const obj = Object.assign({}, val)
       const index = this.list.length
@@ -389,7 +393,10 @@ export default {
       this.isChildren = false
       this.dialogFormVisible = false
     },
-    // 根据id设置group的宽度
+    /**
+     * @description: 根据id设置group的宽度
+     * @param: {Number} id
+     */
     setGroupWidth (id, lists) {
       let parent
       if (lists) {
@@ -417,7 +424,10 @@ export default {
       parent.left = left
       // return parent;
     },
-    // 设置分组百分比
+    /**
+     * @description: 设置分组百分比
+     * @param: {Number} id
+     */
     setGroupPer (id, lists) {
       let z
       if (lists) {
