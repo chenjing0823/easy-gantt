@@ -46,7 +46,7 @@
     </div>
     <gantt-add
       :dialogFormVisible.sync="dialogFormVisible"
-      @handlerNew="submit" />
+      @handlerNew="handlerNew" />
   </div>
 </template>
 
@@ -325,7 +325,7 @@ export default {
      * @description: 新增提交数据
      * @param: {Object} 表格内容
      */
-    submit (val) {
+    handlerNew (val) {
       const obj = Object.assign({}, val)
       const index = this.list.length
       console.log(obj, index)
