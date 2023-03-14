@@ -1,0 +1,162 @@
+<template>
+  <div class="series-line" :style="dynmicStyle">
+    <svg :width="width" :height="height">
+      <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" stroke="black" stroke-width="2" />
+      <line :x1="midPoint1.x" :y1="midPoint1.y" :x2="midPoint2.x" :y2="midPoint2.y" stroke="black" stroke-width="2" />
+      <line :x1="midPoint2.x" :y1="midPoint2.y" :x2="midPoint3.x" :y2="midPoint3.y" stroke="black" stroke-width="2" />
+      <line :x1="midPoint3.x" :y1="midPoint3.y" :x2="midPoint4.x" :y2="midPoint4.y" stroke="black" stroke-width="2" />
+      <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" stroke="black" stroke-width="2" />
+    </svg>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'series-line',
+  data () {
+    return {
+    }
+  },
+  props: {
+    pointData: {
+      type: Object,
+      default: () => ({})
+    },
+    data: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  computed: {
+    dynmicStyle () {
+      const { startX, startY, endX, endY } = this.data
+      const orignX = Math.min(startX, endX)
+      const orignY = Math.min(startY, endY)
+      let overflowWidth = 0
+      let overflowHeight = 0
+      if (startX >= endX) {
+        overflowWidth = 20
+      }
+      if (startY > endY) {
+        overflowHeight = 2
+      }
+      return {
+        left: orignX - overflowWidth + 'px',
+        top: orignY - overflowHeight + 'px'
+      }
+    },
+    // 连线元素 左上角坐标
+    leftTopPoint () {
+      const { startX, startY, endX, endY } = this.pointData
+      let x = Math.min(startX, endX)
+      const y = Math.min(startY, endY)
+      if (startX >= endX) { // 当连接目标在左侧
+        x = x - 20 - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
+      }
+      return {
+        x: x,
+        y: y
+      }
+    },
+    // 连续元素 右下角角坐标
+    rightEndPoint () {
+      const { startX, startY, endX, endY } = this.pointData
+      let x = Math.max(startX, endX)
+      const y = Math.max(startY, endY)
+      if (startX >= endX) { // 当连接目标在左侧
+        x = x + 20 + 2// 连线模块元素需要往右扩大20像素 2表示线框，目地是让线展示更清楚
+      }
+      return {
+        x: x,
+        y: y
+      }
+    },
+    // 开始x坐标
+    startX () {
+      const { startX, endX } = this.pointData
+      let x = startX - this.leftTopPoint.x
+      if (startX >= endX) {
+        x = startX - endX + 20
+      }
+      return x
+    },
+    // 开始y坐标
+    startY () {
+      const { startY } = this.pointData
+      return startY - this.leftTopPoint.y + 2
+    },
+    // 结束x坐标
+    endX () {
+      const { endX } = this.pointData
+      return endX - this.leftTopPoint.x
+    },
+    // 结束y坐标
+    endY () {
+      const { startY, endY } = this.pointData
+      let y = endY - this.leftTopPoint.y - 2
+      if (startY > endY) {
+        y = endY - this.leftTopPoint.y + 2
+      }
+      return y
+    },
+    // 连线设计了4个转折点 第一个节点，默认往右20像素
+    midPoint1 () {
+      return {
+        x: this.startX + 20,
+        y: this.startY
+      }
+    },
+    // 连线设计了4个转折点 第二个节点 默认x为 第一节点x
+    midPoint2 () {
+      const { startY, endY } = this.pointData
+      let y = this.midPoint1.y + 20 // 默认y 为向下20像素
+      if (startY > endY) { // 当目标在上方
+        y = this.midPoint1.y - 20 // y为向上20像素
+      }
+      return {
+        x: this.midPoint1.x,
+        y: y
+      }
+    },
+    // 连线设计了4个转折点 第三个节点 默认x为 第一节点x；y为目标y
+    midPoint3 () {
+      const { startX, endX } = this.pointData
+      let x = this.midPoint1.x
+      let y = this.endY
+      if (startX >= endX) { // 当目标位于左侧
+        x = this.endX - 20 // x为目标位置往左20像素
+        y = this.midPoint2.y // y为第2节点的y
+      }
+      return {
+        x: x,
+        y: y
+      }
+    },
+    // 连线设计了4个转折点 第四个节点 默认x为目标节点往左20像素，y为目标节点
+    midPoint4 () {
+      return {
+        x: this.endX - 20,
+        y: this.endY
+      }
+    },
+    // 连线元素块的宽
+    width () {
+      const { startX, endX } = this.pointData
+      let width = this.rightEndPoint.x - this.leftTopPoint.x
+      if (startX >= endX) { // 当目标点在左侧，左右都扩了20，宽度需要加40
+        width = startX - endX + 40 + 2
+      }
+      return width
+    },
+    // 连线元素块的高
+    height () {
+      return this.rightEndPoint.y - this.leftTopPoint.y + 2 + 2
+    }
+  }
+}
+</script>
+<style lang="stylus" scoped>
+.series-line {
+  position: absolute;
+}
+</style>

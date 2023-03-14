@@ -16,7 +16,6 @@
             <template v-if="currentDaySize.value === 40">
               <span
                 class="dateNum border-line"
-                style="border-left:1px solid #d7d7d7;"
                 :class="{
                   todayNum: day.today,
                   weekday: day.weekday === 0 || day.weekday === 6,
@@ -253,9 +252,6 @@ export default {
             height: 26px;
             border-bottom: 1px solid #d7d7d7;
             box-sizing: border-box;
-          }
-          .border-line {
-            border-left:1px solid #d7d7d7;
           }
 
           // .todayDateNum {

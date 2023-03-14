@@ -38,6 +38,7 @@
         :current-line-day="currentLineDay"
         :left-width="leftWidth"
         :list="list"
+        :line="line"
         @currentLineDayInit="currentLineDayInit"
         @handleCurrentLineDay="handleCurrentLineDay"
         @handleTimeChange="handleTimeChange"
@@ -77,6 +78,10 @@ export default {
       default: 240
     },
     list: {
+      type: Array,
+      default: () => []
+    },
+    line: {
       type: Array,
       default: () => []
     }

@@ -26,32 +26,12 @@
 export default {
   name: 'left-card',
 
-  components: {
-  },
-
-  filters: {
-  },
-
   mixins: [],
   props: {
     list: {
       type: Array,
       default: () => []
     }
-  },
-
-  data () {
-    return {
-    }
-  },
-
-  computed: {
-  },
-
-  watch: {
-  },
-
-  mounted () {
   },
 
   methods: {

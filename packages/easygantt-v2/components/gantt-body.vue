@@ -1,10 +1,15 @@
 <template>
   <div class="gantt-body">
-    <div class="row-line" :style="{top: (index + 1) * 40 + 49 + 'px'}"
+    <div
+      class="row-line"
+      :style="{ top: (index + 1) * 40 + 49 + 'px' }"
       v-for="(item, index) in computedList"
-      :key="index">
-    </div>
+      :key="index"
+    ></div>
     <div class="lineBG">
+      <template v-for="(item, index) in computedLine">
+        <seriesLine :data="item" :point-data="item" :key="index"></seriesLine>
+      </template>
       <template v-for="(item, index) in computedList">
         <div
           class="line"
@@ -19,8 +24,8 @@
           @mousedown="lineMousedown(`line${item.id}`, $event, item.id, item.parentId, index)"
           @mouseover="lineMouseover(`line${item.id}`, $event, item.id, item.parentId, index)"
           @mouseleave="lineMouseleave"
-          @mouseenter="lineMouseenter(`line${item.id}`, $event, item.id,item.parentId, index)"
-          >
+          @mouseenter="lineMouseenter(`line${item.id}`, $event, item.id, item.parentId, index)"
+        >
           <slider
             :min="0"
             :max="100"
@@ -33,12 +38,16 @@
           <div
             class="leftCurDrag"
             v-show="item.type == '1' && hoverId === item.id"
-            @mousedown.stop="leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
+            @mousedown.stop="
+              leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
+            "
           ></div>
           <div
             class="rightCurDrag"
             v-show="item.type == '1' && hoverId === item.id"
-            @mousedown.stop="rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)"
+            @mousedown.stop="
+              rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
+            "
           ></div>
           <div
             class="stoneLine"
@@ -77,21 +86,17 @@
           <span class="projectName">{{ currentProjectMsg.name }}</span>
         </div>
         <div class="lineMsg">
-          <span class="title">持续时间:</span
-          ><span>{{ currentProjectMsg.allTime }}天</span>
+          <span class="title">持续时间:</span><span>{{ currentProjectMsg.allTime }}天</span>
         </div>
         <div class="lineMsg">
-          <span class="title">当前进度:</span
-          ><span>{{ currentProjectMsg.per }}%</span>
+          <span class="title">当前进度:</span><span>{{ currentProjectMsg.per }}%</span>
         </div>
         <div class="lineMsg">
-          <span class="title">开始时间:</span
-          ><span>{{ currentProjectMsg.startTime }}</span>
+          <span class="title">开始时间:</span><span>{{ currentProjectMsg.startTime }}</span>
         </div>
 
         <div class="lineMsg">
-          <span class="title">结束时间:</span
-          ><span>{{ currentProjectMsg.endTime }}</span>
+          <span class="title">结束时间:</span><span>{{ currentProjectMsg.endTime }}</span>
         </div>
       </div>
     </transition>
@@ -99,16 +104,17 @@
 </template>
 
 <script>
+import seriesLine from './series-line.vue'
 import slider from './silder.vue'
 export default {
   name: 'gantt-body',
 
   components: {
-    slider
+    slider,
+    seriesLine
   },
 
-  filters: {
-  },
+  filters: {},
 
   mixins: [],
   props: {
@@ -116,6 +122,10 @@ export default {
       type: Number
     },
     list: {
+      type: Array,
+      default: () => []
+    },
+    line: {
       type: Array,
       default: () => []
     },
@@ -158,13 +168,34 @@ export default {
         top: 0
       },
       hoverId: ''
+      // line: [
+      //   { startX: 17320, startY: 60, endX: 17080, endY: 100 },
+      //   { startX: 17320, startY: 100, endX: 17480, endY: 140 },
+      //   { startX: 17320, startY: 220, endX: 17480, endY: 180 },
+      //   { startX: 17480, startY: 260, endX: 17320, endY: 220 }
+      // ]
     }
   },
 
   computed: {
+    computedLine () {
+      const arr = []
+      this.line.forEach((item) => {
+        const start = this.computedList.find((i) => i.id === item.sourceid)
+        const end = this.computedList.find((i) => i.id === item.targetid)
+        arr.push({
+          id: item.id,
+          startX: start.left + start.widthMe,
+          startY: start.top + 14,
+          endX: end.left,
+          endY: end.top + 14
+        })
+      })
+      return arr
+    },
     computedList () {
       let arr = []
-      this.list.forEach(item => {
+      this.list.forEach((item) => {
         if (!item.children || item.children.length < 1) {
           arr.push(item)
         } else if (item.children && item.children.length >= 1) {
@@ -188,11 +219,9 @@ export default {
     }
   },
 
-  watch: {
-  },
+  watch: {},
 
-  mounted () {
-  },
+  mounted () {},
 
   methods: {
     // 每一行拖拽
@@ -212,7 +241,7 @@ export default {
       let z = 0
       let left
       // console.log(cp);
-      document.onmousemove = event => {
+      document.onmousemove = (event) => {
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         const clientWidth = ganttBlock.width
         // event.pageX - ganttBlock.left 鼠标距离 gantt-right 左侧位置
@@ -252,21 +281,19 @@ export default {
         this.lineMouseover(dom, e, id, parentId, index)
         this.lineMouseleave(e, true)
       }
-      document.onmouseup = events => {
+      document.onmouseup = (events) => {
         if (!result) {
           document.onmousemove = document.onmouseup = null
           return
         }
-        left =
-          Math.round(result / this.currentDaySize.value) *
-          this.currentDaySize.value
+        left = Math.round(result / this.currentDaySize.value) * this.currentDaySize.value
         this.computedList[index].left = left
         line.style.left = left + 'px'
         this.checkIsin(dom, events, id, parentId, index)
         if (parentId) {
-          this.list.forEach(item => {
+          this.list.forEach((item) => {
             if (item.id === parentId) {
-              item.children.forEach(k => {
+              item.children.forEach((k) => {
                 if (k.id === id) {
                   k.left = left
                 }
@@ -275,7 +302,7 @@ export default {
           })
           this.setGroupWidth(parentId)
         } else {
-          this.list.forEach(item => {
+          this.list.forEach((item) => {
             if (item.id === id) {
               item.left = left
             }
@@ -286,16 +313,11 @@ export default {
     },
     changeTime (dom, e, id, parentId, index) {
       const start =
-        Math.round(
-          parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
-        ) *
+        Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
           this.currentDaySize.value +
         this.currentDaySize.value
-      let end =
-        parseInt(this.$refs[dom][0].style.left) +
-        parseInt(this.$refs[dom][0].style.width)
-      end =
-        Math.round(end / this.currentDaySize.value) * this.currentDaySize.value
+      let end = parseInt(this.$refs[dom][0].style.left) + parseInt(this.$refs[dom][0].style.width)
+      end = Math.round(end / this.currentDaySize.value) * this.currentDaySize.value
       const obj = {
         id,
         parentId,
@@ -317,16 +339,11 @@ export default {
     // 鼠标悬停展示上部日期
     lineMouseover (dom, e, id, parentId, index) {
       const start =
-        Math.round(
-          parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
-        ) *
+        Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
           this.currentDaySize.value +
         this.currentDaySize.value
-      let end =
-        parseInt(this.$refs[dom][0].style.left) +
-        parseInt(this.$refs[dom][0].style.width)
-      end =
-        Math.round(end / this.currentDaySize.value) * this.currentDaySize.value
+      let end = parseInt(this.$refs[dom][0].style.left) + parseInt(this.$refs[dom][0].style.width)
+      end = Math.round(end / this.currentDaySize.value) * this.currentDaySize.value
       const currentLineDay = {
         start,
         end
@@ -387,15 +404,11 @@ export default {
     lineMouseenter (dom, e, id, parentId, index) {
       this.hoverId = id
       const start =
-        Math.round(
-          parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value
-        ) * this.currentDaySize.value
-      let end =
-        parseInt(this.$refs[dom][0].style.left) +
-        parseInt(this.$refs[dom][0].style.width)
+        Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
+        this.currentDaySize.value
+      let end = parseInt(this.$refs[dom][0].style.left) + parseInt(this.$refs[dom][0].style.width)
       end =
-        Math.round(end / this.currentDaySize.value) *
-          this.currentDaySize.value -
+        Math.round(end / this.currentDaySize.value) * this.currentDaySize.value -
         this.currentDaySize.value
       this.currentProjectMsg = {
         name: this.computedList[index].name,
@@ -404,7 +417,8 @@ export default {
         startTime: this.computedWithTime(start),
         endTime: this.computedWithTime(end),
         left:
-          e.pageX + 220 >= document.querySelector('.gantt-right').getBoundingClientRect().width + this.leftWidth
+          e.pageX + 220 >=
+          document.querySelector('.gantt-right').getBoundingClientRect().width + this.leftWidth
             ? e.pageX - 220
             : e.pageX,
         top: e.y
@@ -472,22 +486,22 @@ export default {
     setGroupWidth (id, lists) {
       let parent
       if (lists) {
-        parent = lists.find(item => {
+        parent = lists.find((item) => {
           return item.id === id
         })
       } else {
-        parent = this.list.find(item => {
+        parent = this.list.find((item) => {
           return item.id === id
         })
       }
       const left = Math.min.apply(
         Math,
-        parent.children.map(o => {
+        parent.children.map((o) => {
           return o.left
         })
       )
       const arr = []
-      parent.children.forEach(item => {
+      parent.children.forEach((item) => {
         arr.push(item.left + item.widthMe)
       })
       const width = Math.max.apply(Math, arr)
@@ -517,7 +531,7 @@ export default {
       let result1
       let z = 0
       let addwidth
-      document.onmousemove = event => {
+      document.onmousemove = (event) => {
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         if (event.pageX - ganttBlock.left <= 40) {
           z = scrollX - this.currentDaySize.value
@@ -550,14 +564,12 @@ export default {
         this.lineMouseover(dom, e, id, parentId, index)
         this.lineMouseleave(e, true)
       }
-      document.onmouseup = events => {
+      document.onmouseup = (events) => {
         if (!result) {
           document.onmousemove = document.onmouseup = null
           return
         }
-        result =
-          Math.round(result / this.currentDaySize.value) *
-          this.currentDaySize.value
+        result = Math.round(result / this.currentDaySize.value) * this.currentDaySize.value
         result1 =
           Math.round(parseInt(line.style.left) / this.currentDaySize.value) *
           this.currentDaySize.value
@@ -569,9 +581,9 @@ export default {
         this.checkIsin(dom, events, id, parentId, index)
         // this.setComputedListGroupWidth(parentId);
         if (parentId) {
-          this.list.forEach(item => {
+          this.list.forEach((item) => {
             if (item.id === parentId) {
-              item.children.forEach(k => {
+              item.children.forEach((k) => {
                 if (k.id === id) {
                   k.widthMe = k.widthChild = result
                   k.left = result1
@@ -581,7 +593,7 @@ export default {
           })
           this.setGroupWidth(parentId)
         } else {
-          this.list.forEach(item => {
+          this.list.forEach((item) => {
             if (item.id === id) {
               item.widthMe = item.widthChild = result
               item.left = result1
@@ -607,7 +619,7 @@ export default {
       let result
       let z = 0
       let addwidth
-      document.onmousemove = event => {
+      document.onmousemove = (event) => {
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         const clientWidth = ganttBlock.width
         if (event.pageX - ganttBlock.left >= clientWidth - 40) {
@@ -643,22 +655,20 @@ export default {
         this.lineMouseover(dom, e, id, parentId, index)
         this.lineMouseleave(e, true)
       }
-      document.onmouseup = events => {
+      document.onmouseup = (events) => {
         if (!result) {
           document.onmousemove = document.onmouseup = null
           return
         }
-        result =
-          Math.round(result / this.currentDaySize.value) *
-          this.currentDaySize.value
+        result = Math.round(result / this.currentDaySize.value) * this.currentDaySize.value
         this.computedList[index].widthMe = result
         this.computedList[index].widthChild = result
         line.style.width = result + 'px'
         this.checkIsin(dom, events, id, parentId, index)
         if (parentId) {
-          this.list.forEach(item => {
+          this.list.forEach((item) => {
             if (item.id === parentId) {
-              item.children.forEach(k => {
+              item.children.forEach((k) => {
                 if (k.id === id) {
                   k.widthMe = k.widthChild = result
                   // k.left = result1;
@@ -668,7 +678,7 @@ export default {
           })
           this.setGroupWidth(parentId)
         } else {
-          this.list.forEach(item => {
+          this.list.forEach((item) => {
             if (item.id === id) {
               item.widthMe = item.widthChild = result
               // item.left = result1;
@@ -676,6 +686,23 @@ export default {
           })
         }
         document.onmousemove = document.onmouseup = null
+      }
+    },
+    dynmicStyle (data) {
+      const { startX, startY, endX, endY } = data
+      const orignX = Math.min(startX, endX)
+      const orignY = Math.min(startY, endY)
+      let overflowWidth = 0
+      let overflowHeight = 0
+      if (startX >= endX) {
+        overflowWidth = 20
+      }
+      if (startY > endY) {
+        overflowHeight = 2
+      }
+      return {
+        left: orignX - overflowWidth + 'px',
+        top: orignY - overflowHeight + 'px'
       }
     }
   }
