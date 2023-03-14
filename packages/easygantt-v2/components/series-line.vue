@@ -1,11 +1,11 @@
 <template>
   <div class="series-line" :style="dynmicStyle">
     <svg :width="width" :height="height">
-      <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" stroke="black" stroke-width="2" />
-      <line :x1="midPoint1.x" :y1="midPoint1.y" :x2="midPoint2.x" :y2="midPoint2.y" stroke="black" stroke-width="2" />
-      <line :x1="midPoint2.x" :y1="midPoint2.y" :x2="midPoint3.x" :y2="midPoint3.y" stroke="black" stroke-width="2" />
-      <line :x1="midPoint3.x" :y1="midPoint3.y" :x2="midPoint4.x" :y2="midPoint4.y" stroke="black" stroke-width="2" />
-      <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" stroke="black" stroke-width="2" />
+      <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" class="line" />
+      <line :x1="midPoint1.x" :y1="midPoint1.y" :x2="midPoint2.x" :y2="midPoint2.y" class="line" />
+      <line :x1="midPoint2.x" :y1="midPoint2.y" :x2="midPoint3.x" :y2="midPoint3.y" class="line" />
+      <line :x1="midPoint3.x" :y1="midPoint3.y" :x2="midPoint4.x" :y2="midPoint4.y" class="line" />
+      <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" class="line" />
     </svg>
   </div>
 </template>
@@ -158,5 +158,9 @@ export default {
 <style lang="stylus" scoped>
 .series-line {
   position: absolute;
+  .line {
+    stroke: #C9CDD4;
+    stroke-width:2
+  }
 }
 </style>
