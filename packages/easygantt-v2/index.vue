@@ -185,7 +185,7 @@ export default {
             const _item = JSON.parse(JSON.stringify(item))
             delete _item.children
             arr.push(_item)
-            arr = arr.concat(getAllList(item.children, true, index))
+            arr = arr.concat(getAllList(item.children, true, index)) // children数组，是子任务，父节点index
           }
         })
         return arr
@@ -357,8 +357,10 @@ export default {
      */
     handlerNew (val) {
       const obj = Object.assign({}, val)
-      obj.startTime = obj.planTime.length > 0 ? obj.planTime[0] : obj.stoneTime
-      obj.endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
+      const startTime = obj.planTime.length > 0 ? obj.planTime[0] : obj.stoneTime
+      const endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
+      this.$set(obj, 'startTime', startTime)
+      this.$set(obj, 'endTime', endTime)
       this.pushData(obj)
       if (obj.type !== '3') {
         this.handlerRowClick(obj)
@@ -375,18 +377,21 @@ export default {
       const currentListIndex = this.currentListIndex || obj.currentListIndex
       const index = this.list.length
       if (obj.type !== 3) {
-        obj.left = this.computedTimeWidth(obj.startTime)
-        obj.widthMe = obj.widthChild = this.computedTimeWidth(obj.startTime, obj.endTime)
+        this.$set(obj, 'left', this.computedTimeWidth(obj.startTime))
+        this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
+        this.$set(obj, 'widthChild', this.computedTimeWidth(obj.startTime, obj.endTime))
+        let top
         if (index === 0) {
-          obj.top = 6
+          top = 6
         } else {
-          if (this.list[index - 1].children && this.list[index - 1].children.length > 0) {
-            obj.top =
-              this.list[index - 1].children[this.list[index - 1].children.length - 1].top + 40
+          const children = this.list[index - 1].children
+          if (children && children.length > 0) {
+            top = children[children.length - 1].top + 40
           } else {
-            obj.top = this.list[index - 1].top + 40
+            top = this.list[index - 1].top + 40
           }
         }
+        this.$set(obj, 'top', top)
       }
       if (obj.type === 2) {
         obj.per = 100
@@ -394,20 +399,22 @@ export default {
       if (obj.type === 3) {
         obj.per = 0
         obj.id = obj.id || new Date().getTime()
-        obj.expand = true
+        this.$set(obj, 'expand', true)
+        let childrenTop
         if (index === 0) {
-          obj.top = 8 // 项目top 8 刚好
+          childrenTop = 8 // 项目top 8 刚好
         } else {
-          if (this.list[index - 1].children && this.list[index - 1].children.length > 0) {
-            obj.top =
-              this.list[index - 1].children[this.list[index - 1].children.length - 1].top + 40
+          const children = this.list[index - 1].children
+          if (children && children.length > 0) {
+            childrenTop = children[children.length - 1].top + 40
           } else {
-            obj.top = this.list[index - 1].top + 40
+            childrenTop = this.list[index - 1].top + 40
           }
         }
+        this.$set(obj, 'top', childrenTop)
       }
       obj.id = obj.id || new Date().getTime()
-      obj.isShow = true
+      this.$set(obj, 'isShow', true)
       if (isChildren && currentListIndex !== '') {
         const row = this.list[parseInt(currentListIndex)]
         row.children = row.children ? row.children : []
@@ -426,7 +433,8 @@ export default {
         }
         this.$set(this.list, parseInt(currentListIndex), row)
       } else {
-        this.list.push(obj)
+        this.$set(this.list, index, obj)
+        // this.list.push(obj)
       }
     },
     /**
