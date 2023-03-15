@@ -84,6 +84,10 @@ export default {
     line: {
       type: Array,
       default: () => []
+    },
+    dataList: {
+      type: Array,
+      default: () => []
     }
   },
 
@@ -123,7 +127,8 @@ export default {
       },
       dialogFormVisible: false,
       currentListIndex: '',
-      currentRow: null
+      currentRow: null,
+      dataListNew: []
     }
   },
 
@@ -161,9 +166,34 @@ export default {
 
   mounted () {
     this.getDay()
+    this.dataFormat()
   },
 
   methods: {
+    /**
+     * @description: 数据格式化，拿到每个甘特图节点的位置信息
+     */
+    dataFormat () {
+      const getAllList = (dataList, isChildren = false, currentListIndex = '') => {
+        let arr = []
+        dataList.forEach((item, index) => {
+          item.isChildren = isChildren // 是否子任务
+          item.currentListIndex = currentListIndex // 子任务所在的父index
+          if (!item.children || item.children.length < 1) {
+            arr.push(item)
+          } else if (item.children && item.children.length >= 1) {
+            const _item = JSON.parse(JSON.stringify(item))
+            delete _item.children
+            arr.push(_item)
+            arr = arr.concat(getAllList(item.children, true, index))
+          }
+        })
+        return arr
+      }
+      getAllList(this.dataList).forEach(data => {
+        this.pushData(data, true)
+      })
+    },
     getDay () {
       this.getAllDate()
     },
@@ -272,11 +302,6 @@ export default {
         left: width,
         behavior: 'smooth'
       })
-      // document.querySelector('.todayNum').scrollIntoView({
-      //   behavior: 'smooth',
-      //   block: 'start',
-      //   inline: 'center'
-      // })
     },
     handleCurrentLineDay (data) {
       this.currentLineDay = data
@@ -332,15 +357,26 @@ export default {
      */
     handlerNew (val) {
       const obj = Object.assign({}, val)
-      const index = this.list.length
-      console.log(obj, index)
       obj.startTime = obj.planTime.length > 0 ? obj.planTime[0] : obj.stoneTime
       obj.endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
-
+      this.pushData(obj)
+      if (obj.type !== '3') {
+        this.handlerRowClick(obj)
+      }
+      this.currentListIndex = ''
+      this.isChildren = false
+      this.dialogFormVisible = false
+    },
+    /**
+     * @description: 插入数据
+     */
+    pushData (obj, isInit = false) {
+      const isChildren = this.isChildren || obj.isChildren
+      const currentListIndex = this.currentListIndex || obj.currentListIndex
+      const index = this.list.length
       if (obj.type !== 3) {
         obj.left = this.computedTimeWidth(obj.startTime)
         obj.widthMe = obj.widthChild = this.computedTimeWidth(obj.startTime, obj.endTime)
-        // console.log(obj.type);
         if (index === 0) {
           obj.top = 6
         } else {
@@ -348,7 +384,7 @@ export default {
             obj.top =
               this.list[index - 1].children[this.list[index - 1].children.length - 1].top + 40
           } else {
-            obj.top = this.list[index - 1].top + 40 - 2 // 任务是top 6，项目8 - 2
+            obj.top = this.list[index - 1].top + 40
           }
         }
       }
@@ -357,7 +393,7 @@ export default {
       }
       if (obj.type === 3) {
         obj.per = 0
-        obj.id = new Date().getTime()
+        obj.id = obj.id || new Date().getTime()
         obj.expand = true
         if (index === 0) {
           obj.top = 8 // 项目top 8 刚好
@@ -366,37 +402,32 @@ export default {
             obj.top =
               this.list[index - 1].children[this.list[index - 1].children.length - 1].top + 40
           } else {
-            obj.top = this.list[index - 1].top + 40 - 2 // 任务是top 6，项目8 - 2
+            obj.top = this.list[index - 1].top + 40
           }
         }
       }
-      obj.id = new Date().getTime()
+      obj.id = obj.id || new Date().getTime()
       obj.isShow = true
-      if (this.isChildren && this.currentListIndex !== '') {
-        const row = this.list[parseInt(this.currentListIndex)]
+      if (isChildren && currentListIndex !== '') {
+        const row = this.list[parseInt(currentListIndex)]
         row.children = row.children ? row.children : []
         this.$set(row, 'expand', true) // 展开有操作 需要响应
         const cindex = row.children.length
-        obj.top = 40 + cindex * 40 + row.top - 2 // 任务是top 6，项目8 - 2
+        obj.top = 40 + cindex * 40 + row.top
         obj.parentId = row.id
         row.children.push(obj)
         row.children.forEach((item) => {
           item.isShow = true
         })
-        this.setGroupWidth(row.id)
-        this.setGroupPer(row.id)
-        this.resetTop(this.currentListIndex)
-        this.$set(this.list, parseInt(this.currentListIndex), row)
-        console.log(row)
+        if (!isInit) {
+          this.setGroupWidth(row.id)
+          this.setGroupPer(row.id)
+          this.resetTop(currentListIndex)
+        }
+        this.$set(this.list, parseInt(currentListIndex), row)
       } else {
         this.list.push(obj)
       }
-      if (obj.type !== '3') {
-        this.handlerRowClick(obj)
-      }
-      this.currentListIndex = ''
-      this.isChildren = false
-      this.dialogFormVisible = false
     },
     /**
      * @description: 根据id设置group的宽度

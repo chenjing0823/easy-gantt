@@ -1,12 +1,15 @@
 <template>
-  <div class="series-line" :style="dynmicStyle">
+  <div class="series-line" :style="dynmicStyle" @mouseleave="isShowDel = false">
     <svg :width="width" :height="height">
-      <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" class="line" />
+      <!-- <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" class="line" />
       <line :x1="midPoint1.x" :y1="midPoint1.y" :x2="midPoint2.x" :y2="midPoint2.y" class="line" />
       <line :x1="midPoint2.x" :y1="midPoint2.y" :x2="midPoint3.x" :y2="midPoint3.y" class="line" />
       <line :x1="midPoint3.x" :y1="midPoint3.y" :x2="midPoint4.x" :y2="midPoint4.y" class="line" />
-      <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" class="line" />
+      <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" class="line" /> -->
+      <!-- 改用折线直接绘制 便于触发鼠标事件 -->
+      <polyline :points="points" class="poly-line" @click="showDel"/>
     </svg>
+    <i class="el-icon-delete line-icon" v-show="isShowDel"></i>
   </div>
 </template>
 
@@ -15,6 +18,7 @@ export default {
   name: 'series-line',
   data () {
     return {
+      isShowDel: false
     }
   },
   props: {
@@ -151,6 +155,20 @@ export default {
     // 连线元素块的高
     height () {
       return this.rightEndPoint.y - this.leftTopPoint.y + 2 + 2
+    },
+    points () {
+      return `
+      ${this.startX},${this.startY}
+      ${this.midPoint1.x},${this.midPoint1.y}
+      ${this.midPoint2.x},${this.midPoint2.y}
+      ${this.midPoint3.x},${this.midPoint3.y}
+      ${this.midPoint4.x},${this.midPoint4.y}
+      ${this.endX},${this.endY}`
+    }
+  },
+  methods: {
+    showDel () {
+      this.isShowDel = true
     }
   }
 }
@@ -161,6 +179,21 @@ export default {
   .line {
     stroke: #C9CDD4;
     stroke-width:2
+  }
+  .line-icon {
+    position: absolute;
+    left: 25px;
+  }
+  .poly-line {
+    fill: none;
+    stroke: #C9CDD4;
+    stroke-width: 2
+  }
+  .poly-line:hover {
+    fill: none;
+    stroke: #4DACFF;
+    stroke-width: 2
+    cursor: pointer;
   }
 }
 </style>

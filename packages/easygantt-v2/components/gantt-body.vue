@@ -180,7 +180,8 @@ export default {
   computed: {
     computedLine () {
       const arr = []
-      this.line.forEach((item) => {
+      const showLine = this.computedList.length && this.line.length
+      showLine && this.line.forEach((item) => {
         const start = this.computedList.find((i) => i.id === item.sourceid)
         const end = this.computedList.find((i) => i.id === item.targetid)
         arr.push({
