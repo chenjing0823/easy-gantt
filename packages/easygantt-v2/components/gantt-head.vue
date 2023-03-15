@@ -192,9 +192,7 @@ export default {
     // 设置里程碑线的高度
     setStoneLine (isFirst) {
       this.$nextTick(() => {
-        const height = window.getComputedStyle(
-          document.getElementsByClassName('lineBG')[0]
-        ).height
+        const height = getComputedStyle(document.querySelector('.lineBG')).height
         this.lineBGHeight = height
       })
     },

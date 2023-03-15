@@ -395,8 +395,7 @@ export default {
       }
       if (obj.type === 2) {
         obj.per = 100
-      }
-      if (obj.type === 3) {
+      } else if (obj.type === 3) {
         obj.per = 0
         obj.id = obj.id || new Date().getTime()
         this.$set(obj, 'expand', true)

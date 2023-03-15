@@ -51,7 +51,7 @@
           ></div>
           <div
             class="stoneLine"
-            :style="{ top: -item.top + 'px', height: item.top + 'px' }"
+            :style="{ top: -item.top + 'px', height: lineBGHeight }"
             v-if="item.type == '2'"
             @mouseenter="stoneLineMouseenter"
           ></div>
@@ -167,7 +167,9 @@ export default {
         left: 0,
         top: 0
       },
-      hoverId: ''
+      hoverId: '',
+      // 背景高度
+      lineBGHeight: '0px'
       // line: [
       //   { startX: 17320, startY: 60, endX: 17080, endY: 100 },
       //   { startX: 17320, startY: 100, endX: 17480, endY: 140 },
@@ -222,9 +224,18 @@ export default {
 
   watch: {},
 
-  mounted () {},
+  mounted () {
+    this.setStoneLine()
+  },
 
   methods: {
+    // 设置里程碑线的高度
+    setStoneLine (isFirst) {
+      this.$nextTick(() => {
+        const height = getComputedStyle(document.querySelector('.lineBG')).height
+        this.lineBGHeight = height
+      })
+    },
     // 每一行拖拽
     /**
      * @param  {String} dom ref
@@ -766,8 +777,8 @@ export default {
         top: 0;
         left: 50%;
         bottom: 0;
-        margin-left: -1px;
-        width: 2px;
+        // margin-left: -1px;
+        width: 1px;
         background-color: #FF8C2E;
       }
       .milestone {

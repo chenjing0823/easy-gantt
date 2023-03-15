@@ -36,8 +36,8 @@ export default {
           type: '3',
           planTime: [],
           stoneTime: '',
-          startTime: '',
-          endTime: '',
+          startTime: 1677945600000,
+          endTime: 1678982400000,
           id: 1589512272596,
           children: [
             {
@@ -68,6 +68,21 @@ export default {
               startTime: 1678723200000,
               endTime: 1678982400000,
               id: 1589512309848,
+              parentId: 1589512272596
+            },
+            {
+              name: '里程碑1',
+              ower: '',
+              per: 100,
+              type: '2',
+              planTime: [
+                1589817600000,
+                1590076800000
+              ],
+              stoneTime: 1678896000000,
+              startTime: 1678896000000,
+              endTime: 1678896000000,
+              id: 1678896000000,
               parentId: 1589512272596
             }
           ]
