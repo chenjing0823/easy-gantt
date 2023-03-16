@@ -149,18 +149,22 @@ export default {
 
   watch: {
     'currentDaySize.value' (newValue, oldValue) {
-      this.list.forEach(item => {
-        item.left = (item.left / oldValue) * newValue
-        item.widthMe = item.widthChild =
-          (item.widthMe / oldValue) * newValue
-        if (item.children && item.children.length > 0) {
-          item.children.forEach(k => {
-            k.left = (k.left / oldValue) * newValue
-            k.widthMe = k.widthChild =
-              (k.widthMe / oldValue) * newValue
-          })
-        }
-      })
+      const newVal = (item, left, widthMe, widthChild) => {
+        item[left] = (item[left] / oldValue) * newValue
+        item[widthMe] = item[widthChild] = (item[widthMe] / oldValue) * newValue
+      }
+      const widthFormat = (list) => {
+        list.forEach(item => {
+          newVal(item, 'left', 'widthMe', 'widthChild')
+          if (item.widthMeStatic) {
+            newVal(item, 'leftStatic', 'widthMeStatic', 'widthChildStatic')
+          }
+          if (item.children && item.children.length > 0) {
+            widthFormat(item.children)
+          }
+        })
+      }
+      widthFormat(this.list)
     }
   },
 
@@ -376,10 +380,10 @@ export default {
       const isChildren = this.isChildren || obj.isChildren
       const currentListIndex = this.currentListIndex || obj.currentListIndex
       const index = this.list.length
-      if (obj.type !== 3) {
-        this.$set(obj, 'left', this.computedTimeWidth(obj.startTime))
-        this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
-        this.$set(obj, 'widthChild', this.computedTimeWidth(obj.startTime, obj.endTime))
+      this.$set(obj, 'left', this.computedTimeWidth(obj.startTime))
+      this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
+      this.$set(obj, 'widthChild', this.computedTimeWidth(obj.startTime, obj.endTime))
+      if (obj.type !== '3') {
         let top
         if (index === 0) {
           top = 6
@@ -393,10 +397,15 @@ export default {
         }
         this.$set(obj, 'top', top)
       }
-      if (obj.type === 2) {
+      if (obj.type === '2') {
         obj.per = 100
-      } else if (obj.type === 3) {
-        obj.per = 0
+      } else if (obj.type === '3') {
+        if (!isInit) {
+          obj.per = 0
+        }
+        this.$set(obj, 'leftStatic', this.computedTimeWidth(obj.startTime))
+        this.$set(obj, 'widthMeStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
+        this.$set(obj, 'widthChildStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
         obj.id = obj.id || new Date().getTime()
         this.$set(obj, 'expand', true)
         let childrenTop

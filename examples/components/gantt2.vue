@@ -100,20 +100,6 @@ export default {
               parentId: 1678723200000
             }
           ]
-        },
-        {
-          name: '项目里程碑2',
-          ower: '',
-          per: 100,
-          type: '2',
-          planTime: [
-            1679500800000,
-            1679500800000
-          ],
-          stoneTime: 1679500800000,
-          startTime: 1679500800000,
-          endTime: 1679500800000,
-          id: 1679500800000
         }
       ],
       list: []

@@ -63,19 +63,8 @@
             <i class="el-icon-s-flag"></i>
           </div>
         </div>
-        <template v-else-if="item.type === '3'">
-          <div
-            class="group"
-            :style="{
-              top: item.top + 'px',
-              left: item.left + 'px',
-              width: item.widthMe + 'px'
-            }"
-            :key="item.id + 'zzzzz'"
-          >
-            <div class="progress" :style="{ width: item.per + '%' }"></div>
-          </div>
-        </template>
+        <group  v-else-if="item.type === '3'" :key="item.id" :item="item"></group>
+
       </template>
     </div>
     <transition name="el-zoom-in-center">
@@ -111,11 +100,13 @@
 <script>
 import seriesLine from './series-line.vue'
 import slider from './silder.vue'
+import group from './group.vue'
 export default {
   name: 'gantt-body',
 
   components: {
     slider,
+    group,
     seriesLine
   },
 
@@ -789,30 +780,6 @@ export default {
           color: #fff;
           z-index: 1;
         }
-      }
-    }
-    .group {
-      position: absolute;
-      background-color: #C1E8FF !important;
-      border: none !important;
-      border-radius: 0 !important;
-      height: 18px !important;
-      line-height: 18px !important;
-      clip-path: polygon(
-        100% 0,
-        100% 100%,
-        calc(100% - 8px) 60%,
-        8px 60%,
-        0 100%,
-        0 0
-      );
-      // > div {
-      //   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-      // }
-      .progress {
-        // width: 50px;
-        background-color: #74C3FF !important;
-        height: 100%;
       }
     }
   }
