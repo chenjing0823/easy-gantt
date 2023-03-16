@@ -63,18 +63,19 @@
             <i class="el-icon-s-flag"></i>
           </div>
         </div>
-        <div
-          class="group"
-          :style="{
-            top: item.top + 'px',
-            left: item.left + 'px',
-            width: item.widthMe + 'px'
-          }"
-          v-else-if="item.type === '3'"
-          :key="item.id + 'zzzzz'"
-        >
-          <div class="progress" :style="{ width: item.per + '%' }"></div>
-        </div>
+        <template v-else-if="item.type === '3'">
+          <div
+            class="group"
+            :style="{
+              top: item.top + 'px',
+              left: item.left + 'px',
+              width: item.widthMe + 'px'
+            }"
+            :key="item.id + 'zzzzz'"
+          >
+            <div class="progress" :style="{ width: item.per + '%' }"></div>
+          </div>
+        </template>
       </template>
     </div>
     <transition name="el-zoom-in-center">
@@ -439,8 +440,8 @@ export default {
             : e.pageX,
         top: e.y
       }
-      console.log(e.pageX)
-      console.log(e.y)
+      // console.log(e.pageX)
+      // console.log(e.y)
       this.isShowMsg = true
     },
     // 里程碑去掉mouseenter显示
