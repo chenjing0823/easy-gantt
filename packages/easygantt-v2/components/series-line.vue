@@ -9,7 +9,7 @@
       <!-- 改用折线直接绘制 便于触发鼠标事件 -->
       <polyline :points="points" class="poly-line" @click="showDel"/>
     </svg>
-    <i class="el-icon-delete line-icon" v-show="isShowDel"></i>
+    <i class="el-icon-delete line-icon" :style="iconStyle" v-show="isShowDel"></i>
   </div>
 </template>
 
@@ -60,6 +60,16 @@ export default {
       return {
         left: orignX - overflowWidth + 'px',
         top: orignY - overflowHeight + 'px'
+      }
+    },
+    iconStyle () {
+      const { startX, endX } = this.pointData
+      let left = this.currentDaySize.value / 2 + 5 + 'px'
+      if (startX >= endX) {
+        left = this.startX + this.currentDaySize.value / 2 + 5 + 'px'
+      }
+      return {
+        left: left
       }
     },
     // 连线元素 左上角坐标
@@ -167,7 +177,8 @@ export default {
       const { startX, endX } = this.pointData
       let width = this.rightEndPoint.x - this.leftTopPoint.x
       if (startX >= endX) { // 当目标点在左侧，左右都扩了20，宽度需要加40
-        width = startX - endX + 40 + 2
+        // width = startX - endX + 40 + 2
+        width = startX - endX + this.currentDaySize.value + 2
       }
       return width
     },
@@ -201,7 +212,6 @@ export default {
   }
   .line-icon {
     position: absolute;
-    left: 25px;
   }
   .poly-line {
     fill: none;

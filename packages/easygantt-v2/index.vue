@@ -564,5 +564,6 @@ export default {
   flex-direction: column;
   max-width: 100%
   overflow-x: scroll;
+  border-left: 1px solid #F2F3F5;
 }
 </style>

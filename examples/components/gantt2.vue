@@ -69,7 +69,21 @@ export default {
               endTime: 1678982400000,
               id: 1589512309848,
               parentId: 1589512272596
-            },
+            }
+          ]
+        },
+        {
+          name: '项目阶段2',
+          ower: '',
+          per: 100,
+          type: '3',
+          planTime: [],
+          stoneTime: 1678723200000,
+          startTime: 1678723200000,
+          endTime: 1678723200000,
+          id: 1678723200000,
+          children: [
+
             {
               name: '里程碑1',
               ower: '',
@@ -83,20 +97,9 @@ export default {
               startTime: 1678896000000,
               endTime: 1678896000000,
               id: 1678896000000,
-              parentId: 1589512272596
+              parentId: 1678723200000
             }
           ]
-        },
-        {
-          name: '项目里程碑1',
-          ower: '',
-          per: 100,
-          type: '2',
-          planTime: [],
-          stoneTime: 1678723200000,
-          startTime: 1678723200000,
-          endTime: 1678723200000,
-          id: 1678723200000
         },
         {
           name: '项目里程碑2',

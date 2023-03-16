@@ -138,7 +138,7 @@ export default {
       default: () => {
         return {
           label: '天',
-          value: 40
+          value: 60
         }
       }
     },
@@ -703,23 +703,6 @@ export default {
         }
         document.onmousemove = document.onmouseup = null
       }
-    },
-    dynmicStyle (data) {
-      const { startX, startY, endX, endY } = data
-      const orignX = Math.min(startX, endX)
-      const orignY = Math.min(startY, endY)
-      let overflowWidth = 0
-      let overflowHeight = 0
-      if (startX >= endX) {
-        overflowWidth = 20
-      }
-      if (startY > endY) {
-        overflowHeight = 2
-      }
-      return {
-        left: orignX - overflowWidth + 'px',
-        top: orignY - overflowHeight + 'px'
-      }
     }
   }
 }
@@ -735,7 +718,7 @@ export default {
   // }
   .lineBG {
     width: 100%;
-    height: calc(100% - 50px);
+    height: calc(100% - 0px);
     position: relative;
     .first {
       position: absolute;
@@ -750,6 +733,7 @@ export default {
     }
     .line {
       position: absolute;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
       .rightCurDrag {
         cursor: e-resize;
         width: 10px;
