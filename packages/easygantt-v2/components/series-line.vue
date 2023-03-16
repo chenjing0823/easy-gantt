@@ -29,9 +29,21 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    currentDaySize: {
+      type: Object,
+      default: () => {
+        return {
+          label: '天',
+          value: 60
+        }
+      }
     }
   },
   computed: {
+    polylineStaticWidth () {
+      return this.currentDaySize.value / 2
+    },
     dynmicStyle () {
       const { startX, startY, endX, endY } = this.data
       const orignX = Math.min(startX, endX)
@@ -39,7 +51,8 @@ export default {
       let overflowWidth = 0
       let overflowHeight = 0
       if (startX >= endX) {
-        overflowWidth = 20
+        // overflowWidth = 20
+        overflowWidth = this.polylineStaticWidth
       }
       if (startY > endY) {
         overflowHeight = 2
@@ -55,7 +68,8 @@ export default {
       let x = Math.min(startX, endX)
       const y = Math.min(startY, endY)
       if (startX >= endX) { // 当连接目标在左侧
-        x = x - 20 - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
+        // x = x - 20 - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
+        x = x - this.polylineStaticWidth - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
       }
       return {
         x: x,
@@ -68,7 +82,8 @@ export default {
       let x = Math.max(startX, endX)
       const y = Math.max(startY, endY)
       if (startX >= endX) { // 当连接目标在左侧
-        x = x + 20 + 2// 连线模块元素需要往右扩大20像素 2表示线框，目地是让线展示更清楚
+        // x = x + 20 + 2// 连线模块元素需要往右扩大20像素 2表示线框，目地是让线展示更清楚
+        x = x + this.polylineStaticWidth + 2// 连线模块元素需要往右扩大20像素 2表示线框，目地是让线展示更清楚
       }
       return {
         x: x,
@@ -80,7 +95,8 @@ export default {
       const { startX, endX } = this.pointData
       let x = startX - this.leftTopPoint.x
       if (startX >= endX) {
-        x = startX - endX + 20
+        // x = startX - endX + 20
+        x = startX - endX + this.polylineStaticWidth
       }
       return x
     },
@@ -106,7 +122,8 @@ export default {
     // 连线设计了4个转折点 第一个节点，默认往右20像素
     midPoint1 () {
       return {
-        x: this.startX + 20,
+        // x: this.startX + 20,
+        x: this.startX + this.polylineStaticWidth,
         y: this.startY
       }
     },
@@ -128,7 +145,8 @@ export default {
       let x = this.midPoint1.x
       let y = this.endY
       if (startX >= endX) { // 当目标位于左侧
-        x = this.endX - 20 // x为目标位置往左20像素
+        // x = this.endX - 20 // x为目标位置往左20像素
+        x = this.endX - this.polylineStaticWidth // x为目标位置往左20像素
         y = this.midPoint2.y // y为第2节点的y
       }
       return {
@@ -139,7 +157,8 @@ export default {
     // 连线设计了4个转折点 第四个节点 默认x为目标节点往左20像素，y为目标节点
     midPoint4 () {
       return {
-        x: this.endX - 20,
+        // x: this.endX - 20,
+        x: this.endX - this.polylineStaticWidth,
         y: this.endY
       }
     },

@@ -8,7 +8,11 @@
     ></div> -->
     <div class="lineBG">
       <template v-for="(item, index) in computedLine">
-        <seriesLine :data="item" :point-data="item" :key="index"></seriesLine>
+        <seriesLine
+          :data="item"
+          :currentDaySize="currentDaySize"
+          :point-data="item"
+          :key="index"></seriesLine>
       </template>
       <template v-for="(item, index) in computedList">
         <div
