@@ -13,7 +13,7 @@
             v-for="(day, index) in value"
             :key="index + 'dd'"
             :style="{ width: currentDaySize.value + 'px' }">
-            <template v-if="currentDaySize.value === 40">
+            <template v-if="currentDaySize.value === 60">
               <span
                 class="dateNum border-line"
                 :class="{
@@ -262,8 +262,8 @@ export default {
             left: 0px;
             display: block;
             height: 100%;
-            border-left: 1px solid #E5E6EB;
-            background-color: #F7F8FA;
+            border-left: 1px solid #F2F3F5;
+            // background-color: #F7F8FA;
           }
           .weekday {
             color: #c7c7c7;

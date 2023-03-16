@@ -1,11 +1,11 @@
 <template>
   <div class="gantt-body">
-    <div
+    <!-- <div
       class="row-line"
       :style="{ top: (index + 1) * 40 + 49 + 'px' }"
       v-for="(item, index) in computedList"
       :key="index"
-    ></div>
+    ></div> -->
     <div class="lineBG">
       <template v-for="(item, index) in computedLine">
         <seriesLine :data="item" :point-data="item" :key="index"></seriesLine>
@@ -724,11 +724,11 @@ export default {
 <style lang="stylus" scoped>
 .gantt-body {
   height: 100%;
-  .row-line {
-    border-bottom: 1px solid #EBEEF5;
-    width:100%;
-    position: absolute;
-  }
+  // .row-line {
+  //   border-bottom: 1px solid #EBEEF5;
+  //   width:100%;
+  //   position: absolute;
+  // }
   .lineBG {
     width: 100%;
     height: calc(100% - 50px);

@@ -104,12 +104,12 @@ export default {
       // 当前的时间大小
       currentDaySize: {
         label: '天',
-        value: 40
+        value: 60
       },
       currentDaySizeOptions: [
         {
           label: '天',
-          value: 40
+          value: 60
         },
         {
           label: '周',
