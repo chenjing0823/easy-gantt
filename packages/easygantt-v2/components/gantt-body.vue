@@ -41,14 +41,14 @@
           ></slider>
           <div
             class="leftCurDrag"
-            v-show="item.type == '1' && hoverId === item.id"
+            v-show="item.type === '1' && hoverId === item.id"
             @mousedown.stop="
               leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
             "
           ></div>
           <div
             class="rightCurDrag"
-            v-show="item.type == '1' && hoverId === item.id"
+            v-show="item.type === '1' && hoverId === item.id"
             @mousedown.stop="
               rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
             "
@@ -56,14 +56,15 @@
           <div
             class="stoneLine"
             :style="{ top: -item.top + 'px', height: lineBGHeight }"
-            v-if="item.type == '2'"
+            v-if="item.type === '2'"
             @mouseenter="stoneLineMouseenter"
           ></div>
-          <div class="milestone" v-if="item.type == '2'">
+          <div class="milestone" v-if="item.type === '2'">
             <i class="el-icon-s-flag"></i>
           </div>
         </div>
-        <group  v-else-if="item.type === '3'" :key="item.id" :item="item"></group>
+        <!-- 父级条 -->
+        <group v-else-if="item.type === '3'" :key="item.id" :item="item"></group>
 
       </template>
     </div>

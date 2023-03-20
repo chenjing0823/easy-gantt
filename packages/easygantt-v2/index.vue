@@ -377,8 +377,8 @@ export default {
      * @description: 插入数据
      */
     pushData (obj, isInit = false) {
-      const isChildren = this.isChildren || obj.isChildren
-      const currentListIndex = this.currentListIndex || obj.currentListIndex
+      const isChildren = obj.isChildren || this.isChildren
+      const currentListIndex = this.currentListIndex !== '' ? this.currentListIndex : obj.currentListIndex
       const index = this.list.length
       this.$set(obj, 'left', this.computedTimeWidth(obj.startTime))
       this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
