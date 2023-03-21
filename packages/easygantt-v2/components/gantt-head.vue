@@ -7,12 +7,23 @@
         :key="value + 'zz' + key"
         :style="getMonthStyle(value, currentDaySize)"
       >
-        <div class="month-top">{{ item.year }}年{{ key }}月</div>
+        <template v-if="currentDaySize.value === 60">
+          <div class="month-top day-view">{{ item.year }}年{{ key }}月</div>
+        </template>
+        <template v-else-if="currentDaySize.value === 6 || currentDaySize.value === 2">
+          <!-- 年视图展示年 季视图展示年 -->
+          <div class="year-top" :style="{width: currentDaySize.value * item.days + 'px' }" v-if="+key === 1">{{ item.year }}年</div>
+          <div class="month-top"></div>
+        </template>
+        <template v-else-if="currentDaySize.value === 1.5">
+          <div class="month-top year-view" :class="{ yearEndMonth: +key === 1 }"></div>
+        </template>
         <div class="month-day">
           <div class="day"
             v-for="(day, index) in value"
             :key="index + 'dd'"
             :style="{ width: currentDaySize.value + 'px' }">
+            <!-- 日 -->
             <template v-if="currentDaySize.value === 60">
               <span
                 class="dateNum border-line"
@@ -38,36 +49,21 @@
                 }"
               ></span>
             </template>
-            <template v-else-if="currentDaySize.value === 24">
+            <!-- 月 -->
+            <template v-else-if="currentDaySize.value === 6">
+              <!-- 月视图展示月 -->
+              <div class="month-start" v-if="index === 0">
+                {{ key }}月
+              </div>
               <span
                 class="dateNum"
                 :class="{
                   weekday: day.weekday === 0 || day.weekday === 6,
                   isHover:
                     day.width >= currentLineDay.start &&
-                    day.width <= currentLineDay.end,
-                  nodBorder:
-                    day.width >= currentLineDay.start &&
                     day.width <= currentLineDay.end
                 }"
               >
-                <div
-                  style="width:100%21px;height:100%;"
-                  :style="{
-                    borderLeft: index === 0 ? 'none' : '1px solid #d7d7d7'
-                  }"
-                  v-show="
-                    (day.width === currentLineDay.end &&
-                      isHover &&
-                      day.weekday !== 1) ||
-                      (day.width === currentLineDay.start &&
-                        isHover &&
-                        day.weekday !== 1) ||
-                      day.weekday === 1
-                  "
-                >
-                  {{ day.date }}
-                </div>
               </span>
               <span
                 class="dateBG"
@@ -78,49 +74,58 @@
                 }"
                 :style="{
                   width: currentDaySize.value + 'px',
-                  height:
-                    day.weekday === 0 || day.weekday === 6 ? lineBGHeight : '0px'
+                  height: index === 0 ? lineBGHeight : '0px'
                 }"
               ></span>
             </template>
-            <template v-else-if="currentDaySize.value === 12">
+            <!-- 季 -->
+            <template v-else-if="currentDaySize.value === 2">
+              <!-- 季视图展示季 -->
+              <div class="season-start" v-if="season.includes(+key) && index === 0">
+                {{ key | seasonFormat }}
+              </div>
               <span
                 class="dateNum"
                 :class="{
                   isHover:
                     day.width >= currentLineDay.start &&
-                    day.width <= currentLineDay.end,
-                  nodBorder:
+                    day.width <= currentLineDay.end
+                }"
+              >
+              </span>
+              <span
+                class="dateBG"
+                :class="{
+                  today: day.today
+                }"
+                :style="{
+                  width: currentDaySize.value + 'px',
+                  height: season.includes(+key) && index === 0 ? lineBGHeight : '0px'
+                }"
+              ></span>
+            </template>
+            <!-- 年 -->
+            <template v-else-if="currentDaySize.value === 1.5">
+              <div class="year-start" v-if="+key === 1 && index === 0">
+                {{ item.year }}
+              </div>
+              <span
+                class="dateNum"
+                :class="{
+                  isHover:
                     day.width >= currentLineDay.start &&
                     day.width <= currentLineDay.end
                 }"
               >
-                <div
-                  style="width:100%;height:100%;font-size:10px!important;"
-                  :style="{
-                    borderLeft: index === 0 ? 'none' : '1px solid #d7d7d7'
-                  }"
-                  v-show="
-                    (day.width === currentLineDay.end && isHover && day.date !== 1) ||
-                      (day.width === currentLineDay.start &&
-                        isHover &&
-                        day.date !== 1) ||
-                      day.date === 1
-                  "
-                >
-                  {{ day.date }}
-                </div>
               </span>
               <span
-                class="dateBG weekday2"
+                class="dateBG"
                 :class="{
                   today: day.today
                 }"
-                style="border-right:none;"
                 :style="{
                   width: currentDaySize.value + 'px',
-                  height:
-                    day.weekday === 0 || day.weekday === 6 ? lineBGHeight : '0px'
+                  height: +key === 1 && index === 0 ? lineBGHeight : '0px'
                 }"
               ></span>
             </template>
@@ -139,6 +144,11 @@ export default {
   },
 
   filters: {
+    seasonFormat (val) {
+      const month = +val
+      const index = [1, 4, 7, 10].findIndex(s => s === month)
+      return `${index + 1}季度`
+    }
   },
 
   mixins: [],
@@ -174,7 +184,8 @@ export default {
   data () {
     return {
       // 背景高度
-      lineBGHeight: 0
+      lineBGHeight: 0,
+      season: [1, 4, 7, 10] // 季度数组
     }
   },
 
@@ -211,16 +222,42 @@ export default {
     height: 100%;
     .month {
       height: 100%;
+      position: relative;
+      .year-top {
+        position: absolute;
+        left: 0;
+        top: 0;
+        line-height: 23px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #969799;
+        font-size: 14px;
+        text-align: left;
+        font-family: PingFangSC-Regular;
+        border-right: 1px solid #e5e6eb;
+      }
       .month-top {
+        box-sizing: border-box;
         color: rgba(150, 151, 153, 1);
         font-size: 14px;
         text-align: left;
         font-family: PingFangSC-Regular;
-        height: 23px;
-        line-height: 23px;
+        height: 24px;
+        line-height: 24px;
         border-bottom: 1px solid #E5E6EB;
+        border-top: 1px solid #E5E6EB;
         display: flex;
         justify-content: center;
+      }
+      .day-view {
+        border-right: 1px solid #e5e6eb;
+      }
+      .yearEndMonth {
+        border-left: 1px solid #e5e6eb;
+      }
+      .year-view {
+        border-bottom: none;
       }
       .month-day {
         display: flex;
@@ -240,6 +277,49 @@ export default {
             div {
               border-left: none !important;
             }
+          }
+          .month-start {
+            position: absolute;
+            width: 180px;
+            left: 0;
+            z-index: 1;
+            line-height: 26px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #969799;
+            font-size: 14px;
+            text-align: left;
+            font-family: PingFangSC-Regular;
+          }
+          .season-start {
+            position: absolute;
+            width: 180px;
+            left: 0;
+            z-index: 1;
+            line-height: 26px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #969799;
+            font-size: 14px;
+            text-align: left;
+            font-family: PingFangSC-Regular;
+          }
+          .year-start {
+            position: absolute;
+            width: 540px;
+            left: 0;
+            z-index: 1;
+            line-height: 26px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #969799;
+            font-size: 14px;
+            text-align: left;
+            font-family: PingFangSC-Regular;
+            border-left: 1px solid #e5e6eb;
           }
           .dateNum {
             color: rgba(150, 151, 153, 1);

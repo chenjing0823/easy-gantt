@@ -1,6 +1,6 @@
 <template>
   <div class="left-card">
-    <div v-for="item in list" :key="item.id">
+    <div class="card-block" v-for="item in list" :key="item.id">
       <div class="left-card__head line-height">
         <div>
           <i class="el-icon-caret-bottom" v-if="item.expand" @click="item.expand = !item.expand"></i>
@@ -68,9 +68,13 @@ export default {
   flex: 1;
   overflow-y: scroll;
   width: 100%;
-  background-color: #ffffff;
   border-radius: 4px;
+  background-color: #F7F8FA;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+  .card-block {
+    background-color: #ffffff;
+    margin-bottom: 5px;
+  }
   .left-card__head {
     color: rgba(50, 50, 51, 1);
     font-size: 14px;

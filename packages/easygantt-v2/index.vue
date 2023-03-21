@@ -76,7 +76,7 @@ export default {
   props: {
     leftWidth: {
       type: Number,
-      default: 240
+      default: 280
     },
     list: {
       type: Array,
@@ -114,12 +114,16 @@ export default {
           value: 60
         },
         {
-          label: '周',
-          value: 24
+          label: '月',
+          value: 6
         },
         {
-          label: '月',
-          value: 12
+          label: '季',
+          value: 2
+        },
+        {
+          label: '年',
+          value: 1.5
         }
       ],
       // 当前hover的项目起止时间
@@ -421,6 +425,7 @@ export default {
           } else {
             childrenTop = this.list[index - 1].top + 40
           }
+          childrenTop += 5 // 阶段直接有5像素的距离
         }
         this.$set(obj, 'top', childrenTop)
       }

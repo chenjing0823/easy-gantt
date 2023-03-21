@@ -36,18 +36,28 @@
             :max="100"
             v-model="item.per"
             :id="item.id"
-            :hoverId="hoverId"
             :parentId="item.parentId"
             :widths="item.widthChild"
-            v-show="item.type === '1'"
+            v-if="item.type === '1'"
           ></slider>
-          <div class="dragBox" v-show="hoverId === item.id">
+
+          <template v-else-if="item.type === '2'">
+            <div
+              class="stoneLine"
+              :style="{ top: -item.top + 'px', height: lineBGHeight }"
+              @mouseenter="stoneLineMouseenter"
+            ></div>
+            <div class="milestone">
+              <i class="el-icon-s-flag"></i>
+            </div>
+          </template>
+
+          <div class="dragBox" v-show="hoverId === item.id && item.type !== '2'">
             <slider
               :min="0"
               :max="100"
               v-model="item.per"
               :id="item.id"
-              :hoverId="hoverId"
               :parentId="item.parentId"
               :widths="item.widthChild"
               v-show="item.type === '1'"
@@ -67,15 +77,7 @@
               rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
             "
           >||</div>
-          <div
-            class="stoneLine"
-            :style="{ top: -item.top + 'px', height: lineBGHeight }"
-            v-if="item.type === '2'"
-            @mouseenter="stoneLineMouseenter"
-          ></div>
-          <div class="milestone" v-if="item.type === '2'">
-            <i class="el-icon-s-flag"></i>
-          </div>
+
         </div>
         <!-- 父级条 -->
         <group v-else-if="item.type === '3'" :key="item.id" :item="item"></group>
