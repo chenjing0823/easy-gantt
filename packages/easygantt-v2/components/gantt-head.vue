@@ -263,6 +263,7 @@ export default {
             display: block;
             height: 100%;
             border-left: 1px solid #F2F3F5;
+            background-color: #ffffff;
             // background-color: #F7F8FA;
           }
           .weekday {

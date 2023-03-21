@@ -39,6 +39,7 @@
         :left-width="leftWidth"
         :list="list"
         :line="line"
+        :dayLength="dayLength"
         @currentLineDayInit="currentLineDayInit"
         @handleCurrentLineDay="handleCurrentLineDay"
         @handleTimeChange="handleTimeChange"
@@ -99,6 +100,7 @@ export default {
       search: '',
       // 近三年的所有年月日
       allDays: [],
+      dayLength: 0,
       // 月数
       monthArr: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       // 当前的时间大小
@@ -230,6 +232,7 @@ export default {
       days.forEach((item, index) => {
         item.width = (index + 1) * this.currentDaySize.value
       })
+      this.dayLength = days[days.length - 1].width
     },
     /**
      * @description: 切换时间轴
@@ -557,7 +560,10 @@ export default {
 }
 .gantt-left {
   flex: none;
+  display: flex;
+  flex-direction: column;
   .search {
+    flex: none;
     height: 28px;
     background-color: #ffffff;
     padding: 10px 8px;
@@ -574,5 +580,7 @@ export default {
   max-width: 100%
   overflow-x: scroll;
   border-left: 1px solid #F2F3F5;
+  z-index: 1;
+  background-color: #ffffff;
 }
 </style>

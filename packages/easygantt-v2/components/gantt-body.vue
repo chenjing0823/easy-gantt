@@ -6,7 +6,8 @@
       v-for="(item, index) in computedList"
       :key="index"
     ></div> -->
-    <div class="lineBG">
+    <div class="lineBG" :style="{width: dayLength + 'px'}">
+      <!-- <div v-for="item in 100" :key="item" style="position: absolute;" :style="{top: item * 30 + 'px',left: item * 50 + 'px'}">123</div> -->
       <template v-for="(item, index) in computedLine">
         <seriesLine
           :data="item"
@@ -35,24 +36,37 @@
             :max="100"
             v-model="item.per"
             :id="item.id"
+            :hoverId="hoverId"
             :parentId="item.parentId"
             :widths="item.widthChild"
             v-show="item.type === '1'"
           ></slider>
+          <div class="dragBox" v-show="hoverId === item.id">
+            <slider
+              :min="0"
+              :max="100"
+              v-model="item.per"
+              :id="item.id"
+              :hoverId="hoverId"
+              :parentId="item.parentId"
+              :widths="item.widthChild"
+              v-show="item.type === '1'"
+            ></slider>
+          </div>
           <div
-            class="leftCurDrag"
+            class="leftCurDrag curdrag"
             v-show="item.type === '1' && hoverId === item.id"
             @mousedown.stop="
               leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
             "
-          ></div>
+          >||</div>
           <div
-            class="rightCurDrag"
+            class="rightCurDrag curdrag"
             v-show="item.type === '1' && hoverId === item.id"
             @mousedown.stop="
               rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
             "
-          ></div>
+          >||</div>
           <div
             class="stoneLine"
             :style="{ top: -item.top + 'px', height: lineBGHeight }"
@@ -125,6 +139,10 @@ export default {
     line: {
       type: Array,
       default: () => []
+    },
+    dayLength: {
+      type: Number,
+      required: true
     },
     currentDaySize: {
       type: Object,
@@ -713,45 +731,42 @@ export default {
     width: 100%;
     height: calc(100% - 0px);
     position: relative;
-    .first {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 15px;
-      height: 2px;
-      background-color: black;
-    }
-    .seconed {
-
-    }
+    overflow-y: scroll;
     .line {
       position: absolute;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
-      .rightCurDrag {
-        cursor: e-resize;
+      .curdrag {
+        color: #4E5969;
         width: 10px;
-        border: 1px solid #e5e6eb;
-        background-color: #ffffff;
-        height: 26px;
-        position: absolute;
-        right: 0px;
-        transform: translateY(-50%);
-        top: 50%;
-        border-radius: 3px;
-        user-select: none;
-      }
-      .leftCurDrag {
-        cursor: e-resize;
-        width: 10px;
-        border: 1px solid #e5e6eb;
         background-color: #ffffff;
         height: 26px !important;
         position: absolute;
-        left: 0px;
         transform: translateY(-50%);
         top: 50%;
         border-radius: 3px;
         user-select: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .rightCurDrag {
+        cursor: e-resize;
+        right: -10px;
+      }
+      .leftCurDrag {
+        cursor: w-resize;
+        left: -10px;
+      }
+      .dragBox {
+        border-radius: 4px;
+        position: absolute;
+        padding: 4px 10px;
+        top: -4px;
+        left: -10px;
+        height: 28px;
+        width: 100%;
+        background-color: #ffffff;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
       }
       .stoneLine {
         position: absolute;

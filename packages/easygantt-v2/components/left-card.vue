@@ -33,7 +33,28 @@ export default {
       default: () => []
     }
   },
-
+  mounted () {
+    const leftCard = document.querySelector('.left-card')
+    const lineBG = document.querySelector('.lineBG')
+    let leftCardchange = true
+    let lineBGchange = true
+    leftCard.onscroll = () => {
+      if (leftCardchange) {
+        lineBG.scrollTop = leftCard.scrollTop / (leftCard.scrollHeight - leftCard.clientHeight) * (lineBG.scrollHeight - lineBG.clientHeight)
+        lineBGchange = false
+      } else {
+        leftCardchange = true
+      }
+    }
+    lineBG.onscroll = () => {
+      if (lineBGchange) {
+        leftCard.scrollTop = lineBG.scrollTop / (lineBG.scrollHeight - lineBG.clientHeight) * (leftCard.scrollHeight - leftCard.clientHeight)
+        leftCardchange = false
+      } else {
+        lineBGchange = true
+      }
+    }
+  },
   methods: {
     newTask (item) {
       this.$emit('handlerNewTask', item)
@@ -44,6 +65,8 @@ export default {
 
 <style lang="stylus" scoped>
 .left-card {
+  flex: 1;
+  overflow-y: scroll;
   width: 100%;
   background-color: #ffffff;
   border-radius: 4px;

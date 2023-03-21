@@ -41,7 +41,7 @@ export default {
     },
     left () {
       if (this.slider) {
-        return this.widths * this.scale - this.thunk.offsetWidth / 2 + 'px'
+        return this.widths * this.scale + 'px'
       } else {
         return 0 + 'px'
       }
@@ -73,7 +73,6 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    width: 112px;
     height: 28px;
     border-radius: 3px;
     background: #74C3FF;

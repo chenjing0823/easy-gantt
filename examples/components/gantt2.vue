@@ -100,6 +100,50 @@ export default {
               parentId: 1678723200000
             }
           ]
+        },
+
+        {
+          name: '项目启动阶段',
+          ower: '',
+          per: 30,
+          type: '3',
+          planTime: [],
+          stoneTime: '',
+          startTime: 1677945600000,
+          endTime: 1678982400000,
+          id: 1589512272597,
+          children: [
+            {
+              name: '完成工作计划1',
+              ower: '',
+              per: 50,
+              type: '1',
+              planTime: [
+                1589472000000,
+                1589817600000
+              ],
+              stoneTime: '',
+              startTime: 1677945600000,
+              endTime: 1678291200000,
+              id: 1589512287572,
+              parentId: 1589512272596
+            },
+            {
+              name: '完成工作计划2',
+              ower: '',
+              per: 100,
+              type: '1',
+              planTime: [
+                1589817600000,
+                1590076800000
+              ],
+              stoneTime: '',
+              startTime: 1678723200000,
+              endTime: 1678982400000,
+              id: 1589512309849,
+              parentId: 1589512272596
+            }
+          ]
         }
       ],
       list: []
@@ -229,7 +273,7 @@ export default {
 </script>
 <style lang="stylus">
 .gantt2 {
-  height: 900px;
+  height: 700px;
   width: 100%;
 }
 </style>

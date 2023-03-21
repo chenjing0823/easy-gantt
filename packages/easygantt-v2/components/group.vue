@@ -9,7 +9,6 @@
       class="group"
       :style="setStyle(item.top, item.leftStatic, item.widthMeStatic)"
     >
-      <div class="progress" :style="{ width: item.per + '%' }"></div>
     </div>
   </div>
 </template>
@@ -40,7 +39,7 @@ export default {
 <style lang="stylus" scoped>
 .group {
   position: absolute;
-  background-color: #C1E8FF;
+  background-color: #74C3FF;
   border: none;
   border-radius: 0;
   height: 18px;
@@ -53,10 +52,6 @@ export default {
     0 100%,
     0 0
   );
-  .progress {
-    background-color: #74C3FF;
-    height: 100%;
-  }
 }
 .group-dynmic {
   position: absolute;
