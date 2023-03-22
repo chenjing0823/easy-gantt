@@ -29,7 +29,6 @@
                 class="dateNum border-line"
                 :class="{
                   todayNum: day.today,
-                  weekday: day.weekday === 0 || day.weekday === 6,
                   isHover:
                     day.width >= currentLineDay.start &&
                     day.width <= currentLineDay.end
@@ -39,8 +38,6 @@
               <span
                 class="dateBG"
                 :class="{
-                  weekday2: day.weekday === 0,
-                  weekday1: day.weekday === 6,
                   today: day.today
                 }"
                 :style="{
@@ -58,7 +55,6 @@
               <span
                 class="dateNum"
                 :class="{
-                  weekday: day.weekday === 0 || day.weekday === 6,
                   isHover:
                     day.width >= currentLineDay.start &&
                     day.width <= currentLineDay.end
@@ -68,8 +64,6 @@
               <span
                 class="dateBG"
                 :class="{
-                  weekday2: day.weekday === 0,
-                  weekday1: day.weekday === 6,
                   today: day.today
                 }"
                 :style="{
@@ -187,12 +181,6 @@ export default {
       lineBGHeight: 0,
       season: [1, 4, 7, 10] // 季度数组
     }
-  },
-
-  computed: {
-  },
-
-  watch: {
   },
 
   mounted () {
@@ -331,11 +319,6 @@ export default {
             border-bottom: 1px solid #d7d7d7;
             box-sizing: border-box;
           }
-
-          // .todayDateNum {
-          //   background-color: #f0a100;
-          //   color: #fff;
-          // }
           .dateBG {
             position: absolute;
             top: 26px;
@@ -346,12 +329,6 @@ export default {
             background-color: #ffffff;
             // background-color: #F7F8FA;
           }
-          .weekday {
-            color: #c7c7c7;
-          }
-          // .today {
-          //   position: relative;
-          // }
           .today::after {
             content: "";
             height: 100%;

@@ -94,7 +94,7 @@ export default {
 
   methods: {
     submit () {
-      this.$emit('handlerNew', this.form)
+      this.$emit('handlerNewConfirm', this.form)
       this.cancel()
     },
     cancel () {

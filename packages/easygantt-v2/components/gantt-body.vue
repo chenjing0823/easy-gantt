@@ -83,6 +83,13 @@
         <group v-else-if="item.type === '3'" :key="item.id" :item="item"></group>
 
       </template>
+      <!-- 占位格，保持高度与左侧滚动区域一致 -->
+      <div class="null-block"
+        v-if="computedList.length"
+        :style="{
+          left: computedList[computedList.length - 1].left + 'px',
+          top: computedList[computedList.length - 1].top + 45 + 'px'
+        }"></div>
     </div>
     <transition name="el-zoom-in-center">
       <div
@@ -734,6 +741,11 @@ export default {
     height: calc(100% - 0px);
     position: relative;
     overflow-y: scroll;
+    .null-block {
+      position: absolute;
+      height: 32px;
+      width: 20px;
+    }
     .line {
       position: absolute;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)

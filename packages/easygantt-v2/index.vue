@@ -21,6 +21,7 @@
         :list="list"
         :style="{ width: leftWidth + 'px' }"
         @handlerNewTask="handlerNewTask"
+        @handlerNewStage="handlerNewStage"
       ></left-card>
     </div>
     <div class="gantt-right">
@@ -48,7 +49,7 @@
     </div>
     <gantt-add
       :dialogFormVisible.sync="dialogFormVisible"
-      @handlerNew="handlerNew" />
+      @handlerNewConfirm="handlerNewConfirm" />
   </div>
 </template>
 
@@ -356,7 +357,9 @@ export default {
       const width =
         (Math.floor(endTime - startTime) / (1000 * 60 * 60 * 24)) * this.currentDaySize.value +
         this.currentDaySize.value
-      if (!endTime) {
+      if (!startTime) {
+        return 0
+      } else if (!endTime) {
         return left
       } else {
         return width
@@ -365,8 +368,9 @@ export default {
     /**
      * @description: 新增提交数据
      * @param: {Object} 表格内容
+     * @param: {Function} [callback] 成功后回调
      */
-    handlerNew (val) {
+    handlerNew (val, callback) {
       const obj = Object.assign({}, val)
       const startTime = obj.planTime.length > 0 ? obj.planTime[0] : obj.stoneTime
       const endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
@@ -379,6 +383,7 @@ export default {
       this.currentListIndex = ''
       this.isChildren = false
       this.dialogFormVisible = false
+      callback && callback()
     },
     /**
      * @description: 插入数据
@@ -543,6 +548,9 @@ export default {
       this.dialogFormVisible = true
       this.isChildren = true
     },
+    handlerNewStage (data, callback) {
+      this.handlerNewConfirm(data, callback)
+    },
     handlerRowClick (row) {
       document.querySelector('.gantt-right').scrollTo({
         top: 0,
@@ -567,6 +575,7 @@ export default {
   flex: none;
   display: flex;
   flex-direction: column;
+  position: relative;
   .search {
     flex: none;
     height: 28px;
