@@ -210,6 +210,7 @@ export default {
       showLine && this.line.forEach((item) => {
         const start = this.computedList.find((i) => i.id === item.sourceid)
         const end = this.computedList.find((i) => i.id === item.targetid)
+        if (!start || !end) return
         arr.push({
           id: item.id,
           startX: start.left + start.widthMe,
@@ -221,16 +222,34 @@ export default {
       return arr
     },
     computedList () {
-      let arr = []
-      this.list.forEach((item) => {
-        if (!item.children || item.children.length < 1) {
-          arr.push(item)
-        } else if (item.children && item.children.length >= 1) {
-          arr.push(item)
-          arr = arr.concat(item.children)
-        }
-      })
-      return arr
+      let index = 0 // 展示数据的下标
+      let allIndex = 0 // 所有数据的下标
+      const dataFormat = (dataList) => {
+        let arr = []
+        dataList.forEach((item) => {
+          if (!item.isShow) {
+            allIndex++
+            return
+          }
+          // 展示数据的小标 跟其在所有数据下标不一致，说明前面有 allIndex - index 条隐藏不展示数据
+          if (index !== allIndex) {
+            item.top = item.top - (allIndex - index) * 40
+          }
+          allIndex++
+          if (!item.children || item.children.length < 1) {
+            arr.push(item)
+            index++
+          } else if (item.children && item.children.length >= 1) {
+            const _item = JSON.parse(JSON.stringify(item))
+            delete _item.children
+            arr.push(_item)
+            index++
+            arr = arr.concat(dataFormat(item.children)) // children数组，是子任务，父节点index
+          }
+        })
+        return arr
+      }
+      return dataFormat(JSON.parse(JSON.stringify(this.list)))
     },
     // 当前年份
     currentYear () {
@@ -731,11 +750,6 @@ export default {
 <style lang="stylus" scoped>
 .gantt-body {
   height: 100%;
-  // .row-line {
-  //   border-bottom: 1px solid #EBEEF5;
-  //   width:100%;
-  //   position: absolute;
-  // }
   .lineBG {
     width: 100%;
     height: calc(100% - 0px);

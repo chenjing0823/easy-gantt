@@ -1,14 +1,21 @@
 <template>
   <div class="left-card">
-    <div class="card-block" v-for="item in list" :key="item.id">
+    <div class="card-block" v-for="(item, index) in list" :key="item.id">
       <div class="left-card__head head-height">
         <div>
-          <i class="el-icon-caret-bottom" v-if="item.expand" @click="item.expand = !item.expand"></i>
-          <i class="el-icon-caret-top" v-else @click="item.expand = !item.expand"></i>
+          <i class="el-icon-caret-bottom" v-if="item.expand" @click="expandData(index, false)"></i>
+          <i class="el-icon-caret-top" v-else @click="expandData(index, true)"></i>
           <span>{{ item.name }}</span>
         </div>
-        <div>
+        <div class="head-operate">
           <i class="el-icon-plus" @click="newTask(item)"></i>
+          <el-popover
+            placement="bottom"
+            width="154"
+            trigger="click">
+            <div>更多操作</div>
+            <i class="el-icon-more" slot="reference"></i>
+          </el-popover>
         </div>
       </div>
       <template v-if="item.children && item.children.length">
@@ -20,7 +27,7 @@
       </template>
     </div>
     <div class="new-stage card-block" v-if="!isNew" @click="isNew = true">
-      + 新建阶段
+      + 新建项目阶段
     </div>
     <div class="card-block new-stage-form" v-else>
       <div>
@@ -109,6 +116,30 @@ export default {
       }, () => {
         this.cancel()
       })
+    },
+    /**
+     * @description: 收起项目
+     * @param {Number} 目标项目阶段所在数组下标
+     * @param {Boolean} 设置状态 false收起 true展开
+     */
+    expandData (index, state) {
+      /**
+       * @description: 由于可能有3级任务，递归处理更方便
+       * @param {Object} 当前层级数据
+       * @param {Boolean} [isChild] 当前层级数据是否为子项
+       */
+      const setExpand = (data, isChild = false) => {
+        data.expand = state
+        if (isChild) {
+          data.isShow = state
+        }
+        if (data.children && data.children.length) {
+          data.children.forEach((child) => {
+            setExpand(child, true)
+          })
+        }
+      }
+      setExpand(this.list[index])
     }
   }
 }
@@ -135,6 +166,12 @@ export default {
     font-family: PingFangSC-Medium;
     display: flex;
     justify-content: space-between;
+    .head-operate {
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
   }
   .head-height {
     height: 20px;
