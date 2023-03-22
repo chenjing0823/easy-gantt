@@ -21,7 +21,8 @@
         :list="list"
         :style="{ width: leftWidth + 'px' }"
         @handlerNewTask="handlerNewTask"
-        @handlerNewStage="handlerNewStage"
+        @handlerNewStage="handlerNewConfirm"
+        @handlerDeleStage="handlerDeleStage"
       ></left-card>
     </div>
     <div class="gantt-right">
@@ -368,15 +369,16 @@ export default {
     /**
      * @description: 新增提交数据
      * @param: {Object} 表格内容
+     * @param: {Number} index 插入数据的下标
      * @param: {Function} [callback] 成功后回调
      */
-    handlerNewConfirm (val, callback) {
+    handlerNewConfirm (val, listIndex = '', callback) {
       const obj = Object.assign({}, val)
       const startTime = obj.planTime.length > 0 ? obj.planTime[0] : obj.stoneTime
       const endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
       this.$set(obj, 'startTime', startTime)
       this.$set(obj, 'endTime', endTime)
-      this.pushData(obj)
+      this.pushData(obj, false, listIndex)
       if (obj.type !== '3') {
         this.handlerRowClick(obj)
       }
@@ -388,7 +390,7 @@ export default {
     /**
      * @description: 插入数据
      */
-    pushData (obj, isInit = false) {
+    pushData (obj, isInit = false, listIndex = '') {
       const isChildren = obj.isChildren || this.isChildren
       const currentListIndex = this.currentListIndex !== '' ? this.currentListIndex : obj.currentListIndex
       const index = this.list.length
@@ -454,9 +456,30 @@ export default {
         }
         this.$set(this.list, parseInt(currentListIndex), row)
       } else {
-        this.$set(this.list, index, obj)
+        if (listIndex !== '') {
+          // this.$set(this.list, listIndex, obj)
+          this.list.splice(listIndex, 0, obj)
+          this.reComputed()
+        } else {
+          this.$set(this.list, index, obj)
+        }
         // this.list.push(obj)
       }
+    },
+    /**
+     * @description: 需要重新计算高度进行排序
+     */
+    reComputed () {
+      this.$parent.dataList = JSON.parse(JSON.stringify(this.list))
+      this.$parent.list = []
+      this.$nextTick(() => {
+        this.dataFormat()
+      })
+      // console.log(this.list)
+    },
+    handlerDeleStage (index) {
+      this.list.splice(index, 1)
+      this.reComputed()
     },
     /**
      * @description: 根据id设置group的宽度
@@ -547,9 +570,6 @@ export default {
       })
       this.dialogFormVisible = true
       this.isChildren = true
-    },
-    handlerNewStage (data, callback) {
-      this.handlerNewConfirm(data, callback)
     },
     handlerRowClick (row) {
       document.querySelector('.gantt-right').scrollTo({

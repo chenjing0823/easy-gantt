@@ -2,6 +2,7 @@
   <div>
     <div
       class="group-dynmic"
+      v-show="item.expand"
       :style="setStyle(item.top, item.left, item.widthMe)"
     >
     </div>
