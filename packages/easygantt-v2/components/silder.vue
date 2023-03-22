@@ -63,7 +63,7 @@ export default {
 <style lang="stylus" scoped>
 .slider {
   position: relative;
-  height: 28px;
+  height: 24px;
   background: #C1E8FF;
   border-radius: 3px;
   cursor: move;
@@ -73,7 +73,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    height: 28px;
+    height: 24px;
     border-radius: 3px;
     background: #74C3FF;
   }

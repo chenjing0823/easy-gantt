@@ -5,6 +5,7 @@
       <line :x1="midX" :y1="startY" :x2="midX" :y2="endY" stroke="black" stroke-width="2" />
       <line :x1="midX" :y1="endY" :x2="endX" :y2="endY" stroke="black" stroke-width="2" />
     </svg>
+
   </div>
 </template>
 
@@ -31,3 +32,6 @@ export default {
   }
 }
 </script>
+<style>
+
+</style>

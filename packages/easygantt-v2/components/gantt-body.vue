@@ -206,7 +206,7 @@ export default {
         arr.push({
           id: item.id,
           startX: start.left + start.widthMe,
-          startY: start.top + 14,
+          startY: start.top + 12,
           endX: end.left,
           endY: end.top + 14
         })
@@ -765,7 +765,7 @@ export default {
         padding: 4px 10px;
         top: -4px;
         left: -10px;
-        height: 28px;
+        height: 24px;
         width: 100%;
         background-color: #ffffff;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
