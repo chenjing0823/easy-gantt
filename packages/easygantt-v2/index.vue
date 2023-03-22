@@ -370,7 +370,7 @@ export default {
      * @param: {Object} 表格内容
      * @param: {Function} [callback] 成功后回调
      */
-    handlerNew (val, callback) {
+    handlerNewConfirm (val, callback) {
       const obj = Object.assign({}, val)
       const startTime = obj.planTime.length > 0 ? obj.planTime[0] : obj.stoneTime
       const endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
