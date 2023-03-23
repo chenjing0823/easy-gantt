@@ -137,7 +137,7 @@ export default {
       this.isNew = false
     },
     handlerOperateChild (type, data) {
-      console.log(type, data)
+      this.$emit('handlerOperateChild', type, data)
     },
     /**
      * @description: 收起项目

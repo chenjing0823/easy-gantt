@@ -25,7 +25,6 @@
           <el-date-picker
             v-model="form.planTime"
             end-placeholder="结束日期"
-            format="yyyy 年 MM 月 dd 日"
             range-separator="至"
             start-placeholder="开始日期"
             type="daterange"
@@ -36,7 +35,6 @@
         <el-form-item v-show="form.type == 2" label="里程碑时间" prop="stoneTime">
           <el-date-picker
             v-model="form.stoneTime"
-            format="yyyy 年 MM 月 dd 日"
             placeholder="选择日期"
             type="date"
             value-format="timestamp"

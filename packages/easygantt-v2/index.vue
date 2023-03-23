@@ -1,9 +1,6 @@
 <template>
   <div class="easy-gantt-v2">
     <el-button style="position: fixed; top: 0; right: 0" @click="gotoday">今天</el-button>
-    <el-button style="position: fixed; top: 0; right: 100px" @click="dialogFormVisible = true"
-      >新建数据</el-button
-    >
     <el-select v-model="currentDaySize.value" @change="handleSetDaySize" placeholder="请选择" style="position: fixed; top: 0; right: 200px">
       <el-option
         v-for="item in currentDaySizeOptions"
