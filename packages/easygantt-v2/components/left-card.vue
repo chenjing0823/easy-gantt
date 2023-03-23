@@ -1,30 +1,35 @@
 <template>
   <div class="left-card">
     <template v-for="(item, index) in list">
-      <div class="card-block" :key="item.id">
-        <div class="left-card__head head-height">
+      <div :key="item.id" class="card-block">
+        <div class="head-height left-card__head">
           <div>
-            <i class="el-icon-caret-bottom operator-icon" v-if="item.expand" @click="expandData(index, false)"></i>
-            <i class="el-icon-caret-top operator-icon" v-else @click="expandData(index, true)"></i>
+            <i
+              v-if="item.expand"
+              class="el-icon-caret-bottom operator-icon"
+              @click="expandData(index, false)"
+            ></i>
+            <i v-else class="el-icon-caret-top operator-icon" @click="expandData(index, true)"></i>
             <span>{{ item.name }}</span>
           </div>
           <div class="head-operate">
             <i class="el-icon-plus operator-icon" @click="newTask(item)"></i>
-            <el-popover
-              placement="bottom"
-              width="154"
-              trigger="click">
+            <el-popover placement="bottom" trigger="click" width="154">
               <div>
-                <div>编辑</div>
+                <div @click="editStageAfterCur(item)">编辑</div>
                 <div @click="addStageAfterCur(item)">在此之后添加阶段</div>
                 <div @click="deleteStage(item)">删除</div>
               </div>
-              <i class="el-icon-more operator-icon" @click="moreOperator(item)" slot="reference"></i>
+              <i
+                slot="reference"
+                class="el-icon-more operator-icon"
+                @click="moreOperator(item)"
+              ></i>
             </el-popover>
           </div>
         </div>
         <template v-if="item.children && item.children.length">
-          <div class="left-card__body" v-show="item.expand">
+          <div v-show="item.expand" class="left-card__body">
             <div v-for="child in item.children" :key="child.id" class="left-card__body-height">
               {{ child.name }}
             </div>
@@ -33,24 +38,30 @@
       </div>
       <new-stage
         v-if="curData.id === item.id"
-        :clickData="curData"
-        type="special"
-        :item="item"
-        class="card-block"
         :key="item.id + 'newstage'"
+        class="card-block"
+        :click-data="curData"
+        :is-new.sync="isNew"
+        :item="item"
+        :type="type"
+        @handlerEditStage="handlerEditStage"
         @handlerNewStage="handlerNewStage"
         @initClickData="init"
-        :isNew.sync="isNew" ></new-stage>
+      ></new-stage>
     </template>
-    <new-stage class="card-block" @handlerNewStage="handlerNewStage" :isNew.sync="isNew" ></new-stage>
+    <new-stage
+      class="card-block"
+      :is-new.sync="isNew"
+      @handlerNewStage="handlerNewStage"
+    ></new-stage>
   </div>
 </template>
 
 <script>
-
 import NewStage from './new-stage.vue'
+
 export default {
-  name: 'left-card',
+  name: 'LeftCard',
 
   components: {
     NewStage
@@ -64,7 +75,8 @@ export default {
   data () {
     return {
       isNew: false,
-      curData: {}
+      curData: {},
+      type: 'normal'
     }
   },
   mounted () {
@@ -76,7 +88,9 @@ export default {
       if (leftCardchange) {
         console.log(leftCard.clientHeight)
         console.log(lineBG.clientHeight)
-        lineBG.scrollTop = leftCard.scrollTop / (leftCard.scrollHeight - leftCard.clientHeight) * (lineBG.scrollHeight - lineBG.clientHeight)
+        lineBG.scrollTop =
+          (leftCard.scrollTop / (leftCard.scrollHeight - leftCard.clientHeight)) *
+          (lineBG.scrollHeight - lineBG.clientHeight)
         lineBGchange = false
       } else {
         leftCardchange = true
@@ -85,7 +99,9 @@ export default {
     }
     lineBG.onscroll = () => {
       if (lineBGchange) {
-        leftCard.scrollTop = lineBG.scrollTop / (lineBG.scrollHeight - lineBG.clientHeight) * (leftCard.scrollHeight - leftCard.clientHeight)
+        leftCard.scrollTop =
+          (lineBG.scrollTop / (lineBG.scrollHeight - lineBG.clientHeight)) *
+          (leftCard.scrollHeight - leftCard.clientHeight)
         leftCardchange = false
       } else {
         lineBGchange = true
@@ -99,21 +115,32 @@ export default {
     },
     handlerNewStage (data, clickData, callback) {
       if (clickData.id) {
-        const index = this.list.findIndex(item => item.id === clickData.id) + 1
+        const index = this.list.findIndex((item) => item.id === clickData.id) + 1
         this.$emit('handlerNewStage', data, index, callback)
       } else {
         this.$emit('handlerNewStage', data, '', callback)
       }
     },
+    handlerEditStage (data, clickData, callback) {
+      const index = this.list.findIndex((item) => item.id === clickData.id)
+      this.$emit('handlerEditStage', data, index, callback)
+    },
     addStageAfterCur (item) {
+      this.type = 'new'
+      this.curData = item
+      this.isNew = false
+    },
+    editStageAfterCur (item) {
+      this.type = 'edit'
       this.curData = item
       this.isNew = false
     },
     deleteStage (data) {
-      const index = this.list.findIndex(item => item.id === data.id)
+      const index = this.list.findIndex((item) => item.id === data.id)
       this.$emit('handlerDeleStage', index)
     },
     init () {
+      this.type = 'normal'
       this.curData = {}
       this.isNew = false
     },
@@ -200,5 +227,4 @@ export default {
     }
   }
 }
-
 </style>

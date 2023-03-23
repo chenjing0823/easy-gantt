@@ -18,7 +18,7 @@
         </div>
         <div class="bottom">
           <div class="stage-button" @click="cancel">取消</div>
-          <div class="stage-button confirm" @click="addNewStage">确定</div>
+          <div class="stage-button confirm" @click="confirmDispatch">确定</div>
         </div>
       </div>
     </template>
@@ -87,6 +87,14 @@ export default {
     }
   },
 
+  mounted () {
+    console.log(this.type)
+    if (this.type === 'edit') {
+      this.name = this.item.name
+      this.planTime = [this.item.startTime, this.item.endTime]
+    }
+  },
+
   methods: {
     addStage () {
       this.$emit('update:isNew', true)
@@ -97,19 +105,42 @@ export default {
       this.name = ''
       this.planTime = []
     },
+    confirmDispatch () {
+      if (this.type === 'edit') {
+        this.editStage()
+      } else {
+        this.addNewStage()
+      }
+    },
+    editStage () {
+      const data = {
+        name: this.name,
+        planTime: this.planTime
+      }
+      this.$emit('handlerEditStage',
+        data,
+        this.clickData,
+        () => {
+          this.cancel()
+        }
+      )
+    },
     addNewStage () {
-      this.$emit('handlerNewStage', {
+      const data = {
         name: this.name,
         ower: '',
         per: 0,
         type: '3',
         planTime: this.planTime,
         stoneTime: ''
-      },
-      this.clickData,
-      () => {
-        this.cancel()
-      })
+      }
+      this.$emit('handlerNewStage',
+        data,
+        this.clickData,
+        () => {
+          this.cancel()
+        }
+      )
     }
   }
 }

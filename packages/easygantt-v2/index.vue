@@ -21,6 +21,7 @@
         :list="list"
         :style="{ width: leftWidth + 'px' }"
         @handlerNewTask="handlerNewTask"
+        @handlerEditStage="handlerEditStage"
         @handlerNewStage="handlerNewConfirm"
         @handlerDeleStage="handlerDeleStage"
       ></left-card>
@@ -480,6 +481,26 @@ export default {
     handlerDeleStage (index) {
       this.list.splice(index, 1)
       this.reComputed()
+    },
+    /**
+     * @description: 编辑数据
+     * @param: {Object} 编辑内容
+     * @param: {Number} index 编辑数据的下标
+     * @param: {Function} [callback] 成功后回调
+     */
+    handlerEditStage (data, index, callback) {
+      const { name, planTime } = data
+      this.list[index].name = name
+      this.list[index].startTime = planTime[0]
+      this.list[index].endTime = planTime[1]
+      this.list[index].left = this.computedTimeWidth(planTime[0])
+      this.list[index].widthMe = this.computedTimeWidth(planTime[0], planTime[1])
+      this.list[index].widthChild = this.computedTimeWidth(planTime[0], planTime[1])
+      this.list[index].endTime = planTime[1]
+      this.list[index].leftStatic = this.computedTimeWidth(planTime[0])
+      this.list[index].widthMeStatic = this.computedTimeWidth(planTime[0], planTime[1])
+      this.list[index].widthChildStatic = this.computedTimeWidth(planTime[0], planTime[1])
+      callback && callback()
     },
     /**
      * @description: 根据id设置group的宽度
