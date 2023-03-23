@@ -490,16 +490,20 @@ export default {
      */
     handlerEditStage (data, index, callback) {
       const { name, planTime } = data
-      this.list[index].name = name
-      this.list[index].startTime = planTime[0]
-      this.list[index].endTime = planTime[1]
-      this.list[index].left = this.computedTimeWidth(planTime[0])
-      this.list[index].widthMe = this.computedTimeWidth(planTime[0], planTime[1])
-      this.list[index].widthChild = this.computedTimeWidth(planTime[0], planTime[1])
-      this.list[index].endTime = planTime[1]
-      this.list[index].leftStatic = this.computedTimeWidth(planTime[0])
-      this.list[index].widthMeStatic = this.computedTimeWidth(planTime[0], planTime[1])
-      this.list[index].widthChildStatic = this.computedTimeWidth(planTime[0], planTime[1])
+      const dataSet = (data) => {
+        data.name = name
+        data.startTime = planTime[0]
+        data.endTime = planTime[1]
+        data.left = this.computedTimeWidth(planTime[0])
+        data.widthMe = this.computedTimeWidth(planTime[0], planTime[1])
+        data.widthChild = this.computedTimeWidth(planTime[0], planTime[1])
+        data.endTime = planTime[1]
+        data.leftStatic = this.computedTimeWidth(planTime[0])
+        data.widthMeStatic = this.computedTimeWidth(planTime[0], planTime[1])
+        data.widthChildStatic = this.computedTimeWidth(planTime[0], planTime[1])
+      }
+      dataSet(this.list[index])
+
       callback && callback()
     },
     /**
