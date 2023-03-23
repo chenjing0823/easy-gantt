@@ -21,6 +21,7 @@
                 <div @click="deleteStage(item)">删除</div>
               </div>
               <i
+                :ref="'moreOperator' + item.id"
                 slot="reference"
                 class="el-icon-more operator-icon"
                 @click="moreOperator(item)"
@@ -129,11 +130,13 @@ export default {
       this.type = 'new'
       this.curData = item
       this.isNew = false
+      this.$refs[`moreOperator${item.id}`][0].click() // 模拟点击 试popover消失
     },
     editStageAfterCur (item) {
       this.type = 'edit'
       this.curData = item
       this.isNew = false
+      this.$refs[`moreOperator${item.id}`][0].click() // 模拟点击 试popover消失
     },
     deleteStage (data) {
       const index = this.list.findIndex((item) => item.id === data.id)
