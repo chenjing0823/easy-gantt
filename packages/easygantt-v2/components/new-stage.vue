@@ -1,5 +1,6 @@
 <template>
   <div class="add-stage" :class="{ firstShow: clickData.id === item.id && type !== 'normal' }">
+    <!-- 某条数据后新建 -->
     <template v-if="clickData.id === item.id && type !== 'normal'">
       <div class="card-block new-stage-form">
         <div>
@@ -7,7 +8,6 @@
           <el-date-picker
             v-model="planTime"
             end-placeholder="预计结束日期"
-            format="yyyy 年 MM 月 dd 日"
             range-separator="~"
             start-placeholder="预计开始日期"
             type="daterange"
@@ -22,6 +22,7 @@
         </div>
       </div>
     </template>
+    <!-- 常规底部新建 -->
     <template v-else>
       <div class="new-stage card-block" v-if="!isNew" @click="addStage">
         + 新建项目阶段
@@ -32,7 +33,6 @@
           <el-date-picker
             v-model="planTime"
             end-placeholder="预计结束日期"
-            format="yyyy 年 MM 月 dd 日"
             range-separator="~"
             start-placeholder="预计开始日期"
             type="daterange"
@@ -146,9 +146,6 @@ export default {
     }
     /deep/ .el-icon-date {
       display: none;
-    }
-    /deep/ .el-range-input {
-      font-size: 12px;
     }
     .bottom {
       margin-top: 10px;
