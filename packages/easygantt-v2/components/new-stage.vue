@@ -1,5 +1,5 @@
 <template>
-  <div class="add-stage">
+  <div class="add-stage" :class="{ firstShow: clickData.id === item.id && type !== 'normal' }">
     <template v-if="clickData.id === item.id && type !== 'normal'">
       <div class="card-block new-stage-form">
         <div>
@@ -116,7 +116,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
+.add-stage {
+  position: sticky;
+  bottom: 0;
   .new-stage {
     height: 40px;
     display: flex;
@@ -127,8 +129,6 @@ export default {
     font-size: 14px;
     text-align: left;
     font-family: PingFangSC-Regular;
-    position: sticky;
-    bottom: 0;
     margin-bottom: 0;
   }
   .new-stage:hover {
@@ -138,8 +138,6 @@ export default {
   }
   .new-stage-form {
     padding: 12px;
-    position: sticky;
-    bottom: 0;
     .input-name {
       margin-bottom: 10px;
     }
@@ -178,4 +176,8 @@ export default {
       background-color: #FF6A00;
     }
   }
+}
+.firstShow {
+  z-index: 1;
+}
 </style>

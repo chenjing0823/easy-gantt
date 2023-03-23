@@ -39,7 +39,7 @@
         class="card-block"
         :key="item.id + 'newstage'"
         @handlerNewStage="handlerNewStage"
-        @initClickData="initClickData"
+        @initClickData="init"
         :isNew.sync="isNew" ></new-stage>
     </template>
     <new-stage class="card-block" @handlerNewStage="handlerNewStage" :isNew.sync="isNew" ></new-stage>
@@ -105,11 +105,9 @@ export default {
         this.$emit('handlerNewStage', data, '', callback)
       }
     },
-    initClickData () {
-      this.curData = {}
-    },
     addStageAfterCur (item) {
       this.curData = item
+      this.isNew = false
     },
     deleteStage (data) {
       const index = this.list.findIndex(item => item.id === data.id)
