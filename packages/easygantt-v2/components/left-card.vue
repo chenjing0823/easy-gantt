@@ -2,38 +2,25 @@
   <div class="left-card">
     <template v-for="(item, index) in list">
       <div :key="item.id" class="card-block">
-        <div class="head-height left-card__head">
-          <div>
-            <i
-              v-if="item.expand"
-              class="el-icon-caret-bottom operator-icon"
-              @click="expandData(index, false)"
-            ></i>
-            <i v-else class="el-icon-caret-top operator-icon" @click="expandData(index, true)"></i>
-            <span>{{ item.name }}</span>
-          </div>
-          <div class="head-operate">
-            <i class="el-icon-plus operator-icon" @click="newTask(item)"></i>
-            <el-popover placement="bottom" trigger="click" width="154">
-              <div>
-                <div @click="editStageAfterCur(item)">编辑</div>
-                <div @click="addStageAfterCur(item)">在此之后添加阶段</div>
-                <div @click="deleteStage(item)">删除</div>
-              </div>
-              <i
-                :ref="'moreOperator' + item.id"
-                slot="reference"
-                class="el-icon-more operator-icon"
-                @click="moreOperator(item)"
-              ></i>
-            </el-popover>
-          </div>
-        </div>
+        <left-card-stage
+          :index="index"
+          :item="item"
+          @expandData="expandData"
+          @newTask="newTask"
+          @editStageAfterCur="editStageAfterCur"
+          @addStageAfterCur="addStageAfterCur"
+          @deleteStage="deleteStage"
+          @moreOperator="moreOperator"
+        ></left-card-stage>
+
         <template v-if="item.children && item.children.length">
           <div v-show="item.expand" class="left-card__body">
-            <div v-for="child in item.children" :key="child.id" class="left-card__body-height">
-              {{ child.name }}
-            </div>
+            <template v-for="child in item.children">
+              <left-card-body
+                :key="child.id"
+                :child="child"
+                @handlerOperateChild="handlerOperateChild"></left-card-body>
+            </template>
           </div>
         </template>
       </div>
@@ -60,12 +47,16 @@
 
 <script>
 import NewStage from './new-stage.vue'
+import LeftCardStage from './left-card-stage.vue'
+import LeftCardBody from './left-card-body.vue'
 
 export default {
   name: 'LeftCard',
 
   components: {
-    NewStage
+    NewStage,
+    LeftCardStage,
+    LeftCardBody
   },
   props: {
     list: {
@@ -130,13 +121,11 @@ export default {
       this.type = 'new'
       this.curData = item
       this.isNew = false
-      this.$refs[`moreOperator${item.id}`][0].click() // 模拟点击 试popover消失
     },
     editStageAfterCur (item) {
       this.type = 'edit'
       this.curData = item
       this.isNew = false
-      this.$refs[`moreOperator${item.id}`][0].click() // 模拟点击 试popover消失
     },
     deleteStage (data) {
       const index = this.list.findIndex((item) => item.id === data.id)
@@ -146,6 +135,9 @@ export default {
       this.type = 'normal'
       this.curData = {}
       this.isNew = false
+    },
+    handlerOperateChild (type, data) {
+      console.log(type, data)
     },
     /**
      * @description: 收起项目
@@ -192,42 +184,13 @@ export default {
     margin-bottom: 5px;
     border-radius: 5px;
   }
-  .left-card__head {
-    color: rgba(50, 50, 51, 1);
-    font-size: 14px;
-    text-align: left;
-    font-family: PingFangSC-Medium;
-    display: flex;
-    justify-content: space-between;
-    .head-operate {
-      width: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-    }
-    .operator-icon {
-      cursor: pointer;
-    }
-  }
-  .head-height {
-    height: 20px;
-    display: flex;
-    align-items: center;
-    padding: 10px 8px;
-  }
+
   .left-card__body {
     line-height: 20px;
     color: rgba(100, 101, 102, 1);
     font-size: 12px;
     text-align: left;
     font-family: PingFangSC-Regular;
-    .left-card__body-height {
-      height: 19px;
-      border-top: 1px solid #EBEEF5;
-      display: flex;
-      align-items: center;
-      padding: 10px 8px;
-    }
   }
 }
 </style>

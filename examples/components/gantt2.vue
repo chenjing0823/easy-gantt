@@ -41,7 +41,7 @@ export default {
           id: 1589512272596,
           children: [
             {
-              name: '完成工作计划1',
+              name: '完成工作计划完成工作计划划1',
               ower: '',
               per: 50,
               type: '1',
@@ -56,7 +56,7 @@ export default {
               parentId: 1589512272596
             },
             {
-              name: '完成工作计划2',
+              name: '完成工作计划完成工作计划划2',
               ower: '',
               per: 100,
               type: '1',

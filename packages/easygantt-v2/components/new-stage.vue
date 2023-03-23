@@ -88,7 +88,6 @@ export default {
   },
 
   mounted () {
-    console.log(this.type)
     if (this.type === 'edit') {
       this.name = this.item.name
       this.planTime = [this.item.startTime, this.item.endTime]

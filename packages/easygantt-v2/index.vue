@@ -24,6 +24,7 @@
         @handlerEditStage="handlerEditStage"
         @handlerNewStage="handlerNewConfirm"
         @handlerDeleStage="handlerDeleStage"
+        @handlerOperateChild="handlerOperateChild"
       ></left-card>
     </div>
     <div class="gantt-right">
@@ -56,7 +57,7 @@
 </template>
 
 <script>
-import LeftCard from './components/left-card.vue'
+import LeftCard from './components/left-card'
 import GnattHead from './components/gantt-head.vue'
 import GanttBody from './components/gantt-body.vue'
 import GanttAdd from './components/gantt-add.vue'
@@ -481,6 +482,9 @@ export default {
     handlerDeleStage (index) {
       this.list.splice(index, 1)
       this.reComputed()
+    },
+    handlerOperateChild (type, data) {
+      console.log(type, data)
     },
     /**
      * @description: 编辑数据
