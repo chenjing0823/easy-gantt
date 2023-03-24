@@ -4,9 +4,9 @@
       <i
         v-if="item.expand"
         class="el-icon-caret-bottom operator-icon"
-        @click="expandData(index, false)"
+        @click="expandData(false)"
       ></i>
-      <i v-else class="el-icon-caret-top operator-icon" @click="expandData(index, true)"></i>
+      <i v-else class="el-icon-caret-top operator-icon" @click="expandData(true)"></i>
       <span>{{ item.name }}</span>
     </div>
     <div class="head-operate">
@@ -32,14 +32,12 @@ export default {
   name: 'left-card-stage',
   props: {
     item: {
-      props: {
-        type: Object,
-        required: true
-      },
-      index: {
-        type: Number,
-        required: true
-      }
+      type: Object,
+      required: true
+    },
+    curIndex: {
+      type: Number,
+      required: true
     }
   },
 
@@ -50,8 +48,8 @@ export default {
   },
 
   methods: {
-    expandData (index, state) {
-      this.$emit('expandData', index, state)
+    expandData (state) {
+      this.$emit('expandData', this.curIndex, state)
     },
     newTask (item) {
       this.$emit('newTask', item)

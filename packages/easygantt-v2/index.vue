@@ -177,7 +177,7 @@ export default {
 
   mounted () {
     this.getDay()
-    this.dataFormat()
+    // this.dataFormat()
   },
 
   methods: {
@@ -188,19 +188,26 @@ export default {
       const getAllList = (dataList, isChildren = false, currentListIndex = '') => {
         let arr = []
         dataList.forEach((item, index) => {
+          // debugger
           item.isChildren = isChildren // 是否子任务
           item.currentListIndex = currentListIndex // 子任务所在的父index
+
           if (!item.children || item.children.length < 1) {
             arr.push(item)
           } else if (item.children && item.children.length >= 1) {
             const _item = JSON.parse(JSON.stringify(item))
             delete _item.children
             arr.push(_item)
-            arr = arr.concat(getAllList(item.children, true, index)) // children数组，是子任务，父节点index
+            let _index = index
+            if (_item.level === 1 || _item.level === 2) {
+              _index = _item.currentListIndex
+            }
+            arr = arr.concat(getAllList(item.children, true, _index)) // children数组，是子任务，最外层父节点index
           }
         })
         return arr
       }
+      console.log(getAllList(this.dataList))
       getAllList(this.dataList).forEach(data => {
         this.pushData(data, true)
       })
@@ -393,6 +400,7 @@ export default {
       const isChildren = obj.isChildren || this.isChildren
       const currentListIndex = this.currentListIndex !== '' ? this.currentListIndex : obj.currentListIndex
       const index = this.list.length
+      this.$set(obj, 'expand', true)
       this.$set(obj, 'left', this.computedTimeWidth(obj.startTime))
       this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
       this.$set(obj, 'widthChild', this.computedTimeWidth(obj.startTime, obj.endTime))
@@ -420,7 +428,6 @@ export default {
         this.$set(obj, 'widthMeStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
         this.$set(obj, 'widthChildStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
         obj.id = obj.id || new Date().getTime()
-        this.$set(obj, 'expand', true)
         let childrenTop
         if (index === 0) {
           childrenTop = 8 // 项目top 8 刚好
@@ -438,12 +445,15 @@ export default {
       obj.id = obj.id || new Date().getTime()
       this.$set(obj, 'isShow', true)
       if (isChildren && currentListIndex !== '') {
-        const row = this.list[parseInt(currentListIndex)]
+        const row = this.list[currentListIndex]
+
         row.children = row.children ? row.children : []
         this.$set(row, 'expand', true) // 展开有操作 需要响应
         const cindex = row.children.length
         obj.top = 40 + cindex * 40 + row.top
-        obj.parentId = row.id
+        if (obj.level === 1) {
+          obj.parentId = row.id
+        }
         row.children.push(obj)
         row.children.forEach((item) => {
           item.isShow = true
@@ -453,7 +463,7 @@ export default {
           this.setGroupPer(row.id)
           this.resetTop(currentListIndex)
         }
-        this.$set(this.list, parseInt(currentListIndex), row)
+        this.$set(this.list, currentListIndex, row)
       } else {
         if (listIndex !== '') {
           // this.$set(this.list, listIndex, obj)

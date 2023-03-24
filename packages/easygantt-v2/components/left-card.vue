@@ -3,7 +3,7 @@
     <template v-for="(item, index) in list">
       <div :key="item.id" class="card-block">
         <left-card-stage
-          :index="index"
+          :curIndex="index"
           :item="item"
           @expandData="expandData"
           @newTask="newTask"
@@ -19,6 +19,7 @@
               <left-card-body
                 :key="child.id"
                 :child="child"
+                @expandTaskData="expandTaskData"
                 @handlerOperateChild="handlerOperateChild"></left-card-body>
             </template>
           </div>
@@ -162,6 +163,14 @@ export default {
         }
       }
       setExpand(this.list[index])
+    },
+    /**
+     * @description: 收起任务
+     * @param {Object} 目标任务
+     * @param {Boolean} 设置状态 false收起 true展开
+     */
+    expandTaskData (task, state) {
+      console.log(task, state)
     },
     moreOperator (item) {
       console.log(item)

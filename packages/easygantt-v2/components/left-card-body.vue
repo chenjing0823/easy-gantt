@@ -1,6 +1,14 @@
 <template>
   <div class="left-card-body" @mouseenter="showMoreBlock = true" @mouseleave="handlerMouseLeave">
-    <div class="icon-block"><i class="el-icon-s-flag"></i></div>
+    <div class="icon-block" :style="{ width: iconWidth }">
+      <i
+        v-if="child.expand && child.hasChildren"
+        class="el-icon-caret-bottom operator-icon"
+        @click="expandTaskData(false)"
+      ></i>
+      <i v-else-if="!child.expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(true)"></i>
+      <i class="el-icon-s-flag"></i>
+    </div>
     <div class="name-block">{{ child.name }}</div>
     <div class="operator-block">
       <el-popover v-if="showMoreBlock" placement="bottom" trigger="click" width="154" v-model="showMore">
@@ -14,7 +22,7 @@
           </div>
         </div>
         <div
-          class="operator-icon"
+          class="more-icon"
           slot="reference">
           <i
             class="el-icon-more"
@@ -61,6 +69,25 @@ export default {
   },
 
   computed: {
+    iconWidth () {
+      let width = '30px'
+      const { level } = this.child
+      switch (level) {
+        case 1:
+          width = '30px'
+          break
+        case 2:
+          width = '51px'
+          break
+        case 3:
+          width = '72px'
+          break
+
+        default:
+          break
+      }
+      return width
+    }
   },
 
   watch: {
@@ -75,6 +102,9 @@ export default {
   },
 
   methods: {
+    expandTaskData (state) {
+      this.$emit('expandTaskData', this.child, state)
+    },
     dispatchFunction (option) {
       this.showMore = false
       this.showMoreBlock = false
@@ -100,11 +130,16 @@ export default {
   align-items: center;
   padding: 10px 8px;
   .icon-block {
-    width: 30px;
     flex: none;
     display: flex;
     justify-content: flex-end;
     padding: 0 9px;
+
+    .operator-icon {
+      cursor: pointer;
+      color: #C9CDD4;
+      margin-right: 5px;
+    }
   }
   .name-block {
     flex: 1;
@@ -127,7 +162,7 @@ export default {
       width: 20px;
       border-radius: 4px;
     }
-    .operator-icon {
+    .more-icon {
       cursor: pointer;
       margin-right: 8px;
       height: 16px;
@@ -137,7 +172,7 @@ export default {
       justify-content: center;
       color: #C9CDD4;
     }
-    .operator-icon:hover {
+    .more-icon:hover {
       background-color: #FFF5E8;
       color: #FF8C2E;
     }

@@ -2,14 +2,15 @@
   <div class="gantt2" style="display: flex;">
     <!-- <div>asdas</div> -->
     <EasyGanttV2
+      ref="easygantt"
       :list="list"
       :line="line"
-      :dataList="dataList"
-      @handleTimeChange="handleTimeChange"></EasyGanttV2>
+      :dataList="dataList"></EasyGanttV2>
   </div>
 </template>
 
 <script>
+import mockdata from './mockdata'
 export default {
   name: 'gantt2',
 
@@ -26,7 +27,7 @@ export default {
   data () {
     return {
       line: [
-        { id: 1, sourceid: 1589512287571, targetid: 1589512309848 }
+        { id: 1, sourceid: 11, targetid: 12 }
       ],
       dataList: [
         {
@@ -38,39 +39,8 @@ export default {
           stoneTime: '',
           startTime: 1677945600000,
           endTime: 1678982400000,
-          id: 1589512272596,
-          children: [
-            {
-              name: '完成工作计划完成工作计划划1',
-              ower: '',
-              per: 50,
-              type: '1',
-              planTime: [
-                1589472000000,
-                1589817600000
-              ],
-              stoneTime: '',
-              startTime: 1677945600000,
-              endTime: 1678291200000,
-              id: 1589512287571,
-              parentId: 1589512272596
-            },
-            {
-              name: '完成工作计划完成工作计划划2',
-              ower: '',
-              per: 100,
-              type: '1',
-              planTime: [
-                1589817600000,
-                1590076800000
-              ],
-              stoneTime: '',
-              startTime: 1678723200000,
-              endTime: 1678982400000,
-              id: 1589512309848,
-              parentId: 1589512272596
-            }
-          ]
+          id: 1,
+          hasChildren: true
         },
         {
           name: '项目阶段2',
@@ -81,25 +51,8 @@ export default {
           stoneTime: 1678723200000,
           startTime: 1678723200000,
           endTime: 1678723200000,
-          id: 1678723200000,
-          children: [
-
-            {
-              name: '里程碑1',
-              ower: '',
-              per: 100,
-              type: '2',
-              planTime: [
-                1589817600000,
-                1590076800000
-              ],
-              stoneTime: 1678896000000,
-              startTime: 1678896000000,
-              endTime: 1678896000000,
-              id: 1678896000000,
-              parentId: 1678723200000
-            }
-          ]
+          id: 2,
+          hasChildren: true
         },
 
         {
@@ -111,162 +64,88 @@ export default {
           stoneTime: '',
           startTime: 1677945600000,
           endTime: 1678982400000,
-          id: 1589512272597,
-          children: [
-            {
-              name: '完成工作计划1',
-              ower: '',
-              per: 50,
-              type: '1',
-              planTime: [
-                1589472000000,
-                1589817600000
-              ],
-              stoneTime: '',
-              startTime: 1677945600000,
-              endTime: 1678291200000,
-              id: 1589512287572,
-              parentId: 1589512272596
-            },
-            {
-              name: '完成工作计划2',
-              ower: '',
-              per: 100,
-              type: '1',
-              planTime: [
-                1589817600000,
-                1590076800000
-              ],
-              stoneTime: '',
-              startTime: 1678723200000,
-              endTime: 1678982400000,
-              id: 1589512309849,
-              parentId: 1589512272596
-            }
-          ]
+          id: 3,
+          hasChildren: true
         }
       ],
       list: []
-
-      // dataList: [],
-      // list: [
-      //   {
-      //     name: '项目启动阶段',
-      //     ower: '',
-      //     per: 30,
-      //     type: '3',
-      //     planTime: [],
-      //     stoneTime: '',
-      //     startTime: '',
-      //     endTime: '',
-      //     id: 1589512272596,
-      //     expand: true,
-      //     top: 8,
-      //     isShow: true,
-      //     children: [
-      //       {
-      //         name: '完成工作计划1',
-      //         ower: '',
-      //         per: 50,
-      //         type: '1',
-      //         planTime: [
-      //           1589472000000,
-      //           1589817600000
-      //         ],
-      //         stoneTime: '',
-      //         startTime: 1677945600000,
-      //         endTime: 1678291200000,
-      //         left: 17120,
-      //         widthChild: 200,
-      //         widthMe: 200,
-      //         top: 46,
-      //         id: 1589512287571,
-      //         isShow: true,
-      //         parentId: 1589512272596
-      //       },
-      //       {
-      //         name: '完成工作计划2',
-      //         ower: '',
-      //         per: 100,
-      //         type: '1',
-      //         planTime: [
-      //           1589817600000,
-      //           1590076800000
-      //         ],
-      //         stoneTime: '',
-      //         startTime: 1678723200000,
-      //         endTime: 1678982400000,
-      //         left: 17480,
-      //         widthChild: 160,
-      //         widthMe: 160,
-      //         top: 86,
-      //         id: 1589512309848,
-      //         isShow: true,
-      //         parentId: 1589512272596
-      //       }
-      //     ],
-      //     widthChild: 520,
-      //     widthMe: 520,
-      //     left: 17120
-      //   },
-      //   {
-      //     name: '项目里程碑1',
-      //     ower: '',
-      //     per: 100,
-      //     type: '2',
-      //     planTime: [],
-      //     stoneTime: 1678723200000,
-      //     startTime: 1678723200000,
-      //     endTime: 1678723200000,
-      //     left: 17760,
-      //     widthChild: 40,
-      //     widthMe: 40,
-      //     top: 128,
-      //     id: 1678723200000,
-      //     isShow: true
-      //   },
-      //   {
-      //     name: '项目里程碑2',
-      //     ower: '',
-      //     per: 100,
-      //     type: '2',
-      //     planTime: [
-      //       1679500800000,
-      //       1679500800000
-      //     ],
-      //     stoneTime: 1679500800000,
-      //     startTime: 1679500800000,
-      //     endTime: 1679500800000,
-      //     left: 17840,
-      //     widthChild: 40,
-      //     widthMe: 40,
-      //     top: 168,
-      //     id: 1679500800000,
-      //     isShow: true
-      //   }
-      // ]
     }
   },
-
-  computed: {
-  },
-
-  watch: {
-  },
-
   mounted () {
+    this.getGanttData()
   },
 
   methods: {
-    handleTimeChange (data) {
-      // const first = this.list.findIndex(first => {
-      //   return first.id === data.parentId
-      // })
-      // const second = this.list[first].children.findIndex(second => {
-      //   return second.id === data.id
-      // })
-      // this.list[first].children[second].startTime = data.startTime
-      // this.list[first].children[second].endTime = data.endTime
+    // 获取任务接口 id父id 当前任务第几层
+    mockTaskGet (id, level) {
+      return new Promise((resolve, reject) => {
+        const data = mockdata[id].map((data) => {
+          return {
+            ...data,
+            level: level,
+            parentId: id
+          }
+        })
+        setTimeout(() => {
+          resolve(data)
+        }, 300)
+      })
+    },
+    // 需要请求获取任务的接口数 一起
+    async requestData (dataList, level) {
+      const arr = []
+      dataList.forEach(async (item, index) => {
+        if (item.hasChildren) {
+          const request = this.mockTaskGet(item.id, level)
+          arr.push(request)
+        } else {
+          arr.push(null)
+        }
+      })
+      const task = await Promise.all(arr)
+      return task
+    },
+    async getGanttData () {
+      const nowLevelData = async (dataList, level) => {
+        const taskData = await this.requestData(dataList, level)
+
+        const len = taskData.length
+        let childindex = 0
+        while (childindex < len) {
+          const item = taskData[childindex]
+          if (item && item.length) {
+            const data = await nowLevelData(item, level + 1)
+            console.log('子')
+            await this.dataListFormat(item, data)
+          }
+          childindex++
+        }
+        return taskData
+      }
+      // await nowLevelData(this.dataList, 1)
+      console.time('request')
+      const data = await nowLevelData(this.dataList, 1)
+      await this.dataListFormat(this.dataList, data)
+      console.timeEnd('request')
+      console.log('父')
+      console.log(this.dataList)
+      this.$refs.easygantt.dataFormat()
+    },
+    /**
+     * @description: 将子任务 塞入对应父级
+     * @param {Array} 父级数组
+     * @param {taskData} 所有父子的子任务数组
+     */
+    dataListFormat (dataList, taskData) {
+      const len = taskData.length
+      return new Promise(resolve => {
+        let index = 0
+        while (index < len) {
+          taskData[index] && this.$set(dataList[index], 'children', taskData[index])
+          index++
+        }
+        resolve()
+      })
     }
   }
 }
