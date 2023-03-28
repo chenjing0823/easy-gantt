@@ -5,7 +5,8 @@
       ref="easygantt"
       :list="list"
       :line="line"
-      :dataList="dataList"></EasyGanttV2>
+      :dataList="dataList"
+      @handleTimeChange="handleTimeChange"></EasyGanttV2>
   </div>
 </template>
 
@@ -77,13 +78,16 @@ export default {
 
   methods: {
     // 获取任务接口 id父id 当前任务第几层
-    mockTaskGet (id, level) {
+    mockTaskGet (id, level, originIds = []) {
+      const _originIds = JSON.parse(JSON.stringify(originIds))
+      _originIds.push(id)
       return new Promise((resolve, reject) => {
         const data = mockdata[id].map((data) => {
           return {
             ...data,
             level: level,
-            parentId: id
+            parentId: id,
+            originIds: _originIds
           }
         })
         setTimeout(() => {
@@ -96,7 +100,7 @@ export default {
       const arr = []
       dataList.forEach(async (item, index) => {
         if (item.hasChildren) {
-          const request = this.mockTaskGet(item.id, level)
+          const request = this.mockTaskGet(item.id, level, item.originIds)
           arr.push(request)
         } else {
           arr.push(null)
@@ -108,7 +112,6 @@ export default {
     async getGanttData () {
       const nowLevelData = async (dataList, level) => {
         const taskData = await this.requestData(dataList, level)
-
         const len = taskData.length
         let childindex = 0
         while (childindex < len) {
@@ -146,6 +149,9 @@ export default {
         }
         resolve()
       })
+    },
+    handleTimeChange (data) {
+      console.log('改变时间', data)
     }
   }
 }

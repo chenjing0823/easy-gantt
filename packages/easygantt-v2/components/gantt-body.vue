@@ -26,10 +26,10 @@
           v-if="(item.type === '1' || item.type === '2') && item.isShow"
           :ref="'line' + item.id"
           :key="item.id + index + 'ccc'"
-          @mousedown="lineMousedown(`line${item.id}`, $event, item.id, item.parentId, index)"
-          @mouseover="lineMouseover(`line${item.id}`, $event, item.id, item.parentId, index)"
+          @mousedown="lineMousedown(`line${item.id}`, $event, item.id, item.parentId, index, item)"
+          @mouseover="lineMouseover(`line${item.id}`, $event, item.id, item.parentId, index, item)"
           @mouseleave="lineMouseleave"
-          @mouseenter="lineMouseenter(`line${item.id}`, $event, item.id, item.parentId, index)"
+          @mouseenter="lineMouseenter(`line${item.id}`, $event, item.id, item.parentId, index, item)"
         >
           <slider
             :min="0"
@@ -67,14 +67,14 @@
             class="leftCurDrag curdrag"
             v-show="item.type === '1' && hoverId === item.id"
             @mousedown.stop="
-              leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
+              leftCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index, item)
             "
           >||</div>
           <div
             class="rightCurDrag curdrag"
             v-show="item.type === '1' && hoverId === item.id"
             @mousedown.stop="
-              rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index)
+              rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index, item)
             "
           >||</div>
 
@@ -286,8 +286,9 @@ export default {
      * @param  {Number} id id
      * @param  {Number} parentId parentId
      * @param  {Number} index index
+     * @param  {Object} data data
      */
-    lineMousedown (dom, e, id, parentId, index) {
+    lineMousedown (dom, e, id, parentId, index, data) {
       const line = this.$refs[dom][0]
       const initX = e.pageX
       const initScrollX = document.querySelector('.gantt-right').scrollLeft
@@ -333,7 +334,7 @@ export default {
           if (result <= 0) result = 0
           line.style.left = result + 'px'
         }
-        this.lineMouseover(dom, e, id, parentId, index)
+        this.lineMouseover(dom, e, id, parentId, index, data)
         this.lineMouseleave(e, true)
       }
       document.onmouseup = (events) => {
@@ -344,10 +345,11 @@ export default {
         left = Math.round(result / this.currentDaySize.value) * this.currentDaySize.value
         this.computedList[index].left = left
         line.style.left = left + 'px'
-        this.checkIsin(dom, events, id, parentId, index)
+        this.checkIsin(dom, events, id, parentId, index, data)
         if (parentId) {
+          const rootId = data.originIds[0] // 实际上三层任务是平铺开，渲染时候只有1层，通过标记渲染成3层。实际2层 外层id为originIds[0]
           this.list.forEach((item) => {
-            if (item.id === parentId) {
+            if (item.id === rootId) {
               item.children.forEach((k) => {
                 if (k.id === id) {
                   k.left = left
@@ -355,7 +357,7 @@ export default {
               })
             }
           })
-          this.setGroupWidth(parentId)
+          this.setGroupWidth(rootId)
         } else {
           this.list.forEach((item) => {
             if (item.id === id) {
@@ -366,7 +368,7 @@ export default {
         document.onmousemove = document.onmouseup = null
       }
     },
-    changeTime (dom, e, id, parentId, index) {
+    changeTime (dom, e, id, parentId, index, data) {
       const start =
         Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
           this.currentDaySize.value +
@@ -378,7 +380,8 @@ export default {
         parentId,
         index,
         startTime: this.computedWithTime(start - this.currentDaySize.value, true),
-        endTime: this.computedWithTime(end - this.currentDaySize.value, true)
+        endTime: this.computedWithTime(end - this.currentDaySize.value, true),
+        data
       }
       console.log(this.computedWithTime(start - this.currentDaySize.value, false))
       console.log(this.computedWithTime(end - this.currentDaySize.value, false))
@@ -390,9 +393,10 @@ export default {
      * @param  {Number} id id
      * @param  {Number} parentId parentId
      * @param  {Number} index index
+     * @param  {Object} data data
      */
     // 鼠标悬停展示上部日期
-    lineMouseover (dom, e, id, parentId, index) {
+    lineMouseover (dom, e, id, parentId, index, data) {
       const start =
         Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
           this.currentDaySize.value +
@@ -406,7 +410,7 @@ export default {
       this.$emit('handleCurrentLineDay', currentLineDay)
       this.$emit('update:isHover', true)
       this.handlerSelect(this.computedList[index])
-      this.lineMouseenter(dom, e, id, parentId, index)
+      this.lineMouseenter(dom, e, id, parentId, index, data)
     },
     // 鼠标离开信息消失，时间显示消失
     /**
@@ -454,9 +458,10 @@ export default {
      * @param  {Number} id id
      * @param  {Number} parentId parentId
      * @param  {Number} index index
+     * @param  {Object} data data
      */
     // 鼠标进入显示当前项目的基本信息框
-    lineMouseenter (dom, e, id, parentId, index) {
+    lineMouseenter (dom, e, id, parentId, index, data) {
       this.hoverId = id
       const start =
         Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
@@ -499,7 +504,7 @@ export default {
      * @param  {Number} parentId parentId
      * @param  {Number} index index
      */
-    checkIsin (dom, events, id, parentId, index) {
+    checkIsin (dom, events, id, parentId, index, data) {
       const line = this.$refs[dom][0] // 目标silder
       // const lineTop = parseInt(line.style.top)
       // const lineDown = lineTop + 16
@@ -507,8 +512,8 @@ export default {
       // const lineRight = parseInt(this.computedList[index].widthMe) + lineLeft
       const targetElement = events.target || events.srcElement // 鼠标最后的元素
       if (line.contains(targetElement)) {
-        this.lineMouseover(dom, events, id, parentId, index)
-        this.lineMouseenter(dom, events, id, parentId, index)
+        this.lineMouseover(dom, events, id, parentId, index, data)
+        this.lineMouseenter(dom, events, id, parentId, index, data)
       } else {
         this.isShowMsg = false
         const currentLineDay = {
@@ -517,7 +522,7 @@ export default {
         }
         this.$emit('currentLineDayInit', currentLineDay)
       }
-      this.changeTime(dom, events, id, parentId, index)
+      this.changeTime(dom, events, id, parentId, index, data)
     },
     // 根据距离计算时间
     /**
@@ -577,7 +582,7 @@ export default {
      * @param  {Number} parentId parentId
      * @param  {Number} index index
      */
-    leftCurDragMounsedown (dom, e, id, parentId, index) {
+    leftCurDragMounsedown (dom, e, id, parentId, index, data) {
       const initScrollX = document.querySelector('.gantt-right').scrollLeft
       const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
       const line = this.$refs[dom][0]
@@ -616,7 +621,7 @@ export default {
         line.style.width = result + 'px'
         line.style.left = result1 + 'px'
         this.computedList[index].widthChild = result
-        this.lineMouseover(dom, e, id, parentId, index)
+        this.lineMouseover(dom, e, id, parentId, index, data)
         this.lineMouseleave(e, true)
       }
       document.onmouseup = (events) => {
@@ -633,11 +638,12 @@ export default {
         line.style.width = result + 'px'
         this.computedList[index].left = result1
         line.style.left = result1 + 'px'
-        this.checkIsin(dom, events, id, parentId, index)
+        this.checkIsin(dom, events, id, parentId, index, data)
         // this.setComputedListGroupWidth(parentId);
         if (parentId) {
+          const rootId = data.originIds[0] // 实际上三层任务是平铺开，渲染时候只有1层，通过标记渲染成3层。实际2层 外层id为originIds[0]
           this.list.forEach((item) => {
-            if (item.id === parentId) {
+            if (item.id === rootId) {
               item.children.forEach((k) => {
                 if (k.id === id) {
                   k.widthMe = k.widthChild = result
@@ -646,7 +652,7 @@ export default {
               })
             }
           })
-          this.setGroupWidth(parentId)
+          this.setGroupWidth(rootId)
         } else {
           this.list.forEach((item) => {
             if (item.id === id) {
@@ -666,7 +672,7 @@ export default {
      * @param  {Number} parentId parentId
      * @param  {Number} index index
      */
-    rightCurDragMounsedown (dom, e, id, parentId, index) {
+    rightCurDragMounsedown (dom, e, id, parentId, index, data) {
       const initScrollX = document.querySelector('.gantt-right').scrollLeft
       const ganttBlock = document.querySelector('.gantt-right').getBoundingClientRect()
       const line = this.$refs[dom][0]
@@ -707,7 +713,7 @@ export default {
           this.computedList[index].widthMe = result
           this.computedList[index].widthChild = result
         }
-        this.lineMouseover(dom, e, id, parentId, index)
+        this.lineMouseover(dom, e, id, parentId, index, data)
         this.lineMouseleave(e, true)
       }
       document.onmouseup = (events) => {
@@ -719,10 +725,11 @@ export default {
         this.computedList[index].widthMe = result
         this.computedList[index].widthChild = result
         line.style.width = result + 'px'
-        this.checkIsin(dom, events, id, parentId, index)
+        this.checkIsin(dom, events, id, parentId, index, data)
         if (parentId) {
+          const rootId = data.originIds[0] // 实际上三层任务是平铺开，渲染时候只有1层，通过标记渲染成3层。实际2层 外层id为originIds[0]
           this.list.forEach((item) => {
-            if (item.id === parentId) {
+            if (item.id === rootId) {
               item.children.forEach((k) => {
                 if (k.id === id) {
                   k.widthMe = k.widthChild = result
@@ -731,7 +738,7 @@ export default {
               })
             }
           })
-          this.setGroupWidth(parentId)
+          this.setGroupWidth(rootId)
         } else {
           this.list.forEach((item) => {
             if (item.id === id) {

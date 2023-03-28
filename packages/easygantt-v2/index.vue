@@ -333,23 +333,55 @@ export default {
      * @param: {Object} 滑动任务快的数据体
      */
     handleTimeChange (data) {
-      if (!data.parentId) {
-        // 里程碑节点
-        const stone = this.list.findIndex((stone) => {
-          return stone.id === data.id
+      const _data = data
+      const { originIds } = _data.data
+      // if (!data.parentId) {
+      //   // 里程碑节点
+      //   const stone = this.list.findIndex((stone) => {
+      //     return stone.id === data.id
+      //   })
+      //   this.list[stone].startTime = data.startTime
+      //   this.list[stone].endTime = data.endTime
+      //   return
+      // }
+      const upLevelIndex = (data, parentId) => {
+        const index = data.findIndex((up) => {
+          return up.id === parentId
         })
-        this.list[stone].startTime = data.startTime
-        this.list[stone].endTime = data.endTime
-        return
+        return index
       }
-      const first = this.list.findIndex((first) => {
-        return first.id === data.parentId
-      })
-      const second = this.list[first].children.findIndex((second) => {
-        return second.id === data.id
-      })
-      this.list[first].children[second].startTime = data.startTime
-      this.list[first].children[second].endTime = data.endTime
+      const dataIndex = (data) => {
+        const index = data.findIndex((item) => {
+          return item.id === _data.id
+        })
+        return index
+      }
+      const out = upLevelIndex(this.list, originIds[0])
+      const index = dataIndex(this.list[out].children)
+      this.list[out].children[index].startTime = _data.startTime
+      this.list[out].children[index].endTime = _data.endTime
+      this.$emit('handleTimeChange', data)
+      // if (level === 1) {
+      //   const out = upLevelIndex(this.list, originIds[0])
+      //   const index = dataIndex(this.list[out])
+      //   this.list[out].children[index].startTime = data.startTime
+      //   this.list[out].children[index].endTime = data.endTime
+      // } else if (level === 2) {
+      //   const out = upLevelIndex(this.list, originIds[0])
+      //   const second = upLevelIndex(this.list[out].children, originIds[1])
+      //   const index = dataIndex(this.list[out].children)
+      //   this.list[out].children[second].children[index].startTime = data.startTime
+      //   this.list[out].children[second].children[index].endTime = data.endTime
+      // } else if (level === 3) {
+      //   const out = upLevelIndex(this.list, originIds[0])
+      //   const second = upLevelIndex(this.list[out].children, originIds[1])
+      //   const third = upLevelIndex(this.list[out].children[second].children, originIds[2])
+      //   const index = dataIndex(this.list[out].children[second].children)
+      //   this.list[out].children[second].children[third].children[index].startTime = data.startTime
+      //   this.list[out].children[second].children[third].children[index].endTime = data.endTime
+      // }
+      // this.list[upLevel].children[index].startTime = data.startTime
+      // this.list[upLevel].children[index].endTime = data.endTime
     },
     /**
      * @description: 根据时间计算距离
