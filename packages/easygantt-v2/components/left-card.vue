@@ -20,6 +20,7 @@
                 v-show="child.isShow"
                 :key="child.id"
                 :child="child"
+                :expand="child.expand"
                 @expandTaskData="expandTaskData"
                 @handlerOperateChild="handlerOperateChild"></left-card-body>
             </template>
@@ -175,7 +176,7 @@ export default {
       const index = task.currentListIndex
       task.expand = state
       const { id } = task
-      this.list[index].children.forEach(child => {
+      this.list[index].children.forEach((child, cindex) => {
         if (child.originIds.includes(id)) { // 判断收展目标任务的id 是否在子任务的 originIds 里即可
           child.isShow = state
         }

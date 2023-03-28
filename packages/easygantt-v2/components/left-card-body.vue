@@ -2,14 +2,14 @@
   <div class="left-card-body" @mouseenter="showMoreBlock = true" @mouseleave="handlerMouseLeave">
     <div class="icon-block" :style="{ width: iconWidth }">
       <i
-        v-if="child.expand && child.hasChildren"
+        v-if="expand && child.hasChildren"
         class="el-icon-caret-bottom operator-icon"
         @click="expandTaskData(!child.expand)"
       ></i>
-      <i v-else-if="!child.expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(!child.expand)"></i>
+      <i v-else-if="!expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(!child.expand)"></i>
       <i class="el-icon-s-flag"></i>
     </div>
-    <div class="name-block">{{ child.name }}</div>
+    <div class="name-block">{{ child.name }}{{child.expand}}</div>
     <div class="operator-block">
       <el-popover v-if="showMoreBlock" placement="bottom" trigger="click" width="154" v-model="showMore">
         <div>
@@ -49,6 +49,10 @@ export default {
   props: {
     child: {
       type: Object,
+      required: true
+    },
+    expand: {
+      type: Boolean,
       required: true
     }
   },
