@@ -7,7 +7,7 @@
         @click="expandTaskData(!child.expand)"
       ></i>
       <i v-else-if="!expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(!child.expand)"></i>
-      <i class="el-icon-s-flag"></i>
+      <i :class="{ 'el-icon-s-flag' : child.hasChildren, 'el-icon-folder-checked': !child.hasChildren }"></i>
     </div>
     <div class="name-block">{{ child.name }}</div>
     <div class="operator-block">
