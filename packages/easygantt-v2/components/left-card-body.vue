@@ -4,9 +4,9 @@
       <i
         v-if="child.expand && child.hasChildren"
         class="el-icon-caret-bottom operator-icon"
-        @click="expandTaskData(false)"
+        @click="expandTaskData(!child.expand)"
       ></i>
-      <i v-else-if="!child.expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(true)"></i>
+      <i v-else-if="!child.expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(!child.expand)"></i>
       <i class="el-icon-s-flag"></i>
     </div>
     <div class="name-block">{{ child.name }}</div>

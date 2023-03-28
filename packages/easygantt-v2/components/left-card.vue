@@ -17,6 +17,7 @@
           <div v-show="item.expand" class="left-card__body">
             <template v-for="child in item.children">
               <left-card-body
+                v-show="child.isShow"
                 :key="child.id"
                 :child="child"
                 @expandTaskData="expandTaskData"
@@ -144,8 +145,9 @@ export default {
      * @description: 收起项目
      * @param {Number} 目标项目阶段所在数组下标
      * @param {Boolean} 设置状态 false收起 true展开
+     * @param {Number} 收起展开的任务id
      */
-    expandData (index, state) {
+    expandData (index, state, id) {
       /**
        * @description: 由于可能有3级任务，递归处理更方便
        * @param {Object} 当前层级数据
@@ -170,7 +172,14 @@ export default {
      * @param {Boolean} 设置状态 false收起 true展开
      */
     expandTaskData (task, state) {
-      console.log(task, state)
+      const index = task.currentListIndex
+      task.expand = state
+      const { id } = task
+      this.list[index].children.forEach(child => {
+        if (child.originIds.includes(id)) { // 判断收展目标任务的id 是否在子任务的 originIds 里即可
+          child.isShow = state
+        }
+      })
     },
     moreOperator (item) {
       console.log(item)
