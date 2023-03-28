@@ -436,6 +436,11 @@ export default {
       this.$set(obj, 'left', this.computedTimeWidth(obj.startTime))
       this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
       this.$set(obj, 'widthChild', this.computedTimeWidth(obj.startTime, obj.endTime))
+      if (obj.type === '3' || obj.hasChildren) {
+        this.$set(obj, 'leftStatic', this.computedTimeWidth(obj.startTime))
+        this.$set(obj, 'widthMeStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
+        this.$set(obj, 'widthChildStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
+      }
       if (obj.type !== '3') {
         let top
         if (index === 0) {
@@ -456,10 +461,6 @@ export default {
         if (!isInit) {
           obj.per = 0
         }
-        this.$set(obj, 'leftStatic', this.computedTimeWidth(obj.startTime))
-        this.$set(obj, 'widthMeStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
-        this.$set(obj, 'widthChildStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
-        obj.id = obj.id || new Date().getTime()
         let childrenTop
         if (index === 0) {
           childrenTop = 8 // 项目top 8 刚好

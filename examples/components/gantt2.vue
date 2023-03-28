@@ -85,17 +85,22 @@ export default {
       const _originIds = JSON.parse(JSON.stringify(originIds))
       _originIds.push(id)
       return new Promise((resolve, reject) => {
-        const data = mockdata[id].map((data) => {
-          return {
-            ...data,
-            level: level,
-            parentId: id,
-            originIds: _originIds
-          }
-        })
-        setTimeout(() => {
-          resolve(data)
-        }, 300)
+        try {
+          const data = mockdata[id].map((data) => {
+            return {
+              ...data,
+              level: level,
+              parentId: id,
+              originIds: _originIds
+            }
+          })
+
+          setTimeout(() => {
+            resolve(data)
+          }, 300)
+        } catch (error) {
+          console.log(id)
+        }
       })
     },
     // 需要请求获取任务的接口数 一起

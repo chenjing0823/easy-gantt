@@ -9,7 +9,7 @@
       <i v-else-if="!expand && child.hasChildren" class="el-icon-caret-top operator-icon" @click="expandTaskData(!child.expand)"></i>
       <i class="el-icon-s-flag"></i>
     </div>
-    <div class="name-block">{{ child.name }}{{child.expand}}</div>
+    <div class="name-block">{{ child.name }}</div>
     <div class="operator-block">
       <el-popover v-if="showMoreBlock" placement="bottom" trigger="click" width="154" v-model="showMore">
         <div>

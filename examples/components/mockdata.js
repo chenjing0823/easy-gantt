@@ -26,7 +26,21 @@ export default {
       stoneTime: '',
       startTime: 1678723200000,
       endTime: 1678982400000,
-      id: 12,
+      id: 12
+    },
+    {
+      name: '完成工作计划划3',
+      ower: '',
+      per: 80,
+      type: '1',
+      planTime: [
+        1589817600000,
+        1590076800000
+      ],
+      stoneTime: '',
+      startTime: 1678723200000,
+      endTime: 1678982400000,
+      id: 13,
       hasChildren: true
     }
   ],
@@ -77,18 +91,18 @@ export default {
     }
   ],
 
-  // 完成工作计划完成工作计划划2的子
-  12: [
+  // 完成工作计划完成工作计划划3的子
+  13: [
     {
       name: '第二层1',
       ower: '',
       per: 0,
       type: '1',
-      planTime: [1677945600000, 1678118400000],
+      planTime: [1678464000000, 1678809600000],
       stoneTime: '',
-      startTime: 1677945600000,
-      endTime: 1678118400000,
-      id: 121,
+      startTime: 1678464000000,
+      endTime: 1678809600000,
+      id: 131,
       hasChildren: true
     },
     {
@@ -97,28 +111,28 @@ export default {
       per: 0,
       type: '1',
       planTime: [
-        1678032000000,
+        1677945600000,
         1678204800000],
       stoneTime: '',
-      startTime: 1678032000000,
+      startTime: 1677945600000,
       endTime: 1678204800000,
-      id: 122,
+      id: 132,
       hasChildren: true
     }
   ],
 
   // 完成工作计划完成工作计划划2的子
-  121: [
+  131: [
     {
       name: '第二层1第三层1',
       ower: '',
       per: 0,
       type: '1',
-      planTime: [1677945600000, 1678118400000],
+      planTime: [1678464000000, 1678550400000],
       stoneTime: '',
-      startTime: 1677945600000,
-      endTime: 1678118400000,
-      id: 1211
+      startTime: 1678464000000,
+      endTime: 1678550400000,
+      id: 1311
     },
     {
       name: '第二层1第三层2',
@@ -126,17 +140,17 @@ export default {
       per: 0,
       type: '1',
       planTime: [
-        1678032000000,
-        1678204800000],
+        1678550400000,
+        1678809600000],
       stoneTime: '',
-      startTime: 1678032000000,
-      endTime: 1678204800000,
-      id: 1212
+      startTime: 1678550400000,
+      endTime: 1678809600000,
+      id: 1312
     }
   ],
 
   // 完成工作计划完成工作计划划2的子
-  122: [
+  132: [
     {
       name: '第二层2第三层1',
       ower: '',
@@ -146,7 +160,7 @@ export default {
       stoneTime: '',
       startTime: 1677945600000,
       endTime: 1678118400000,
-      id: 1221
+      id: 1321
     },
     {
       name: '第二层2第三层2',
@@ -159,7 +173,7 @@ export default {
       stoneTime: '',
       startTime: 1678032000000,
       endTime: 1678204800000,
-      id: 1222
+      id: 1322
     }
   ]
 }
