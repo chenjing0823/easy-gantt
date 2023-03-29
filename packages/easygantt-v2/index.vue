@@ -163,8 +163,8 @@ export default {
       const widthFormat = (list) => {
         list.forEach(item => {
           newVal(item, 'left', 'widthMe', 'widthChild')
-          if (item.widthMeStatic) {
-            newVal(item, 'leftStatic', 'widthMeStatic', 'widthChildStatic')
+          if (item.widthMeShow) {
+            newVal(item, 'leftShow', 'widthMeShow', 'widthChildShow')
           }
           if (item.children && item.children.length > 0) {
             widthFormat(item.children)
@@ -437,9 +437,9 @@ export default {
       this.$set(obj, 'widthMe', this.computedTimeWidth(obj.startTime, obj.endTime))
       this.$set(obj, 'widthChild', this.computedTimeWidth(obj.startTime, obj.endTime))
       if (obj.type === '3' || obj.hasChildren) {
-        this.$set(obj, 'leftStatic', this.computedTimeWidth(obj.startTime))
-        this.$set(obj, 'widthMeStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
-        this.$set(obj, 'widthChildStatic', this.computedTimeWidth(obj.startTime, obj.endTime))
+        this.$set(obj, 'leftShow', this.computedTimeWidth(obj.startTime))
+        this.$set(obj, 'widthMeShow', this.computedTimeWidth(obj.startTime, obj.endTime))
+        this.$set(obj, 'widthChildShow', this.computedTimeWidth(obj.startTime, obj.endTime))
       }
       if (obj.type !== '3') {
         let top
@@ -542,9 +542,9 @@ export default {
         data.widthMe = this.computedTimeWidth(planTime[0], planTime[1])
         data.widthChild = this.computedTimeWidth(planTime[0], planTime[1])
         data.endTime = planTime[1]
-        data.leftStatic = this.computedTimeWidth(planTime[0])
-        data.widthMeStatic = this.computedTimeWidth(planTime[0], planTime[1])
-        data.widthChildStatic = this.computedTimeWidth(planTime[0], planTime[1])
+        data.leftShow = this.computedTimeWidth(planTime[0])
+        data.widthMeShow = this.computedTimeWidth(planTime[0], planTime[1])
+        data.widthChildShow = this.computedTimeWidth(planTime[0], planTime[1])
       }
       dataSet(this.list[index])
 

@@ -3,12 +3,12 @@
     <div
       class="group-dynmic"
       v-show="item.expand"
-      :style="setStyle(item.top, item.left, item.widthMe)"
+      :style="setStyle(item.top, item.leftShow, item.widthMeShow)"
     >
     </div>
     <div
       class="group"
-      :style="setStyle(item.top, item.leftStatic, item.widthMeStatic)"
+      :style="setStyle(item.top, item.left, item.widthMe)"
     >
     </div>
   </div>

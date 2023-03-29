@@ -23,7 +23,7 @@
             width: item.widthMe + 'px',
             top: item.top + 'px'
           }"
-          v-if="(item.type === '1' || item.type === '2') && item.isShow"
+          v-if="isTask(item)"
           :ref="'line' + item.id"
           :key="item.id + index + 'ccc'"
           @mousedown="lineMousedown(`line${item.id}`, $event, item.id, item.parentId, index, item)"
@@ -80,7 +80,7 @@
 
         </div>
         <!-- 父级条 -->
-        <group v-else-if="item.type === '3'" :key="item.id" :item="item"></group>
+        <group v-else-if="isGroup(item)" :key="item.id" :item="item"></group>
 
       </template>
       <!-- 占位格，保持高度与左侧滚动区域一致 -->
@@ -194,12 +194,6 @@ export default {
       hoverId: '',
       // 背景高度
       lineBGHeight: '0px'
-      // line: [
-      //   { startX: 17320, startY: 60, endX: 17080, endY: 100 },
-      //   { startX: 17320, startY: 100, endX: 17480, endY: 140 },
-      //   { startX: 17320, startY: 220, endX: 17480, endY: 180 },
-      //   { startX: 17480, startY: 260, endX: 17320, endY: 220 }
-      // ]
     }
   },
 
@@ -272,6 +266,14 @@ export default {
   },
 
   methods: {
+    isTask (item) {
+      const { type, isShow, hasChildren, expand } = item
+      return ['1', '2'].includes(type) && isShow && (!hasChildren || !expand)
+    },
+    isGroup (item) {
+      const { type, hasChildren, expand } = item
+      return type === '3' || (hasChildren && expand)
+    },
     // 设置里程碑线的高度
     setStoneLine (isFirst) {
       this.$nextTick(() => {
@@ -357,7 +359,16 @@ export default {
               })
             }
           })
-          this.setGroupWidth(rootId)
+          if (data.level === 1) {
+            this.setGroupWidth(rootId)
+          } else if (data.level === 2) {
+            const level1 = data.originIds[1]
+            this.setGroupWidth(rootId, level1)
+          } else if (data.level === 3) {
+            const level1 = data.originIds[1]
+            const level2 = data.originIds[2]
+            this.setGroupWidth(rootId, level1, level2)
+          }
         } else {
           this.list.forEach((item) => {
             if (item.id === id) {
@@ -543,32 +554,54 @@ export default {
       }
     },
     // 根据id设置group的宽度
-    setGroupWidth (id, lists) {
-      let parent
-      if (lists) {
-        parent = lists.find((item) => {
-          return item.id === id
-        })
-      } else {
-        parent = this.list.find((item) => {
-          return item.id === id
-        })
-      }
-      const left = Math.min.apply(
-        Math,
-        parent.children.map((o) => {
-          return o.left
-        })
-      )
-      const arr = []
-      parent.children.forEach((item) => {
-        arr.push(item.left + item.widthMe)
+    setGroupWidth (id, level1, level2) {
+      const parent = this.list.find((item) => {
+        return item.id === id
       })
-      const width = Math.max.apply(Math, arr)
-      const widthMe = width - left
-      parent.widthMe = parent.widthChild = widthMe
-      parent.left = left
-      // return parent;
+      const left = []
+      const leftLevel1 = []
+      const leftLevel2 = []
+      const arr = []
+      const arrLevel1 = []
+      const arrLevel2 = []
+      parent.children.forEach((item) => {
+        if (item.originIds.includes(level2)) {
+          leftLevel2.push(item.left)
+          arrLevel2.push(item.left + item.widthMe)
+        } else if (item.originIds.includes(level1)) {
+          leftLevel1.push(item.left)
+          arrLevel1.push(item.left + item.widthMe)
+        } else {
+          left.push(item.left)
+          arr.push(item.left + item.widthMe)
+        }
+      })
+      const setWidth = (parent, arr, leftArr) => {
+        const left = Math.min.apply(
+          Math,
+          leftArr
+        )
+        const width = Math.max.apply(Math, arr)
+        const widthMe = width - left
+        parent.widthMeShow = parent.widthChildShow = widthMe
+        parent.leftShow = left
+      }
+      // 优先处理最小可展开层 再往上调用
+      if (level2) {
+        const task = parent.children.find((item) => {
+          return item.id === level2
+        })
+        setWidth(task, arrLevel2, leftLevel2)
+        this.setGroupWidth(id, level1)
+      } else if (level1) {
+        const task = parent.children.find((item) => {
+          return item.id === level1
+        })
+        setWidth(task, arrLevel1, leftLevel1)
+        this.setGroupWidth(id)
+      } else {
+        setWidth(parent, arr, left)
+      }
     },
     // 设置左侧leftmenu高亮
     handlerSelect (row) {
