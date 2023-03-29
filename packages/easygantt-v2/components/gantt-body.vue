@@ -764,7 +764,7 @@ export default {
     overflow-y: scroll;
     .null-block {
       position: absolute;
-      height: 32px;
+      height: 37px;
       width: 20px;
     }
     .line {
