@@ -193,7 +193,8 @@ export default {
       },
       hoverId: '',
       // 背景高度
-      lineBGHeight: '0px'
+      lineBGHeight: '0px',
+      initFlag: false
     }
   },
 
@@ -243,7 +244,8 @@ export default {
         })
         return arr
       }
-      return dataFormat(JSON.parse(JSON.stringify(this.list)))
+      const list = JSON.parse(JSON.stringify(this.list))
+      return dataFormat(list)
     },
     // 当前年份
     currentYear () {
@@ -259,7 +261,22 @@ export default {
     }
   },
 
-  watch: {},
+  watch: {
+    computedList: {
+      handler (val) {
+        if (!this.initFlag) {
+          const obj = {}
+          val.forEach(data => {
+            if (data.originIds && data.originIds.length && !data.hasChildren) {
+              this.setGroupWidth(data.originIds, obj)
+            }
+          })
+          this.initFlag = true
+        }
+      },
+      deep: true
+    }
+  },
 
   mounted () {
     this.setStoneLine()
@@ -360,14 +377,14 @@ export default {
             }
           })
           if (data.level === 1) {
-            this.setGroupWidth(rootId)
+            this.setGroupWidth([rootId])
           } else if (data.level === 2) {
             const level1 = data.originIds[1]
-            this.setGroupWidth(rootId, level1)
+            this.setGroupWidth([rootId, level1])
           } else if (data.level === 3) {
             const level1 = data.originIds[1]
             const level2 = data.originIds[2]
-            this.setGroupWidth(rootId, level1, level2)
+            this.setGroupWidth([rootId, level1, level2])
           }
         } else {
           this.list.forEach((item) => {
@@ -554,7 +571,7 @@ export default {
       }
     },
     // 根据id设置group的宽度
-    setGroupWidth (id, level1, level2) {
+    setGroupWidth ([id, level1, level2], obj) {
       const parent = this.list.find((item) => {
         return item.id === id
       })
@@ -588,19 +605,32 @@ export default {
       }
       // 优先处理最小可展开层 再往上调用
       if (level2) {
+        if (obj && obj[level2]) return // 已经初始化过group 不再重复初始化 节约性能
         const task = parent.children.find((item) => {
           return item.id === level2
         })
         setWidth(task, arrLevel2, leftLevel2)
-        this.setGroupWidth(id, level1)
+        this.setGroupWidth([id, level1])
       } else if (level1) {
+        if (obj && obj[level1]) return // 已经初始化过group 不再重复初始化 节约性能
         const task = parent.children.find((item) => {
           return item.id === level1
         })
         setWidth(task, arrLevel1, leftLevel1)
-        this.setGroupWidth(id)
+        this.setGroupWidth([id])
       } else {
+        if (obj && obj[id]) return // 已经初始化过group 不再重复初始化 节约性能
         setWidth(parent, arr, left)
+      }
+      if (obj) {
+        // 代表初始化
+        if (level2 && !obj[level2]) {
+          obj[level2] = true
+        } else if (level1 && !obj[level1]) {
+          obj[level1] = true
+        } else if (id && !obj[id]) {
+          obj[id] = true
+        }
       }
     },
     // 设置左侧leftmenu高亮
@@ -685,7 +715,16 @@ export default {
               })
             }
           })
-          this.setGroupWidth(rootId)
+          if (data.level === 1) {
+            this.setGroupWidth([rootId])
+          } else if (data.level === 2) {
+            const level1 = data.originIds[1]
+            this.setGroupWidth([rootId, level1])
+          } else if (data.level === 3) {
+            const level1 = data.originIds[1]
+            const level2 = data.originIds[2]
+            this.setGroupWidth([rootId, level1, level2])
+          }
         } else {
           this.list.forEach((item) => {
             if (item.id === id) {
@@ -771,7 +810,16 @@ export default {
               })
             }
           })
-          this.setGroupWidth(rootId)
+          if (data.level === 1) {
+            this.setGroupWidth([rootId])
+          } else if (data.level === 2) {
+            const level1 = data.originIds[1]
+            this.setGroupWidth([rootId, level1])
+          } else if (data.level === 3) {
+            const level1 = data.originIds[1]
+            const level2 = data.originIds[2]
+            this.setGroupWidth([rootId, level1, level2])
+          }
         } else {
           this.list.forEach((item) => {
             if (item.id === id) {
