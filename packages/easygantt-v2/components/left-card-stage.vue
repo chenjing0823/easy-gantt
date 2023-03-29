@@ -13,9 +13,10 @@
       <i class="el-icon-plus operator-icon" @click="newTask(item)"></i>
       <el-popover placement="bottom" trigger="click" width="154" v-model="showMore">
         <div>
-          <div @click="editStageAfterCur(item)">编辑</div>
-          <div @click="addStageAfterCur(item)">在此之后添加阶段</div>
-          <div @click="deleteStage(item)">删除</div>
+          <div
+            v-for="option in options"
+            :key="option.type"
+            @click="handlerOperateStage(option, item)">{{ option.name }}</div>
         </div>
         <i
           slot="reference"
@@ -43,7 +44,14 @@ export default {
 
   data () {
     return {
-      showMore: false
+      showMore: false,
+      options: [
+        { type: 1, name: '调整状态' },
+        { type: 2, name: '编辑' },
+        { type: 3, name: '调整时间' },
+        { type: 4, name: '在此后增加新阶段' },
+        { type: 5, name: '删除' }
+      ]
     }
   },
 
@@ -54,16 +62,9 @@ export default {
     newTask (item) {
       this.$emit('newTask', item)
     },
-    editStageAfterCur (item) {
-      this.$emit('editStageAfterCur', item)
+    handlerOperateStage (option, item) {
       this.showMore = false
-    },
-    addStageAfterCur (item) {
-      this.$emit('addStageAfterCur', item)
-      this.showMore = false
-    },
-    deleteStage (item) {
-      this.$emit('deleteStage', item)
+      this.$emit('handlerOperateStage', option, item)
     },
     moreOperator (item) {
       this.$emit('moreOperator', item)

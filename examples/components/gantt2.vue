@@ -6,7 +6,11 @@
       :list="list"
       :line="line"
       :dataList="dataList"
-      @handleTimeChange="handleTimeChange"></EasyGanttV2>
+      @handleTimeChange="handleTimeChange"
+      @handlerDeleStage="handlerDeleStage"
+      @handlerNewStage="handlerNewStage"
+      @handlerEditStage="handlerEditStage"
+      @handlerOperateTask="handlerOperateTask"></EasyGanttV2>
   </div>
 </template>
 
@@ -160,6 +164,18 @@ export default {
     },
     handleTimeChange (data) {
       console.log('改变时间', data)
+    },
+    handlerDeleStage (index) {
+      console.log(index)
+    },
+    handlerNewStage (listIndex, obj) {
+      console.log(listIndex, obj)
+    },
+    handlerEditStage (index, newData) {
+      console.log(index, newData)
+    },
+    handlerOperateTask (type, data) {
+      console.log(type, data)
     }
   }
 }

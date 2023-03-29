@@ -112,7 +112,7 @@ export default {
     dispatchFunction (option) {
       this.showMore = false
       this.showMoreBlock = false
-      this.$emit('handlerOperateChild', option.type, this.child)
+      this.$emit('handlerOperateTask', option.type, this.child)
     },
     moreOperator (item) {
       console.log(item)

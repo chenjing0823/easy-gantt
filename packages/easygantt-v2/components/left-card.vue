@@ -7,6 +7,7 @@
           :item="item"
           @expandData="expandData"
           @newTask="newTask"
+          @handlerOperateStage="handlerOperateStage"
           @editStageAfterCur="editStageAfterCur"
           @addStageAfterCur="addStageAfterCur"
           @deleteStage="deleteStage"
@@ -22,7 +23,7 @@
                 :child="child"
                 :expand="child.expand"
                 @expandTaskData="expandTaskData"
-                @handlerOperateChild="handlerOperateChild"></left-card-body>
+                @handlerOperateTask="handlerOperateTask"></left-card-body>
             </template>
           </div>
         </template>
@@ -120,6 +121,18 @@ export default {
       const index = this.list.findIndex((item) => item.id === clickData.id)
       this.$emit('handlerEditStage', data, index, callback)
     },
+    handlerOperateStage (option, item) {
+      const { type } = option
+      const _this = this
+      const methodEnum = {
+        1: (item) => { console.log(option, item) },
+        2: (item) => { _this.editStageAfterCur(item) },
+        3: (item) => { console.log(option, item) },
+        4: (item) => { _this.addStageAfterCur(item) },
+        5: (item) => { _this.deleteStage(item) }
+      }
+      methodEnum[type](item)
+    },
     addStageAfterCur (item) {
       this.type = 'new'
       this.curData = item
@@ -139,8 +152,8 @@ export default {
       this.curData = {}
       this.isNew = false
     },
-    handlerOperateChild (type, data) {
-      this.$emit('handlerOperateChild', type, data)
+    handlerOperateTask (type, data) {
+      this.$emit('handlerOperateTask', type, data)
     },
     /**
      * @description: 收起项目

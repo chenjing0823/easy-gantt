@@ -1,6 +1,6 @@
 <template>
   <div class="gantt-add">
-    <el-dialog title="新建" :visible.sync="dialogFormVisible">
+    <el-dialog title="新建任务" :visible.sync="dialogFormVisible">
       <el-form :model="form">
         <el-form-item label="名称">
           <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -9,13 +9,6 @@
           <el-select v-model="form.ower" placeholder="请选择活动区域">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="类型">
-          <el-select v-model="form.type" placeholder="请选择活动区域">
-            <el-option label="任务" value="1"></el-option>
-            <el-option label="里程碑" value="2"></el-option>
-            <el-option label="项目阶段" value="3"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="进度">

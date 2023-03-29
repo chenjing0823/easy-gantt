@@ -21,7 +21,7 @@
         @handlerEditStage="handlerEditStage"
         @handlerNewStage="handlerNewConfirm"
         @handlerDeleStage="handlerDeleStage"
-        @handlerOperateChild="handlerOperateChild"
+        @handlerOperateTask="handlerOperateTask"
       ></left-card>
     </div>
     <div class="gantt-right">
@@ -416,6 +416,9 @@ export default {
       const endTime = obj.planTime.length > 0 ? obj.planTime[1] : obj.stoneTime
       this.$set(obj, 'startTime', startTime)
       this.$set(obj, 'endTime', endTime)
+
+      this.$emit('handlerNewStage', listIndex, obj)
+
       this.pushData(obj, false, listIndex)
       if (obj.type !== '3') {
         this.handlerRowClick(obj)
@@ -484,17 +487,20 @@ export default {
         this.$set(row, 'expand', true) // 展开有操作 需要响应
         const cindex = row.children.length
         obj.top = 40 + cindex * 40 + row.top
-        if (obj.level === 1) {
-          obj.parentId = row.id
-        }
+
         row.children.push(obj)
         row.children.forEach((item) => {
           item.isShow = true
         })
         if (!isInit) {
-          this.setGroupWidth(row.id)
+          this.$set(obj, 'originIds', [row.id])
+          this.$set(obj, 'level', 1)
+          this.setGroupWidth([row.id])
           this.setGroupPer(row.id)
           this.resetTop(currentListIndex)
+        }
+        if (obj.level === 1) {
+          this.$set(obj, 'parentId', row.id)
         }
         this.$set(this.list, currentListIndex, row)
       } else {
@@ -520,11 +526,12 @@ export default {
       // console.log(this.list)
     },
     handlerDeleStage (index) {
+      this.$emit('handlerDeleStage', index)
       this.list.splice(index, 1)
       this.reComputed()
     },
-    handlerOperateChild (type, data) {
-      console.log(type, data)
+    handlerOperateTask (type, data) {
+      this.$emit('handlerOperateTask', type, data)
     },
     /**
      * @description: 编辑数据
@@ -545,41 +552,76 @@ export default {
         data.leftShow = this.computedTimeWidth(planTime[0])
         data.widthMeShow = this.computedTimeWidth(planTime[0], planTime[1])
         data.widthChildShow = this.computedTimeWidth(planTime[0], planTime[1])
+        return data
       }
-      dataSet(this.list[index])
+      const newData = dataSet(this.list[index])
+
+      this.$emit('handlerEditStage', index, newData)
 
       callback && callback()
     },
-    /**
-     * @description: 根据id设置group的宽度
-     * @param: {Number} id
-     */
-    setGroupWidth (id, lists) {
-      let parent
-      if (lists) {
-        parent = lists.find((item) => {
-          return item.id === id
-        })
-      } else {
-        parent = this.list.find((item) => {
-          return item.id === id
-        })
-      }
-      const left = Math.min.apply(
-        Math,
-        parent.children.map((o) => {
-          return o.left
-        })
-      )
-      const arr = []
-      parent.children.forEach((item) => {
-        arr.push(item.left + item.widthMe)
+    // 根据id设置group的宽度
+    setGroupWidth ([id, level1, level2], obj) {
+      const parent = this.list.find((item) => {
+        return item.id === id
       })
-      const width = Math.max.apply(Math, arr)
-      const widthMe = width - left
-      parent.widthMe = parent.widthChild = widthMe
-      parent.left = left
-      // return parent;
+      const left = []
+      const leftLevel1 = []
+      const leftLevel2 = []
+      const arr = []
+      const arrLevel1 = []
+      const arrLevel2 = []
+      parent.children.forEach((item) => {
+        if (item.originIds.includes(level2)) {
+          leftLevel2.push(item.left)
+          arrLevel2.push(item.left + item.widthMe)
+        } else if (item.originIds.includes(level1)) {
+          leftLevel1.push(item.left)
+          arrLevel1.push(item.left + item.widthMe)
+        } else {
+          left.push(item.left)
+          arr.push(item.left + item.widthMe)
+        }
+      })
+      const setWidth = (parent, arr, leftArr) => {
+        const left = Math.min.apply(
+          Math,
+          leftArr
+        )
+        const width = Math.max.apply(Math, arr)
+        const widthMe = width - left
+        parent.widthMeShow = parent.widthChildShow = widthMe
+        parent.leftShow = left
+      }
+      // 优先处理最小可展开层 再往上调用
+      if (level2) {
+        if (obj && obj[level2]) return // 已经初始化过group 不再重复初始化 节约性能
+        const task = parent.children.find((item) => {
+          return item.id === level2
+        })
+        setWidth(task, arrLevel2, leftLevel2)
+        this.setGroupWidth([id, level1])
+      } else if (level1) {
+        if (obj && obj[level1]) return // 已经初始化过group 不再重复初始化 节约性能
+        const task = parent.children.find((item) => {
+          return item.id === level1
+        })
+        setWidth(task, arrLevel1, leftLevel1)
+        this.setGroupWidth([id])
+      } else {
+        if (obj && obj[id]) return // 已经初始化过group 不再重复初始化 节约性能
+        setWidth(parent, arr, left)
+      }
+      if (obj) {
+        // 代表初始化
+        if (level2 && !obj[level2]) {
+          obj[level2] = true
+        } else if (level1 && !obj[level1]) {
+          obj[level1] = true
+        } else if (id && !obj[id]) {
+          obj[id] = true
+        }
+      }
     },
     /**
      * @description: 设置分组百分比
