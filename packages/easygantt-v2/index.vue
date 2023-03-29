@@ -333,34 +333,27 @@ export default {
      * @param: {Object} 滑动任务快的数据体
      */
     handleTimeChange (data) {
-      const _data = data
-      const { originIds } = _data.data
-      // if (!data.parentId) {
-      //   // 里程碑节点
-      //   const stone = this.list.findIndex((stone) => {
-      //     return stone.id === data.id
-      //   })
-      //   this.list[stone].startTime = data.startTime
-      //   this.list[stone].endTime = data.endTime
-      //   return
-      // }
-      const upLevelIndex = (data, parentId) => {
-        const index = data.findIndex((up) => {
-          return up.id === parentId
-        })
-        return index
+      const callback = () => {
+        const _data = data
+        const { originIds } = _data.data
+        const upLevelIndex = (data, parentId) => {
+          const index = data.findIndex((up) => {
+            return up.id === parentId
+          })
+          return index
+        }
+        const dataIndex = (data) => {
+          const index = data.findIndex((item) => {
+            return item.id === _data.id
+          })
+          return index
+        }
+        const out = upLevelIndex(this.list, originIds[0])
+        const index = dataIndex(this.list[out].children)
+        this.list[out].children[index].startTime = _data.startTime
+        this.list[out].children[index].endTime = _data.endTime
       }
-      const dataIndex = (data) => {
-        const index = data.findIndex((item) => {
-          return item.id === _data.id
-        })
-        return index
-      }
-      const out = upLevelIndex(this.list, originIds[0])
-      const index = dataIndex(this.list[out].children)
-      this.list[out].children[index].startTime = _data.startTime
-      this.list[out].children[index].endTime = _data.endTime
-      this.$emit('handleTimeChange', data)
+      this.$emit('handleTimeChange', data, callback)
       // if (level === 1) {
       //   const out = upLevelIndex(this.list, originIds[0])
       //   const index = dataIndex(this.list[out])
@@ -417,16 +410,16 @@ export default {
       this.$set(obj, 'startTime', startTime)
       this.$set(obj, 'endTime', endTime)
 
-      this.$emit('handlerNewStage', listIndex, obj)
-
-      this.pushData(obj, false, listIndex)
-      if (obj.type !== '3') {
-        this.handlerRowClick(obj)
-      }
-      this.currentListIndex = ''
-      this.isChildren = false
-      this.dialogFormVisible = false
-      callback && callback()
+      this.$emit('handlerNewStage', listIndex, obj, () => {
+        this.pushData(obj, false, listIndex)
+        if (obj.type !== '3') {
+          this.handlerRowClick(obj)
+        }
+        this.currentListIndex = ''
+        this.isChildren = false
+        this.dialogFormVisible = false
+        callback && callback()
+      })
     },
     /**
      * @description: 插入数据
@@ -526,9 +519,11 @@ export default {
       // console.log(this.list)
     },
     handlerDeleStage (index) {
-      this.$emit('handlerDeleStage', index)
-      this.list.splice(index, 1)
-      this.reComputed()
+      const callback = () => {
+        this.list.splice(index, 1)
+        this.reComputed()
+      }
+      this.$emit('handlerDeleStage', index, callback)
     },
     handlerOperateTask (type, data) {
       this.$emit('handlerOperateTask', type, data)
@@ -541,22 +536,20 @@ export default {
      */
     handlerEditStage (data, index, callback) {
       const { name, planTime } = data
-      const dataSet = (data) => {
+      const dataSet = () => {
+        const data = this.list[index]
         data.name = name
         data.startTime = planTime[0]
         data.endTime = planTime[1]
         data.left = this.computedTimeWidth(planTime[0])
         data.widthMe = this.computedTimeWidth(planTime[0], planTime[1])
         data.widthChild = this.computedTimeWidth(planTime[0], planTime[1])
-        data.endTime = planTime[1]
         data.leftShow = this.computedTimeWidth(planTime[0])
         data.widthMeShow = this.computedTimeWidth(planTime[0], planTime[1])
         data.widthChildShow = this.computedTimeWidth(planTime[0], planTime[1])
-        return data
       }
-      const newData = dataSet(this.list[index])
 
-      this.$emit('handlerEditStage', index, newData)
+      this.$emit('handlerEditStage', index, data, dataSet)
 
       callback && callback()
     },

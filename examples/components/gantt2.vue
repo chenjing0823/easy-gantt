@@ -162,17 +162,25 @@ export default {
         resolve()
       })
     },
-    handleTimeChange (data) {
+    handleTimeChange (data, callback) {
       console.log('改变时间', data)
+      // TODO 数据保存成功后触发回调函数
+      callback && callback()
     },
-    handlerDeleStage (index) {
+    handlerDeleStage (index, callback) {
       console.log(index)
+      // TODO 数据保存成功后触发回调函数
+      callback && callback()
     },
-    handlerNewStage (listIndex, obj) {
+    handlerNewStage (listIndex, obj, callback) {
       console.log(listIndex, obj)
+      // TODO 数据保存成功后触发回调函数
+      callback && callback()
     },
-    handlerEditStage (index, newData) {
+    handlerEditStage (index, newData, callback) {
       console.log(index, newData)
+      // TODO 数据保存成功后触发回调函数
+      callback && callback()
     },
     handlerOperateTask (type, data) {
       console.log(type, data)
