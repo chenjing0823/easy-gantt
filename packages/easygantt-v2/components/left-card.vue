@@ -82,8 +82,6 @@ export default {
     let lineBGchange = true
     leftCard.onscroll = () => {
       if (leftCardchange) {
-        console.log(leftCard.clientHeight)
-        console.log(lineBG.clientHeight)
         lineBG.scrollTop =
           (leftCard.scrollTop / (leftCard.scrollHeight - leftCard.clientHeight)) *
           (lineBG.scrollHeight - lineBG.clientHeight)
