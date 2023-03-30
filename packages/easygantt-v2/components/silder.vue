@@ -1,6 +1,17 @@
 <template>
-  <div class="slider" ref="slider">
-    <div class="process" :style="{ width }" :class="{ finish: this.per === 100 }"></div>
+  <div
+    class="slider"
+    :data-end-id="id"
+    :data-end-top="top + 14"
+    :data-end-left="left"
+    ref="slider">
+    <div
+      class="process"
+      :data-end-id="id"
+      :data-end-top="top + 14"
+      :data-end-left="left"
+      :style="{ width }"
+      :class="{ finish: this.per === 100 }"></div>
   </div>
 </template>
 
@@ -15,7 +26,7 @@ export default {
   },
 
   mixins: [],
-  props: ['min', 'max', 'value', 'widths', 'id', 'parentId'],
+  props: ['min', 'max', 'value', 'widths', 'id', 'parentId', 'top', 'left'],
 
   data () {
     return {
@@ -33,13 +44,6 @@ export default {
       return (this.per - this.min) / (this.max - this.min)
     },
     width () {
-      if (this.slider) {
-        return this.widths * this.scale + 'px'
-      } else {
-        return 0 + 'px'
-      }
-    },
-    left () {
       if (this.slider) {
         return this.widths * this.scale + 'px'
       } else {

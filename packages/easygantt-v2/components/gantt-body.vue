@@ -7,13 +7,20 @@
       :key="index"
     ></div> -->
     <div class="lineBG" :style="{width: dayLength + 'px'}">
+      <svg v-if="movePoints.endX" width="100%" height="100%">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" class="svg-marker" />
+        </marker>
+      </defs>
+        <line :x1="movePoints.startX" :y1="movePoints.startY" :x2="movePoints.endX" :y2="movePoints.endY" marker-end="url(#arrow)" class="svg-line" />
+      </svg>
       <!-- <div v-for="item in 100" :key="item" style="position: absolute;" :style="{top: item * 30 + 'px',left: item * 50 + 'px'}">123</div> -->
       <template v-for="(item, index) in computedLine">
         <seriesLine
-          :data="item"
           :currentDaySize="currentDaySize"
           :point-data="item"
-          :key="index"></seriesLine>
+          :key="index + 'lll'"></seriesLine>
       </template>
       <template v-for="(item, index) in computedList">
         <div
@@ -36,6 +43,8 @@
             :max="100"
             v-model="item.per"
             :id="item.id"
+            :top="item.top"
+            :left="item.left"
             :parentId="item.parentId"
             :widths="item.widthChild"
             v-if="item.type === '1'"
@@ -52,12 +61,19 @@
             </div>
           </template>
 
-          <div class="dragBox" v-show="hoverId === item.id && item.type !== '2'">
+          <div
+            class="dragBox"
+            :data-end-id="item.id"
+            :data-end-top="item.top + 14"
+            :data-end-left="item.left"
+            v-show="hoverId === item.id && item.type !== '2'">
             <slider
               :min="0"
               :max="100"
               v-model="item.per"
               :id="item.id"
+              :top="item.top"
+              :left="item.left"
               :parentId="item.parentId"
               :widths="item.widthChild"
               v-show="item.type === '1'"
@@ -77,7 +93,18 @@
               rightCurDragMounsedown(`line${item.id}`, $event, item.id, item.parentId, index, item)
             "
           >||</div>
-
+          <!-- <div
+            class="leftcurPoint curPoint"
+            v-show="item.type === '1' && hoverId === item.id"
+            @mousedown.stop="
+              leftcurPointMounsedown(`line${item.id}`, $event, item.id, item.parentId, index, item)
+            "></div> -->
+          <div
+          class="rightcurPoint curPoint"
+            v-show="item.type === '1' && hoverId === item.id"
+            @mousedown.stop="
+              rightcurPointMounsedown(`line${item.id}`, $event, item.id, item.parentId, index, item)
+            "></div>
         </div>
         <!-- 父级条 -->
         <group v-else-if="isGroup(item)" :key="item.id" :item="item"></group>
@@ -194,7 +221,8 @@ export default {
       hoverId: '',
       // 背景高度
       lineBGHeight: '0px',
-      initFlag: false
+      initFlag: false,
+      movePoints: {}
     }
   },
 
@@ -832,6 +860,57 @@ export default {
         }
         document.onmousemove = document.onmouseup = null
       }
+    },
+    // leftcurPointMounsedown (dom, e, id, parentId, index, data) {},
+    rightcurPointMounsedown (dom, e, id, parentId, index, data) {
+      // const cx = e.pageX
+      // const cy = e.pageY
+      const { top, left, widthMe } = data
+      const startX = left + widthMe
+      const startY = top + 14
+      this.$set(this.movePoints, 'id', new Date().getTime())
+      this.$set(this.movePoints, 'isDrag', true)
+      this.$set(this.movePoints, 'startX', startX)
+      this.$set(this.movePoints, 'startY', startY)
+      const arr = []
+      const element = document.querySelector('.lineBG')
+      const callback = (e) => {
+        // if (e.target.classNmae)
+        const isChangeEvent = e.target.classList.contains('lineBG') || e.target.classList.contains('slider') || e.target.classList.contains('process')
+        if (!isChangeEvent && e.target.style.pointerEvents !== 'none') {
+          e.target.style.pointerEvents = 'none'
+          arr.push(e.target)
+          return
+        }
+        // document.querySelector('.series-line').style.pointerEvents = 'none'
+        let endX = e.offsetX
+        let endY = e.offsetY
+        console.log(endX, endY)
+        const { endId, endTop, endLeft } = e.target.dataset
+        if (endId) {
+          endX = +endLeft
+          endY = +endTop
+        }
+        this.$set(this.movePoints, 'endX', endX)
+        this.$set(this.movePoints, 'endY', endY)
+      }
+      element.addEventListener('mousemove', callback)
+      document.onmouseup = (events) => {
+        const { endId } = events.target.dataset
+        if (endId) {
+          this.line.push({
+            id: new Date().getTime(),
+            sourceid: id,
+            targetid: +endId
+          })
+        }
+        this.movePoints = {}
+        arr.forEach(dom => {
+          dom.style.pointerEvents = 'auto'
+        })
+        document.onmouseup = null
+        element.removeEventListener('mousemove', callback)
+      }
     }
   }
 }
@@ -845,6 +924,13 @@ export default {
     height: calc(100% - 0px);
     position: relative;
     overflow-y: scroll;
+    .svg-line {
+      stroke: #4DACFF;
+      stroke-width: 2
+    }
+    .svg-marker {
+      fill: #4DACFF;
+    }
     .null-block {
       position: absolute;
       height: 37px;
@@ -853,6 +939,22 @@ export default {
     .line {
       position: absolute;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+      .curPoint {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border: 2px solid #4DACFF;
+        top: 7px;
+        // 24/2 - 10/2 = 7
+      }
+      .leftcurPoint {
+        left: -20px;
+      }
+      .rightcurPoint {
+        right: -20px;
+      }
       .curdrag {
         color: #4E5969;
         width: 10px;
@@ -866,6 +968,10 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
       .rightCurDrag {
         cursor: e-resize;

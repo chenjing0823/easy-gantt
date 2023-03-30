@@ -160,6 +160,8 @@ export default {
     text-align: left;
     font-family: PingFangSC-Regular;
     margin-bottom: 0;
+    box-sizing: border-box;
+    border-top: 1px solid #f7f8fa;
   }
   .new-stage:hover {
     cursor: pointer;
@@ -168,6 +170,8 @@ export default {
   }
   .new-stage-form {
     padding: 12px;
+    box-sizing: border-box;
+    border-top: 1px solid #f7f8fa;
     .input-name {
       margin-bottom: 10px;
     }

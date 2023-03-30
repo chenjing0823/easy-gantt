@@ -1,15 +1,38 @@
 <template>
-  <div class="series-line" :style="dynmicStyle" @mouseleave="isShowDel = false">
-    <svg :width="width" :height="height">
+  <div
+    class="series-line"
+    :style="dynmicStyle">
+    <svg
+      :width="width"
+      :height="height"
+      :ref="'svg' + pointData.id"
+      @mouseenter="svgMouseEnter"
+      @mouseleave="svgMouseLeave">
       <!-- <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" class="line" />
       <line :x1="midPoint1.x" :y1="midPoint1.y" :x2="midPoint2.x" :y2="midPoint2.y" class="line" />
       <line :x1="midPoint2.x" :y1="midPoint2.y" :x2="midPoint3.x" :y2="midPoint3.y" class="line" />
       <line :x1="midPoint3.x" :y1="midPoint3.y" :x2="midPoint4.x" :y2="midPoint4.y" class="line" />
       <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" class="line" /> -->
+      <defs>
+        <marker :id="'arrow-line'+pointData.id" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" class="svg-marker-line" :class="{isHover: isHover}" />
+        </marker>
+      </defs>
       <!-- 改用折线直接绘制 便于触发鼠标事件 -->
-      <polyline :points="points" class="poly-line" @click="showDel"/>
+      <polyline
+        :ref="'polyline' + pointData.id"
+        :points="points" class="poly-line"
+        :marker-end="getMarkend"
+        @mouseenter="polylineMouseEnter"
+        @mouseleave="polylineMouseLevel"
+        @click="showDel"/>
     </svg>
-    <i class="el-icon-delete line-icon" :style="iconStyle" v-show="isShowDel"></i>
+    <i
+      class="el-icon-delete line-icon"
+      :style="iconStyle"
+      @mouseenter="iconMouseEnter"
+      @mouseleave="iconMouseLeave"
+      v-show="isShowDel"></i>
   </div>
 </template>
 
@@ -18,15 +41,13 @@ export default {
   name: 'series-line',
   data () {
     return {
-      isShowDel: false
+      isShowDel: false,
+      isHover: false,
+      icon: false
     }
   },
   props: {
     pointData: {
-      type: Object,
-      default: () => ({})
-    },
-    data: {
       type: Object,
       default: () => ({})
     },
@@ -41,11 +62,15 @@ export default {
     }
   },
   computed: {
+    getMarkend () {
+      const id = this.pointData.id
+      return `url(#arrow-line${id})`
+    },
     polylineStaticWidth () {
       return this.currentDaySize.value / 2
     },
     dynmicStyle () {
-      const { startX, startY, endX, endY } = this.data
+      const { startX, startY, endX, endY } = this.pointData
       const orignX = Math.min(startX, endX)
       const orignY = Math.min(startY, endY)
       let overflowWidth = 0
@@ -55,7 +80,7 @@ export default {
         overflowWidth = this.polylineStaticWidth
       }
       if (startY > endY) {
-        overflowHeight = 2
+        overflowHeight = 8
       }
       return {
         left: orignX - overflowWidth + 'px',
@@ -76,10 +101,13 @@ export default {
     leftTopPoint () {
       const { startX, startY, endX, endY } = this.pointData
       let x = Math.min(startX, endX)
-      const y = Math.min(startY, endY)
+      let y = Math.min(startY, endY)
       if (startX >= endX) { // 当连接目标在左侧
         // x = x - 20 - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
         x = x - this.polylineStaticWidth - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
+      }
+      if (startY > endY) {
+        y = y + 0
       }
       return {
         x: x,
@@ -112,8 +140,12 @@ export default {
     },
     // 开始y坐标
     startY () {
-      const { startY } = this.pointData
-      return startY - this.leftTopPoint.y + 2
+      const { startY, endY } = this.pointData
+      let y = startY - this.leftTopPoint.y + 2
+      if (startY > endY) {
+        y = startY - this.leftTopPoint.y + 10
+      }
+      return y
     },
     // 结束x坐标
     endX () {
@@ -125,7 +157,7 @@ export default {
       const { startY, endY } = this.pointData
       let y = endY - this.leftTopPoint.y - 2
       if (startY > endY) {
-        y = endY - this.leftTopPoint.y + 2
+        y = endY - this.leftTopPoint.y + 6
       }
       return y
     },
@@ -184,7 +216,7 @@ export default {
     },
     // 连线元素块的高
     height () {
-      return this.rightEndPoint.y - this.leftTopPoint.y + 2 + 2
+      return this.rightEndPoint.y - this.leftTopPoint.y + 2 + 2 + 8
     },
     points () {
       return `
@@ -196,9 +228,40 @@ export default {
       ${this.endX},${this.endY}`
     }
   },
+
+  mounted () {
+  },
   methods: {
+    mouseenter (e) {
+      console.log(e)
+    },
     showDel () {
       this.isShowDel = true
+    },
+    polylineMouseEnter () {
+      this.$el.style.zIndex = 1
+      this.isHover = true
+    },
+    polylineMouseLevel () {
+      this.isHover = false
+    },
+    svgMouseEnter (e) {
+      console.log(e)
+      // this.isShowDel = false
+    },
+    svgMouseLeave (e) {
+      this.$el.style.zIndex = ''
+      setTimeout(() => {
+        if (!this.icon) {
+          this.isShowDel = false
+        }
+      }, 1000)
+    },
+    iconMouseEnter () {
+      this.icon = true
+    },
+    iconMouseLeave () {
+      this.icon = false
     }
   }
 }
@@ -217,6 +280,12 @@ export default {
     fill: none;
     stroke: #C9CDD4;
     stroke-width: 2
+  }
+  .svg-marker-line {
+    fill: #C9CDD4;
+  }
+  .isHover {
+    fill: #4DACFF;
   }
   .poly-line:hover {
     fill: none;

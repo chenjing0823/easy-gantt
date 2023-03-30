@@ -20,7 +20,6 @@
 
         <left-card
           :list="list"
-
           :sliderRowId="sliderRowId"
           :style="{ width: leftWidth + 'px' }"
           @handlerNewTask="handlerNewTask"
@@ -692,13 +691,13 @@ export default {
   flex: none;
   height: 50px;
   box-sizing: border-box;
-  border: 1px solid #F2F3F5;
+  border: 1px solid #f7f8fa;
 }
 .gantt-content {
   display: flex;
   height: calc(100% - 50px);
   box-sizing: border-box;
-  border: 1px solid #F2F3F5;
+  border: 1px solid #f7f8fa;
   border-top: none;
 }
 .gantt-left {
