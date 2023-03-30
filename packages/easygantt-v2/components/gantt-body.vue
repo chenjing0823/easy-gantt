@@ -20,7 +20,8 @@
         <seriesLine
           :currentDaySize="currentDaySize"
           :point-data="item"
-          :key="index + 'lll'"></seriesLine>
+          :key="index + 'lll'"
+          @handelDeletepre="handelDeletepre"></seriesLine>
       </template>
       <template v-for="(item, index) in computedList">
         <div
@@ -288,6 +289,9 @@ export default {
 
         this.$emit('gotoday')
       })
+    },
+    handelDeletepre (id) {
+      this.$emit('handelDeletepre', id)
     },
     // 每一行拖拽
     /**

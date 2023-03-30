@@ -47,6 +47,7 @@
           :line="line"
           :dayLength="dayLength"
           @gotoday="gotoday"
+          @handelDeletepre="handelDeletepre"
           @currentLineDayInit="currentLineDayInit"
           @handleCurrentLineDay="handleCurrentLineDay"
           @handleTimeChange="handleTimeChange"
@@ -216,7 +217,6 @@ export default {
         })
         return arr
       }
-      console.log(getAllList(this.dataList))
       getAllList(this.dataList).forEach(data => {
         this.pushData(data, true)
       })
@@ -384,6 +384,9 @@ export default {
       } else {
         return width
       }
+    },
+    handelDeletepre (id) {
+      this.$emit('handelDeletepre', id)
     },
     handlerSelect (row) {
       this.sliderRowId = row ? row.id : ''

@@ -10,6 +10,7 @@
       @handlerDeleStage="handlerDeleStage"
       @handlerNewStage="handlerNewStage"
       @handlerEditStage="handlerEditStage"
+      @handelDeletepre="handelDeletepre"
       @handlerOperateTask="handlerOperateTask"></EasyGanttV2>
   </div>
 </template>
@@ -181,6 +182,11 @@ export default {
       console.log(index, newData)
       // TODO 数据保存成功后触发回调函数
       callback && callback()
+    },
+    handelDeletepre (id) {
+      const index = this.line.findIndex(line => line.id === id)
+      this.line.splice(index, 1)
+      console.log('删除前置任务，id: ', id)
     },
     handlerOperateTask (type, data) {
       console.log(type, data)

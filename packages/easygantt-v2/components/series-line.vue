@@ -31,6 +31,7 @@
       v-show="isShowDel"
       class="line-icon"
       :style="iconStyle"
+      @click="handelDeletepre"
       @mouseenter="iconMouseEnter"
       @mouseleave="iconMouseLeave">
       <i
@@ -256,7 +257,7 @@ export default {
       this.isHover = false
     },
     svgMouseEnter (e) {
-      console.log(e)
+      // console.log(e)
       // this.isShowDel = false
     },
     svgMouseLeave (e) {
@@ -272,6 +273,9 @@ export default {
     },
     iconMouseLeave () {
       this.icon = false
+    },
+    handelDeletepre () {
+      this.$emit('handelDeletepre', this.pointData.id)
     }
   }
 }
