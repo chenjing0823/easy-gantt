@@ -88,13 +88,18 @@ export default {
       }
     },
     iconStyle () {
-      const { startX, endX } = this.pointData
+      const { startX, startY, endX, endY } = this.pointData
       let left = this.currentDaySize.value / 2 + 5 + 'px'
+      let top = 0
       if (startX >= endX) {
         left = this.startX + this.currentDaySize.value / 2 + 5 + 'px'
       }
+      if (startY > endY) {
+        top = startY - endY
+      }
       return {
-        left: left
+        left: left,
+        top: top + 'px'
       }
     },
     // 连线元素 左上角坐标
@@ -233,7 +238,7 @@ export default {
   },
   methods: {
     mouseenter (e) {
-      console.log(e)
+      // console.log(e)
     },
     showDel () {
       this.isShowDel = true
