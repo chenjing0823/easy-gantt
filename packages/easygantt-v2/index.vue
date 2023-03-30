@@ -1,51 +1,60 @@
 <template>
   <div class="easy-gantt-v2">
-    <el-button style="position: fixed; top: 0; right: 0" @click="gotoday">今天</el-button>
-    <el-select v-model="currentDaySize.value" @change="handleSetDaySize" placeholder="请选择" style="position: fixed; top: 0; right: 200px">
-      <el-option
-        v-for="item in currentDaySizeOptions"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value">
-      </el-option>
-    </el-select>
-    <div class="gantt-left">
-      <div class="search">
-        <el-input v-model="search" placeholder="请输入内容" size="mini"> </el-input>
-      </div>
-
-      <left-card
-        :list="list"
-        :style="{ width: leftWidth + 'px' }"
-        @handlerNewTask="handlerNewTask"
-        @handlerEditStage="handlerEditStage"
-        @handlerNewStage="handlerNewConfirm"
-        @handlerDeleStage="handlerDeleStage"
-        @handlerOperateTask="handlerOperateTask"
-      ></left-card>
+    <div class="gantt-time">
+      <span>时间轴</span>
+      <el-button size="small" @click="gotoday">今天</el-button>
+      <el-select size="small" v-model="currentDaySize.value" @change="handleSetDaySize" placeholder="请选择">
+        <el-option
+          v-for="item in currentDaySizeOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
     </div>
-    <div class="gantt-right">
-      <gnatt-head
-        :all-days="allDays"
-        :isHover="isHover"
-        :current-day-size="currentDaySize"
-        :current-line-day="currentLineDay"
-      >
-      </gnatt-head>
-      <gantt-body
-        ref="ganttbody"
-        :isHover.sync="isHover"
-        :current-day-size="currentDaySize"
-        :current-line-day="currentLineDay"
-        :left-width="leftWidth"
-        :list="list"
-        :line="line"
-        :dayLength="dayLength"
-        @currentLineDayInit="currentLineDayInit"
-        @handleCurrentLineDay="handleCurrentLineDay"
-        @handleTimeChange="handleTimeChange"
-      >
-      </gantt-body>
+    <div class="gantt-content">
+      <div class="gantt-left">
+        <div class="search">
+          <el-input v-model="search" placeholder="请输入内容" size="mini"> </el-input>
+        </div>
+
+        <left-card
+          :list="list"
+
+          :sliderRowId="sliderRowId"
+          :style="{ width: leftWidth + 'px' }"
+          @handlerNewTask="handlerNewTask"
+          @handlerEditStage="handlerEditStage"
+          @handlerNewStage="handlerNewConfirm"
+          @handlerDeleStage="handlerDeleStage"
+          @handlerOperateTask="handlerOperateTask"
+        ></left-card>
+      </div>
+      <div class="gantt-right">
+        <gnatt-head
+          :all-days="allDays"
+          :isHover="isHover"
+          :current-day-size="currentDaySize"
+          :current-line-day="currentLineDay"
+        >
+        </gnatt-head>
+        <gantt-body
+          ref="ganttbody"
+          :isHover.sync="isHover"
+          :current-day-size="currentDaySize"
+          :current-line-day="currentLineDay"
+          :left-width="leftWidth"
+          :list="list"
+          :line="line"
+          :dayLength="dayLength"
+          @gotoday="gotoday"
+          @currentLineDayInit="currentLineDayInit"
+          @handleCurrentLineDay="handleCurrentLineDay"
+          @handleTimeChange="handleTimeChange"
+          @handlerSelect="handlerSelect"
+        >
+        </gantt-body>
+      </div>
     </div>
     <gantt-add
       :dialogFormVisible.sync="dialogFormVisible"
@@ -135,7 +144,8 @@ export default {
       dialogFormVisible: false,
       currentListIndex: '',
       currentRow: null,
-      dataListNew: []
+      dataListNew: [],
+      sliderRowId: '' // 鼠标所在滑块对应的左侧id
     }
   },
 
@@ -354,27 +364,6 @@ export default {
         this.list[out].children[index].endTime = _data.endTime
       }
       this.$emit('handleTimeChange', data, callback)
-      // if (level === 1) {
-      //   const out = upLevelIndex(this.list, originIds[0])
-      //   const index = dataIndex(this.list[out])
-      //   this.list[out].children[index].startTime = data.startTime
-      //   this.list[out].children[index].endTime = data.endTime
-      // } else if (level === 2) {
-      //   const out = upLevelIndex(this.list, originIds[0])
-      //   const second = upLevelIndex(this.list[out].children, originIds[1])
-      //   const index = dataIndex(this.list[out].children)
-      //   this.list[out].children[second].children[index].startTime = data.startTime
-      //   this.list[out].children[second].children[index].endTime = data.endTime
-      // } else if (level === 3) {
-      //   const out = upLevelIndex(this.list, originIds[0])
-      //   const second = upLevelIndex(this.list[out].children, originIds[1])
-      //   const third = upLevelIndex(this.list[out].children[second].children, originIds[2])
-      //   const index = dataIndex(this.list[out].children[second].children)
-      //   this.list[out].children[second].children[third].children[index].startTime = data.startTime
-      //   this.list[out].children[second].children[third].children[index].endTime = data.endTime
-      // }
-      // this.list[upLevel].children[index].startTime = data.startTime
-      // this.list[upLevel].children[index].endTime = data.endTime
     },
     /**
      * @description: 根据时间计算距离
@@ -396,6 +385,9 @@ export default {
       } else {
         return width
       }
+    },
+    handlerSelect (row) {
+      this.sliderRowId = row ? row.id : ''
     },
     /**
      * @description: 新增提交数据
@@ -693,7 +685,21 @@ export default {
   width: 100%;
   position: relative;
   overflow: hidden
+  flex-direction: column;
   // background-color: #F4F4F4;
+}
+.gantt-time {
+  flex: none;
+  height: 50px;
+  box-sizing: border-box;
+  border: 1px solid #F2F3F5;
+}
+.gantt-content {
+  display: flex;
+  height: calc(100% - 50px);
+  box-sizing: border-box;
+  border: 1px solid #F2F3F5;
+  border-top: none;
 }
 .gantt-left {
   flex: none;

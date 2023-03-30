@@ -296,6 +296,8 @@ export default {
       this.$nextTick(() => {
         const height = getComputedStyle(document.querySelector('.lineBG')).height
         this.lineBGHeight = height
+
+        this.$emit('gotoday')
       })
     },
     // 每一行拖拽
@@ -635,7 +637,7 @@ export default {
     },
     // 设置左侧leftmenu高亮
     handlerSelect (row) {
-      // console.log('handlerSelect', row)
+      this.$emit('handlerSelect', row)
     },
     // 左侧拖拽增加
     /**
@@ -925,7 +927,7 @@ export default {
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     border: 1px solid #ebeef5;
-
+    z-index: 3;
     .lineMsg {
       margin-bottom: 10px;
       .projectName {

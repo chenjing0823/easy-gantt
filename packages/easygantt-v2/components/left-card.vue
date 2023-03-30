@@ -22,6 +22,7 @@
                 :key="child.id"
                 :child="child"
                 :expand="child.expand"
+                :sliderRowId="sliderRowId"
                 @expandTaskData="expandTaskData"
                 @handlerOperateTask="handlerOperateTask"></left-card-body>
             </template>
@@ -66,6 +67,10 @@ export default {
     list: {
       type: Array,
       default: () => []
+    },
+    sliderRowId: {
+      type: [String, Number],
+      default: ''
     }
   },
   data () {

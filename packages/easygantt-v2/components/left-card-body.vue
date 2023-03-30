@@ -1,5 +1,5 @@
 <template>
-  <div class="left-card-body" @mouseenter="showMoreBlock = true" @mouseleave="handlerMouseLeave">
+  <div class="left-card-body" :class="{ handlerRow: sliderRowId === child.id }" @mouseenter="showMoreBlock = true" @mouseleave="handlerMouseLeave">
     <div class="icon-block" :style="{ width: iconWidth }">
       <i
         v-if="expand && child.hasChildren"
@@ -54,6 +54,10 @@ export default {
     expand: {
       type: Boolean,
       required: true
+    },
+    sliderRowId: {
+      type: [String, Number],
+      default: ''
     }
   },
 
@@ -127,6 +131,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.handlerRow {
+  background-color: #F2F3F5;
+}
 .left-card-body {
   height: 19px;
   border-top: 1px solid #EBEEF5;
