@@ -118,33 +118,6 @@
           top: computedList[computedList.length - 1].top + 45 + 'px'
         }"></div>
     </div>
-    <transition name="el-zoom-in-center">
-      <div
-        class="projectMsg"
-        v-if="isShowMsg"
-        :style="{
-          left: currentProjectMsg.left + 'px',
-          top: currentProjectMsg.top + 'px'
-        }"
-      >
-        <div class="lineMsg">
-          <span class="projectName">{{ currentProjectMsg.name }}</span>
-        </div>
-        <div class="lineMsg">
-          <span class="title">持续时间:</span><span>{{ currentProjectMsg.allTime }}天</span>
-        </div>
-        <div class="lineMsg">
-          <span class="title">当前进度:</span><span>{{ currentProjectMsg.per }}%</span>
-        </div>
-        <div class="lineMsg">
-          <span class="title">开始时间:</span><span>{{ currentProjectMsg.startTime }}</span>
-        </div>
-
-        <div class="lineMsg">
-          <span class="title">结束时间:</span><span>{{ currentProjectMsg.endTime }}</span>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -206,18 +179,6 @@ export default {
 
   data () {
     return {
-      // 是否显示信息
-      isShowMsg: false,
-      // 当前hover的项目信息
-      currentProjectMsg: {
-        name: '',
-        allTime: 0,
-        per: 0,
-        startTime: 0,
-        endTime: 0,
-        left: 0,
-        top: 0
-      },
       hoverId: '',
       // 背景高度
       lineBGHeight: '0px',
@@ -476,37 +437,12 @@ export default {
      * @param  {Boolean} move 是否移动状态
      */
     lineMouseleave (e, move) {
-      if (move) {
-        this.isShowMsg = false
-        this.currentProjectMsg = {
-          name: '',
-          allTime: 0,
-          per: 0,
-          startTime: 0,
-          endTime: 0,
-          left: 0,
-          top: 0
-        }
-        // this.handlerSelect();
-        return
-      }
-
       const currentLineDay = {
         start: 0,
         end: 0
       }
       this.$emit('currentLineDayInit', currentLineDay)
       this.$emit('update:isHover', false)
-      this.isShowMsg = false
-      this.currentProjectMsg = {
-        name: '',
-        allTime: 0,
-        per: 0,
-        startTime: 0,
-        endTime: 0,
-        left: 0,
-        top: 0
-      }
       this.hoverId = ''
       this.handlerSelect()
     },
@@ -521,33 +457,9 @@ export default {
     // 鼠标进入显示当前项目的基本信息框
     lineMouseenter (dom, e, id, parentId, index, data) {
       this.hoverId = id
-      const start =
-        Math.round(parseInt(this.$refs[dom][0].style.left) / this.currentDaySize.value) *
-        this.currentDaySize.value
-      let end = parseInt(this.$refs[dom][0].style.left) + parseInt(this.$refs[dom][0].style.width)
-      end =
-        Math.round(end / this.currentDaySize.value) * this.currentDaySize.value -
-        this.currentDaySize.value
-      this.currentProjectMsg = {
-        name: this.computedList[index].name,
-        allTime: (end - start) / this.currentDaySize.value + 1,
-        per: this.computedList[index].per,
-        startTime: this.computedWithTime(start),
-        endTime: this.computedWithTime(end),
-        left:
-          e.pageX + 220 >=
-          document.querySelector('.gantt-right').getBoundingClientRect().width + this.leftWidth
-            ? e.pageX - 220
-            : e.pageX,
-        top: e.y
-      }
-      // console.log(e.pageX)
-      // console.log(e.y)
-      this.isShowMsg = true
     },
     // 里程碑去掉mouseenter显示
     stoneLineMouseenter () {
-      this.isShowMsg = false
       const currentLineDay = {
         start: 0,
         end: 0
@@ -564,16 +476,11 @@ export default {
      */
     checkIsin (dom, events, id, parentId, index, data) {
       const line = this.$refs[dom][0] // 目标silder
-      // const lineTop = parseInt(line.style.top)
-      // const lineDown = lineTop + 16
-      // const lineLeft = parseInt(line.style.left)
-      // const lineRight = parseInt(this.computedList[index].widthMe) + lineLeft
       const targetElement = events.target || events.srcElement // 鼠标最后的元素
       if (line.contains(targetElement)) {
         this.lineMouseover(dom, events, id, parentId, index, data)
         this.lineMouseenter(dom, events, id, parentId, index, data)
       } else {
-        this.isShowMsg = false
         const currentLineDay = {
           start: 0,
           end: 0
