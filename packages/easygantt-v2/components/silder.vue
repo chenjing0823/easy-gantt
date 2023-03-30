@@ -4,12 +4,14 @@
     :data-end-id="id"
     :data-end-top="top + 14"
     :data-end-left="left"
+    :data-end-width="widths"
     ref="slider">
     <div
       class="process"
       :data-end-id="id"
       :data-end-top="top + 14"
       :data-end-left="left"
+      :data-end-width="widths"
       :style="{ width }"
       :class="{ finish: this.per === 100 }"></div>
   </div>

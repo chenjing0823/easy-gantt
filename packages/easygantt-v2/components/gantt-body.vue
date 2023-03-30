@@ -7,12 +7,12 @@
       :key="index"
     ></div> -->
     <div class="lineBG" :style="{width: dayLength + 'px'}">
-      <svg v-if="movePoints.endX" width="100%" height="100%">
-      <defs>
-        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L7,3 z" class="svg-marker" />
-        </marker>
-      </defs>
+      <svg v-if="movePoints.endX" class="drag-line-svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" class="svg-marker" />
+          </marker>
+        </defs>
         <line :x1="movePoints.startX" :y1="movePoints.startY" :x2="movePoints.endX" :y2="movePoints.endY" marker-end="url(#arrow)" class="svg-line" />
       </svg>
       <!-- <div v-for="item in 100" :key="item" style="position: absolute;" :style="{top: item * 30 + 'px',left: item * 50 + 'px'}">123</div> -->
@@ -883,12 +883,12 @@ export default {
           return
         }
         // document.querySelector('.series-line').style.pointerEvents = 'none'
+        const scrollY = document.querySelector('.lineBG').scrollTop
         let endX = e.offsetX
-        let endY = e.offsetY
-        console.log(endX, endY)
-        const { endId, endTop, endLeft } = e.target.dataset
+        let endY = e.offsetY + scrollY
+        const { endId, endTop, endLeft, endWidth } = e.target.dataset
         if (endId) {
-          endX = +endLeft
+          endX = +endLeft + Math.floor(+endWidth / 2)
           endY = +endTop
         }
         this.$set(this.movePoints, 'endX', endX)
@@ -924,6 +924,11 @@ export default {
     height: calc(100% - 0px);
     position: relative;
     overflow-y: scroll;
+    .drag-line-svg {
+      height: 100%;
+      width: 100%;
+      z-index:1;
+    }
     .svg-line {
       stroke: #4DACFF;
       stroke-width: 2

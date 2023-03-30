@@ -27,12 +27,17 @@
         @mouseleave="polylineMouseLevel"
         @click="showDel"/>
     </svg>
-    <i
-      class="el-icon-delete line-icon"
+    <div
+      v-show="isShowDel"
+      class="line-icon"
       :style="iconStyle"
       @mouseenter="iconMouseEnter"
-      @mouseleave="iconMouseLeave"
-      v-show="isShowDel"></i>
+      @mouseleave="iconMouseLeave">
+      <i
+        class="el-icon-delete"
+        ></i>
+    </div>
+
   </div>
 </template>
 
@@ -260,7 +265,7 @@ export default {
         if (!this.icon) {
           this.isShowDel = false
         }
-      }, 1000)
+      }, 2000)
     },
     iconMouseEnter () {
       this.icon = true
@@ -280,6 +285,15 @@ export default {
   }
   .line-icon {
     position: absolute;
+    height: 28px;
+    width: 28px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #F77D79;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
   }
   .poly-line {
     fill: none;
