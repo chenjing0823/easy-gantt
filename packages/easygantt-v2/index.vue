@@ -385,8 +385,8 @@ export default {
         return width
       }
     },
-    handelDeletepre (id) {
-      this.$emit('handelDeletepre', id)
+    handelDeletepre (id, callback) {
+      this.$emit('handelDeletepre', id, callback)
     },
     handlerSelect (row) {
       this.sliderRowId = row ? row.id : ''

@@ -12,12 +12,14 @@
       :ref="'groupdynmicline' + item.id"
       v-show="item.expand"
       :style="setStyle(item.top, item.leftShow, item.widthMeShow)"
+      @mouseenter="groupMouseEnter"
     >
     </div>
     <div
       class="group-line"
       :ref="'groupline' + item.id"
       :style="setStyle(item.top, item.left, item.widthMe)"
+      @mouseenter="groupMouseEnter"
     >
     </div>
   </div>
@@ -31,6 +33,10 @@ export default {
     item: {
       type: Object,
       required: true
+    },
+    isMove: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -113,6 +119,14 @@ export default {
         // 动态块包住父
         groupLine.style.clipPath = 'polygon(100% 0, 100% 60%, calc(100% - 8px) 60%, 8px 60%, 0 60%,0 0)'
       }
+    },
+    groupMouseEnter () {
+      console.log(this.item.id)
+      if (this.isMove) return
+      this.$emit('groupMouseEnter', this.item.id)
+    },
+    groupMouseLeave () {
+      this.$emit('groupMouseLeave')
     }
   }
 }

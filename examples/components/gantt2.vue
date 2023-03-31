@@ -183,10 +183,12 @@ export default {
       // TODO 数据保存成功后触发回调函数
       callback && callback()
     },
-    handelDeletepre (id) {
+    handelDeletepre (id, callback) {
       const index = this.line.findIndex(line => line.id === id)
       this.line.splice(index, 1)
       console.log('删除前置任务，id: ', id)
+      // TODO 数据保存成功后触发回调函数
+      callback && callback()
     },
     handlerOperateTask (type, data) {
       console.log(type, data)

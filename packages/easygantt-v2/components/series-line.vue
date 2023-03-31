@@ -2,23 +2,29 @@
   <div
     class="series-line"
     :style="dynmicStyle">
-    <svg
+    <div
+      class="draw-line"
+      :class="{ isHover: isHover, endLine: index ===  block.length - 1}"
+      v-for="(line, index) in block"
+      :key="index"
+      :style="getStyle(line)"
+      @mouseenter="polylineMouseEnter"
+      @mouseleave="polylineMouseLevel"
+      @click="showDel">
+    </div>
+    <!-- svg堆叠 影响其他svg的交互 改用div -->
+    <!-- <svg
       :width="width"
       :height="height"
       :ref="'svg' + pointData.id"
+      @mousemove="svgMouseMove"
       @mouseenter="svgMouseEnter"
       @mouseleave="svgMouseLeave">
-      <!-- <line :x1="startX" :y1="startY" :x2="midPoint1.x" :y2="midPoint1.y" class="line" />
-      <line :x1="midPoint1.x" :y1="midPoint1.y" :x2="midPoint2.x" :y2="midPoint2.y" class="line" />
-      <line :x1="midPoint2.x" :y1="midPoint2.y" :x2="midPoint3.x" :y2="midPoint3.y" class="line" />
-      <line :x1="midPoint3.x" :y1="midPoint3.y" :x2="midPoint4.x" :y2="midPoint4.y" class="line" />
-      <line :x1="midPoint4.x" :y1="midPoint4.y" :x2="endX" :y2="endY" class="line" /> -->
       <defs>
         <marker :id="'arrow-line'+pointData.id" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
           <path d="M0,0 L0,6 L7,3 z" class="svg-marker-line" :class="{isHover: isHover}" />
         </marker>
       </defs>
-      <!-- 改用折线直接绘制 便于触发鼠标事件 -->
       <polyline
         :ref="'polyline' + pointData.id"
         :points="points" class="poly-line"
@@ -26,7 +32,7 @@
         @mouseenter="polylineMouseEnter"
         @mouseleave="polylineMouseLevel"
         @click="showDel"/>
-    </svg>
+    </svg> -->
     <div
       v-show="isShowDel"
       class="line-icon"
@@ -49,7 +55,8 @@ export default {
     return {
       isShowDel: false,
       isHover: false,
-      icon: false
+      icon: false,
+      iconposition: {}
     }
   },
   props: {
@@ -68,10 +75,10 @@ export default {
     }
   },
   computed: {
-    getMarkend () {
-      const id = this.pointData.id
-      return `url(#arrow-line${id})`
-    },
+    // getMarkend () {
+    //   const id = this.pointData.id
+    //   return `url(#arrow-line${id})`
+    // },
     polylineStaticWidth () {
       return this.currentDaySize.value / 2
     },
@@ -94,18 +101,10 @@ export default {
       }
     },
     iconStyle () {
-      const { startX, startY, endX, endY } = this.pointData
-      let left = this.currentDaySize.value / 2 + 5 + 'px'
-      let top = 0
-      if (startX >= endX) {
-        left = this.startX + this.currentDaySize.value / 2 + 5 + 'px'
-      }
-      if (startY > endY) {
-        top = startY - endY
-      }
+      const { x, y } = this.iconposition
       return {
-        left: left,
-        top: top + 'px'
+        left: x + 5 + 'px',
+        top: y + 5 + 'px'
       }
     },
     // 连线元素 左上角坐标
@@ -115,7 +114,7 @@ export default {
       let y = Math.min(startY, endY)
       if (startX >= endX) { // 当连接目标在左侧
         // x = x - 20 - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
-        x = x - this.polylineStaticWidth - 2 // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
+        x = x - this.polylineStaticWidth // 连线模块元素需要往左扩大20像素 2表示线框，目地是让线展示更清楚
       }
       if (startY > endY) {
         y = y + 0
@@ -216,37 +215,80 @@ export default {
       }
     },
     // 连线元素块的宽
-    width () {
-      const { startX, endX } = this.pointData
-      let width = this.rightEndPoint.x - this.leftTopPoint.x
-      if (startX >= endX) { // 当目标点在左侧，左右都扩了20，宽度需要加40
-        // width = startX - endX + 40 + 2
-        width = startX - endX + this.currentDaySize.value + 2
-      }
-      return width
-    },
+    // width () {
+    //   const { startX, endX } = this.pointData
+    //   let width = this.rightEndPoint.x - this.leftTopPoint.x
+    //   if (startX >= endX) { // 当目标点在左侧，左右都扩了20，宽度需要加40
+    //     // width = startX - endX + 40 + 2
+    //     width = startX - endX + this.currentDaySize.value + 2
+    //   }
+    //   return width
+    // },
     // 连线元素块的高
-    height () {
-      return this.rightEndPoint.y - this.leftTopPoint.y + 2 + 2 + 8
-    },
-    points () {
-      return `
-      ${this.startX},${this.startY}
-      ${this.midPoint1.x},${this.midPoint1.y}
-      ${this.midPoint2.x},${this.midPoint2.y}
-      ${this.midPoint3.x},${this.midPoint3.y}
-      ${this.midPoint4.x},${this.midPoint4.y}
-      ${this.endX},${this.endY}`
+    // height () {
+    //   return this.rightEndPoint.y - this.leftTopPoint.y + 2 + 2 + 8
+    // },
+    // points () {
+    //   return `
+    //   ${this.startX},${this.startY}
+    //   ${this.midPoint1.x},${this.midPoint1.y}
+    //   ${this.midPoint2.x},${this.midPoint2.y}
+    //   ${this.midPoint3.x},${this.midPoint3.y}
+    //   ${this.midPoint4.x},${this.midPoint4.y}
+    //   ${this.endX},${this.endY}`
+    // },
+    block () {
+      return [
+        { x1: this.startX, y1: this.startY, x2: this.midPoint1.x, y2: this.midPoint1.y },
+        { x1: this.midPoint1.x, y1: this.midPoint1.y, x2: this.midPoint2.x, y2: this.midPoint2.y },
+        { x1: this.midPoint2.x, y1: this.midPoint2.y, x2: this.midPoint3.x, y2: this.midPoint3.y },
+        { x1: this.midPoint3.x, y1: this.midPoint3.y, x2: this.midPoint4.x, y2: this.midPoint4.y },
+        { x1: this.midPoint4.x, y1: this.midPoint4.y, x2: this.endX, y2: this.endY }
+      ]
     }
   },
 
   mounted () {
   },
   methods: {
+    getStyle (line) {
+      const { x1, y1, x2, y2 } = line
+      let height
+      let width
+
+      let left = x1
+      let top = y1
+      if (x1 === x2) {
+        height = Math.abs(y1 - y2)
+        width = 2
+        if (y1 > y2) {
+          top = y2
+        }
+      } else if (y1 === y2) {
+        width = Math.abs(x1 - x2)
+        height = 2
+        if (x1 > x2) {
+          left = x2
+        }
+      }
+      return {
+        width: width + 'px',
+        height: height + 'px',
+        left: left + 'px',
+        top: top + 'px'
+      }
+    },
     mouseenter (e) {
       // console.log(e)
     },
-    showDel () {
+    showDel (e) {
+      console.log(e)
+      const x = e.offsetX
+      const y = e.offsetY
+      this.iconposition = {
+        x,
+        y
+      }
       this.isShowDel = true
     },
     polylineMouseEnter () {
@@ -255,12 +297,6 @@ export default {
     },
     polylineMouseLevel () {
       this.isHover = false
-    },
-    svgMouseEnter (e) {
-      // console.log(e)
-      // this.isShowDel = false
-    },
-    svgMouseLeave (e) {
       this.$el.style.zIndex = ''
       setTimeout(() => {
         if (!this.icon) {
@@ -275,20 +311,42 @@ export default {
       this.icon = false
     },
     handelDeletepre () {
-      this.$emit('handelDeletepre', this.pointData.id)
+      this.$emit('handelDeletepre', this.pointData.id, () => { this.isShowDel = false })
     }
   }
 }
 </script>
 <style lang="stylus" scoped>
+.draw-line {
+  cursor: pointer;
+  position: absolute;
+  background-color: #C9CDD4;
+}
+.endLine::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -1px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid #C9CDD4;
+}
+.isHover {
+  background-color: #4DACFF;
+}
+.isHover::after {
+  border-left: 7px solid #4DACFF;
+}
 .series-line {
   position: absolute;
-  .line {
-    stroke: #C9CDD4;
-    stroke-width:2
-  }
+  // .line {
+  //   stroke: #C9CDD4;
+  //   stroke-width:2
+  // }
   .line-icon {
     position: absolute;
+    cursor: pointer;
+    z-index: 10;
     height: 28px;
     width: 28px;
     background-color: #ffffff;
@@ -299,22 +357,19 @@ export default {
     color: #F77D79;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
   }
-  .poly-line {
-    fill: none;
-    stroke: #C9CDD4;
-    stroke-width: 2
-  }
-  .svg-marker-line {
-    fill: #C9CDD4;
-  }
-  .isHover {
-    fill: #4DACFF;
-  }
-  .poly-line:hover {
-    fill: none;
-    stroke: #4DACFF;
-    stroke-width: 2
-    cursor: pointer;
-  }
+  // .poly-line {
+  //   fill: none;
+  //   stroke: #C9CDD4;
+  //   stroke-width: 2
+  // }
+  // .svg-marker-line {
+  //   fill: #C9CDD4;
+  // }
+  // .poly-line:hover {
+  //   fill: none;
+  //   stroke: #4DACFF;
+  //   stroke-width: 2
+  //   cursor: pointer;
+  // }
 }
 </style>

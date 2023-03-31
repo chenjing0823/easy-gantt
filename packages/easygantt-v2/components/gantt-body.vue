@@ -108,7 +108,13 @@
             "></div>
         </div>
         <!-- 父级条 -->
-        <group v-else-if="isGroup(item)" :key="item.id" :item="item"></group>
+        <group
+          v-else-if="isGroup(item)"
+          :key="item.id"
+          :item="item"
+          :isMove="isMove"
+          @groupMouseEnter="groupMouseEnter"
+          ></group>
 
       </template>
       <!-- 占位格，保持高度与左侧滚动区域一致 -->
@@ -181,6 +187,8 @@ export default {
   data () {
     return {
       hoverId: '',
+      hoverGroupId: '',
+      isMove: false,
       // 背景高度
       lineBGHeight: '0px',
       initFlag: false,
@@ -275,11 +283,11 @@ export default {
   methods: {
     isTask (item) {
       const { type, isShow, hasChildren, expand } = item
-      return ['1', '2'].includes(type) && isShow && (!hasChildren || !expand)
+      return (['1', '2'].includes(type) && isShow && (!hasChildren || !expand)) || (this.hoverGroupId === item.id && type !== '3')
     },
     isGroup (item) {
       const { type, hasChildren, expand } = item
-      return type === '3' || (hasChildren && expand)
+      return type === '3' || (hasChildren && expand) || (['1', '2'].includes(type) && this.hoverGroupId !== item.id)
     },
     // 设置里程碑线的高度
     setStoneLine (isFirst) {
@@ -290,8 +298,8 @@ export default {
         this.$emit('gotoday')
       })
     },
-    handelDeletepre (id) {
-      this.$emit('handelDeletepre', id)
+    handelDeletepre (id, callback) {
+      this.$emit('handelDeletepre', id, callback)
     },
     // 每一行拖拽
     /**
@@ -312,10 +320,11 @@ export default {
       let left
       // console.log(cp);
       document.onmousemove = (event) => {
+        this.isMove = true
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         const clientWidth = ganttBlock.width
         // event.pageX - ganttBlock.left 鼠标距离 gantt-right 左侧位置
-        if (event.pageX - ganttBlock.left >= clientWidth - 40) {
+        if (event.pageX - ganttBlock.left >= clientWidth - this.currentDaySize.value) {
           z = scrollX + this.currentDaySize.value
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
@@ -349,7 +358,7 @@ export default {
           line.style.left = result + 'px'
         }
         this.lineMouseover(dom, e, id, parentId, index, data)
-        this.lineMouseleave(e, true)
+        // this.lineMouseleave(e, true)
       }
       document.onmouseup = (events) => {
         if (!result) {
@@ -388,6 +397,7 @@ export default {
             }
           })
         }
+        this.isMove = false
         document.onmousemove = document.onmouseup = null
       }
     },
@@ -448,6 +458,10 @@ export default {
       this.$emit('currentLineDayInit', currentLineDay)
       this.$emit('update:isHover', false)
       this.hoverId = ''
+      console.log('this.isMove', this.isMove)
+      if (!this.isMove) {
+        this.hoverGroupId = ''
+      }
       this.handlerSelect()
     },
     /**
@@ -460,7 +474,11 @@ export default {
      */
     // 鼠标进入显示当前项目的基本信息框
     lineMouseenter (dom, e, id, parentId, index, data) {
+      if (this.isMove) {
+        return
+      }
       this.hoverId = id
+      this.hoverGroupId = id
     },
     // 里程碑去掉mouseenter显示
     stoneLineMouseenter () {
@@ -596,8 +614,9 @@ export default {
       let z = 0
       let addwidth
       document.onmousemove = (event) => {
+        this.isMove = true
         const scrollX = document.querySelector('.gantt-right').scrollLeft
-        if (event.pageX - ganttBlock.left <= 40) {
+        if (event.pageX - ganttBlock.left <= this.currentDaySize.value) {
           z = scrollX - this.currentDaySize.value
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
@@ -626,7 +645,7 @@ export default {
         line.style.left = result1 + 'px'
         this.computedList[index].widthChild = result
         this.lineMouseover(dom, e, id, parentId, index, data)
-        this.lineMouseleave(e, true)
+        // this.lineMouseleave(e, true)
       }
       document.onmouseup = (events) => {
         if (!result) {
@@ -674,6 +693,7 @@ export default {
             }
           })
         }
+        this.isMove = false
         document.onmousemove = document.onmouseup = null
       }
     },
@@ -694,9 +714,10 @@ export default {
       let z = 0
       let addwidth
       document.onmousemove = (event) => {
+        this.isMove = true
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         const clientWidth = ganttBlock.width
-        if (event.pageX - ganttBlock.left >= clientWidth - 40) {
+        if (event.pageX - ganttBlock.left >= clientWidth - this.currentDaySize.value) {
           z = scrollX + this.currentDaySize.value
           document.querySelector('.gantt-right').scrollTo({
             top: 0,
@@ -704,7 +725,7 @@ export default {
             behavior: 'smooth'
           })
           addwidth = event.pageX - cx + scrollX - initScrollX
-        } else if (event.pageX - ganttBlock.left <= 40) {
+        } else if (event.pageX - ganttBlock.left <= this.currentDaySize.value) {
           z = scrollX - this.currentDaySize.value
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
@@ -727,7 +748,7 @@ export default {
           this.computedList[index].widthChild = result
         }
         this.lineMouseover(dom, e, id, parentId, index, data)
-        this.lineMouseleave(e, true)
+        // this.lineMouseleave(e, true)
       }
       document.onmouseup = (events) => {
         if (!result) {
@@ -769,6 +790,7 @@ export default {
             }
           })
         }
+        this.isMove = false
         document.onmousemove = document.onmouseup = null
       }
     },
@@ -822,6 +844,10 @@ export default {
         document.onmouseup = null
         element.removeEventListener('mousemove', callback)
       }
+    },
+    groupMouseEnter (id) {
+      this.hoverGroupId = id
+      this.hoverId = id
     }
   }
 }
