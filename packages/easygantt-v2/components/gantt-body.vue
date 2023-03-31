@@ -132,6 +132,7 @@
 import seriesLine from './series-line.vue'
 import slider from './silder.vue'
 import group from './group.vue'
+import ganttTool from './gantt-tool.js'
 export default {
   name: 'gantt-body',
 
@@ -319,21 +320,19 @@ export default {
       let z = 0
       let left
       // console.log(cp);
-      document.onmousemove = (event) => {
+      document.onmousemove = ganttTool.throttle((event) => {
         this.isMove = true
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         const clientWidth = ganttBlock.width
         // event.pageX - ganttBlock.left 鼠标距离 gantt-right 左侧位置
-        if (event.pageX - ganttBlock.left >= clientWidth - this.currentDaySize.value) {
-          z = scrollX + this.currentDaySize.value
-          // window.scrollTo(z, 0);
+        if (event.pageX - ganttBlock.left >= clientWidth - 40) {
+          z = scrollX + 40
           document.querySelector('.gantt-right').scrollTo({
             top: 0,
             left: z,
             behavior: 'smooth'
           })
           const newWith = event.pageX - initX + scrollX - initScrollX
-
           result = this.computedList[index].left + newWith
           line.style.left = result + 'px'
           if (result <= 0) result = 0
@@ -359,7 +358,7 @@ export default {
         }
         this.lineMouseover(dom, e, id, parentId, index, data)
         // this.lineMouseleave(e, true)
-      }
+      }, 50)
       document.onmouseup = (events) => {
         if (!result) {
           document.onmousemove = document.onmouseup = null
@@ -613,11 +612,11 @@ export default {
       let result1
       let z = 0
       let addwidth
-      document.onmousemove = (event) => {
+      document.onmousemove = ganttTool.throttle((event) => {
         this.isMove = true
         const scrollX = document.querySelector('.gantt-right').scrollLeft
-        if (event.pageX - ganttBlock.left <= this.currentDaySize.value) {
-          z = scrollX - this.currentDaySize.value
+        if (event.pageX - ganttBlock.left <= 40) {
+          z = scrollX - 40
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
             top: 0,
@@ -626,9 +625,12 @@ export default {
           })
           addwidth = -(event.pageX - cx + scrollX - initScrollX)
         } else {
-          addwidth = -(event.pageX - cx)
+          if (Math.abs(scrollX - initScrollX)) {
+            addwidth = -(event.pageX - cx + scrollX - initScrollX)
+          } else {
+            addwidth = -(event.pageX - cx)
+          }
         }
-        console.log(addwidth)
         result = this.computedList[index].widthMe + addwidth
         result1 = this.computedList[index].left - addwidth
         if (result <= this.currentDaySize.value) {
@@ -646,7 +648,7 @@ export default {
         this.computedList[index].widthChild = result
         this.lineMouseover(dom, e, id, parentId, index, data)
         // this.lineMouseleave(e, true)
-      }
+      }, 200)
       document.onmouseup = (events) => {
         if (!result) {
           document.onmousemove = document.onmouseup = null
@@ -713,11 +715,11 @@ export default {
       let result
       let z = 0
       let addwidth
-      document.onmousemove = (event) => {
+      document.onmousemove = ganttTool.throttle((event) => {
         this.isMove = true
         const scrollX = document.querySelector('.gantt-right').scrollLeft
         const clientWidth = ganttBlock.width
-        if (event.pageX - ganttBlock.left >= clientWidth - this.currentDaySize.value) {
+        if (event.pageX - ganttBlock.left >= clientWidth - 40) {
           z = scrollX + this.currentDaySize.value
           document.querySelector('.gantt-right').scrollTo({
             top: 0,
@@ -725,7 +727,7 @@ export default {
             behavior: 'smooth'
           })
           addwidth = event.pageX - cx + scrollX - initScrollX
-        } else if (event.pageX - ganttBlock.left <= this.currentDaySize.value) {
+        } else if (event.pageX - ganttBlock.left <= 40) {
           z = scrollX - this.currentDaySize.value
           // window.scrollTo(z, 0);
           document.querySelector('.gantt-right').scrollTo({
@@ -735,7 +737,11 @@ export default {
           })
           addwidth = event.pageX - cx + scrollX - initScrollX
         } else {
-          addwidth = event.pageX - cx
+          if (Math.abs(scrollX - initScrollX)) {
+            addwidth = event.pageX - cx + Math.abs(scrollX - initScrollX)
+          } else {
+            addwidth = event.pageX - cx
+          }
         }
         result = this.computedList[index].widthMe + addwidth
         line.style.width = result + 'px'
@@ -749,7 +755,7 @@ export default {
         }
         this.lineMouseover(dom, e, id, parentId, index, data)
         // this.lineMouseleave(e, true)
-      }
+      }, 200)
       document.onmouseup = (events) => {
         if (!result) {
           document.onmousemove = document.onmouseup = null

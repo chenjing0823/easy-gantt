@@ -53,9 +53,22 @@ const addNum = (num, month, year) => {
 const isLeapYear = (year) => {
   return year % 4 > 0
 }
+const throttle = (func, delay) => {
+  let lastTime = 0
+  return function () {
+    const context = this
+    const args = arguments
+    const currentTime = new Date().getTime()
+    if (currentTime - lastTime > delay) {
+      func.apply(context, args)
+      lastTime = currentTime
+    }
+  }
+}
 
 export default {
   checkMonthDays,
   addNum,
-  isLeapYear
+  isLeapYear,
+  throttle
 }
